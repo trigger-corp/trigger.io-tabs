@@ -1,0 +1,11 @@
+{
+	"modules": {"tabs": {"version": "exampleversion"}},
+	
+	"core": {
+		"general": {
+			"trusted_urls": [
+				"<all_urls>"
+			]
+		}
+	}
+}

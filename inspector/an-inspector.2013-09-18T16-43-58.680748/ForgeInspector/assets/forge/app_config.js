@@ -1,0 +1,1 @@
+window.forge = {}; window.forge.config = {"core": {"general": {"trusted_urls": ["*://*/*/src/fixtures/tabs/trusted.html"]}}, "modules": {"tabs": {"version": "exampleversion"}, "inspector": {"version": "1.0"}}};

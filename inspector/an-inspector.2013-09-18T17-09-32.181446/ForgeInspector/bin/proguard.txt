@@ -1,0 +1,9 @@
+# view AndroidManifest.xml #generated:14
+-keep class io.trigger.forge.android.core.ForgeActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:13
+-keep class io.trigger.forge.android.core.ForgeApp { <init>(...); }
+
+# view AndroidManifest.xml #generated:25
+-keep class io.trigger.forge.android.core.ForgeContentProvider { <init>(...); }
+

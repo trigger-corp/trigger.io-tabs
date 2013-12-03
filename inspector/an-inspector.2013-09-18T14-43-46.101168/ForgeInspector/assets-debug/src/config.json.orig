@@ -1,0 +1,37 @@
+{
+	"config_version": "4",
+	"name": "scratch",
+	"author": "james@trigger.io",
+	"version": "0.1",
+	"platform_version": "v2.0.1",
+	"description": "An empty app created by default",
+	"core": {
+		"general": {
+			"logging": {
+				"level": "DEBUG"
+			},
+			"reload": true
+		}
+	},
+	"modules": {
+		"module1": {
+			"version": "0.5"
+		},
+		"file": {
+			"version": "2.1"
+		},
+		"prefs": {
+			"version": "2.0"
+		},
+		"display": {
+			"version": "2.0",
+			"config": {}
+		},
+		"topbar": {
+			"version": "2.1"
+		},
+		"tabs": {
+			"version": "2.1"
+		}
+	}
+}
