@@ -1,1 +1,0 @@
-window.forge = {}; window.forge.config = {"core": {"general": {"trusted_urls": ["<all_urls>"]}}, "modules": {"inspector": {"version": "1.0"}}};
