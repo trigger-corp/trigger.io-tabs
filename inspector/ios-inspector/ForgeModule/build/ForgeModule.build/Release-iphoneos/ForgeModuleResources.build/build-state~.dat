@@ -1,36 +1,0 @@
-TForgeModuleResources
-v6
-r1
-cCheck dependencies
-cCompileXIB /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib
-cTouch /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/build/Release-iphoneos/tabs.bundle
-
-N/Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/build/Release-iphoneos/tabs.bundle
-t1379521742
-s102
-
-N/Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/build/Release-iphoneos/tabs.bundle/tabs_modalWebViewController.nib
-t1379521742
-s136
-
-N/Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib
-c00000000523714630000000000000B8D
-t1379341411
-s2957
-
-CCheck dependencies
-r0
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies18"Check dependencies32775d4c0ceab741^5dfe5f4c0ceab741^---0#1#1#--18"Check dependencies36"D90A5C41-17B8-4685-91BF-2117BF6E28F0-
-
-CCompileXIB /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib
-s401214540.378403
-e401214542.245077
-r1
-xCompileXIB
-x/Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection108"Compiling /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib42"CompileXIB tabs_modalWebViewController.xiba722614c0ceab741^e4bd3e4e0ceab741^---0#0#1#-19%DVTDocumentLocation2@114"file://localhost/Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib0000000000000000^1509"CompileXIB tabs_modalWebViewController.xib    cd /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule    setenv PATH "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/libexec:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/local/bin:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/usr/bin:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/usr/local/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/local/bin:/Applications/Xcode.app/Contents/Developer/Tools:/usr/bin:/bin:/usr/sbin:/sbin"    setenv XCODE_DEVELOPER_USR_PATH /Applications/Xcode.app/Contents/Developer/usr/bin/..    /Applications/Xcode.app/Contents/Developer/usr/bin/ibtool --errors --warnings --notices --minimum-deployment-target 4.3 --output-format human-readable-text --compile /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/build/Release-iphoneos/tabs.bundle/tabs_modalWebViewController.nib /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/tabs_modalWebViewController.xib36"C23FF99F-6243-4605-8272-E2C24A7B6968-
-b7E201E6A-0684-41F0-A915-64FC5C02815D
-
-CTouch /Users/james/Code/modules/tabs/inspector/ios-inspector/ForgeModule/build/Release-iphoneos/tabs.bundle
-r0
-
