@@ -2,7 +2,7 @@
     "changes": "* Update Android tabbar styling to match iOS 7.", 
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.", 
     "min_platform_version": "v2.1.0", 
-    "name": "tabs", 
+    "namespace": "tabs", 
     "platform_version": "v2.1.0", 
     "version": "2.7"
 }
