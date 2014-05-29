@@ -8,7 +8,7 @@ The ``forge.tabs`` namespace allows you to open a browser tab.
 !method: forge.tabs.open(url, success, error)
 !param: url `string` the URL to open in the new browser tab
 !param: success `function(object)` callback to be invoked when no errors occur
-!description: Opens a new tab with the specified url. This will display a [modal view](/docs/current/recipes/integrations/modal.html) and the success callback will be called with an object containing a url and optionally a ``userClosed`` boolean property.
+!description: Opens a new tab with the specified url. This will display a [modal view](/docs/current/recipes/integrations/modal.html) and the success callback will be called with an object containing a url and optionally a ``userCancelled`` boolean property.
 !platforms: iOS, Android
 !param: error `function(content)` called with details of any error which may occur
 
@@ -81,7 +81,7 @@ The ``modalBrowser`` returned in the success callback has the following methods:
 - ``modalBrowser.loadStarted.addListener(callback)``: This callback will be called whenever a page load is started. The callback will be passed an object with a ``url`` field for the pages url.
 - ``modalBrowser.loadFinished.addListener(callback)``: This callback will be called whenever a page load finishes. The callback will be passed an object with a ``url`` field for the pages url.
 - ``modalBrowser.loadError.addListener(callback)``: This callback will be called whenever a page load fails. The callback will be passed an object with a ``url`` field for the pages url and a ``description`` field with a text description of the error.
-- ``modalBrowser.closed.addListener(callback)``: This callback will be called whenever the modalBrowser is closed. The callback will be passed an object with a ``url`` field for the browsers final url and ``userClosed`` which is a boolean to indicate whether the user closed the modal browser.
+- ``modalBrowser.closed.addListener(callback)``: This callback will be called whenever the modalBrowser is closed. The callback will be passed an object with a ``url`` field for the browsers final url and ``userCancelled`` which is a boolean to indicate whether the user closed the modal browser.
 
 
 **Example**:
