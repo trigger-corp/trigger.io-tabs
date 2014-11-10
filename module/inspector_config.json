@@ -3,5 +3,10 @@
 	},
 	"this_module": {
 		"config": {}
+	},
+	"core": {
+		"general": {
+			"trusted_urls": [ "<all_urls>" ]
+		}
 	}
 }
