@@ -64,6 +64,7 @@ if (forge.is.mobile()) {
 			forge.tabs.openWithOptions({
 				url: url,
 				tint: [75, 0, 0, 255],
+				titleTint: [0, 0, 255, 255],
 				buttonTint: [0, 75, 0, 255],
 				title: "Hello",
 				buttonText: "Leave"

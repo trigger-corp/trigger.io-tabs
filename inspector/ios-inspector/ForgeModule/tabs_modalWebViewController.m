@@ -43,11 +43,17 @@
 		[backButton setTitle:backLabel];
 	}
 	[navigationItem setTitle:title];
+    
 	if (tint != nil && [navBar respondsToSelector:@selector(setBarTintColor:)]) {
-		[navBar setBarTintColor:tint];
+        [navBar setBarTintColor:tint];
 	} else if (tint != nil && [navBar respondsToSelector:@selector(setTintColor:)]) {
 		[navBar setTintColor:tint];
 	}
+
+    if (titleTint != nil && [navBar respondsToSelector:@selector(setTitleTextAttributes:)]) {
+        [navBar setTitleTextAttributes:@{ NSForegroundColorAttributeName:titleTint }];
+    }
+    
 	if (buttonTint != nil && [backButton respondsToSelector:@selector(setTintColor:)]) {
 		[backButton setTintColor:buttonTint];
 	}
@@ -105,6 +111,9 @@
 }
 - (void)setPattern:(NSString *)newPattern {
 	pattern = newPattern;
+}
+- (void)setTitleTintColor:(UIColor *)newTint {
+    titleTint = newTint;
 }
 - (void)setTintColor:(UIColor *)newTint {
 	tint = newTint;

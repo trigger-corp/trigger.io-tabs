@@ -197,6 +197,7 @@ public class ModalView {
 				JsonElement buttonIcon = null;
 				JsonArray buttonTint = null;
 				JsonArray tint = null;
+				JsonArray titleTint = null;
 				url = task.params.get("url").getAsString();
 				if (task.params.has("pattern")) {
 					pattern = task.params.get("pattern").getAsString();
@@ -212,6 +213,9 @@ public class ModalView {
 				}
 				if (task.params.has("tint")) {
 					tint = task.params.getAsJsonArray("tint");
+				}
+				if (task.params.has("titleTint")) {
+					titleTint = task.params.getAsJsonArray("titleTint");
 				}
 				if (task.params.has("buttonTint")) {
 					buttonTint = task.params.getAsJsonArray("buttonTint");
@@ -262,7 +266,11 @@ public class ModalView {
 				if (title != null) {
 					titleView.setText(title);
 				}
-				titleView.setTextColor(0xFF000000);
+				int titleColor = 0xFF000000;
+				if (titleTint != null) {
+					titleColor = Color.argb(titleTint.get(3).getAsInt(), titleTint.get(0).getAsInt(), titleTint.get(1).getAsInt(), titleTint.get(2).getAsInt());
+				}
+				titleView.setTextColor(titleColor);
 				titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
 				titleView.setGravity(Gravity.CENTER);
 				topbar.addView(titleView);

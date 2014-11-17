@@ -21,6 +21,7 @@
 	ForgeTask *task;
 	NSString *pattern;
 	UIColor *tint;
+	UIColor *titleTint;
 	UIColor *buttonTint;
 	NSString *backImage;
 	NSDictionary *returnObj;
@@ -33,6 +34,7 @@
 - (void)setBackLabel:(NSString *)newBackLabel;
 - (void)setBackImage:(NSString *)newBackImage;
 - (void)setTitle:(NSString *)newTitle;
+- (void)setTitleTintColor:(UIColor *)newTint;
 - (void)setTintColor:(UIColor *)newTint;
 - (void)setButtonTintColor:(UIColor *)newTint;
 - (void)setTask:(ForgeTask *)newTask;
