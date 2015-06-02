@@ -32,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -39,6 +40,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -242,8 +244,8 @@ public class ModalView {
 				layout.addView(progress);
 
 				// Add a top bar
-				LinearLayout topbar = new LinearLayout(ForgeApp.getActivity());
-				topbar.setOrientation(LinearLayout.HORIZONTAL);
+				RelativeLayout topbar = new RelativeLayout(ForgeApp.getActivity());
+				//topbar.setOrientation(LinearLayout.HORIZONTAL);
 
 				int size = 50;
 				DisplayMetrics metrics = new DisplayMetrics();
@@ -251,7 +253,7 @@ public class ModalView {
 				int requiredSize = Math.round(metrics.density * size);
 				final int margin = Math.round(metrics.density * 8);
 
-				topbar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, requiredSize));
+				topbar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, requiredSize));				
 				topbar.setGravity(Gravity.CENTER);
 
 				int color = 0xFFEEEEEE;
@@ -259,26 +261,12 @@ public class ModalView {
 					color = Color.argb(tint.get(3).getAsInt(), tint.get(0).getAsInt(), tint.get(1).getAsInt(), tint.get(2).getAsInt());
 				}
 				ColorDrawable bgColor = new ColorDrawable(color);
-				topbar.setBackgroundDrawable(bgColor);
-
-				// Add default title
-				TextView titleView = new TextView(ForgeApp.getActivity());
-				if (title != null) {
-					titleView.setText(title);
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+					topbar.setBackgroundDrawable(bgColor);
 				}
-				int titleColor = 0xFF000000;
-				if (titleTint != null) {
-					titleColor = Color.argb(titleTint.get(3).getAsInt(), titleTint.get(0).getAsInt(), titleTint.get(1).getAsInt(), titleTint.get(2).getAsInt());
+				else {
+					topbar.setBackground(bgColor);
 				}
-				titleView.setTextColor(titleColor);
-				titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
-				titleView.setGravity(Gravity.CENTER);
-				topbar.addView(titleView);
-				topbar.setPadding(margin, 0, margin, 0);
-
-				// Add padding
-				topbar.addView(new View(ForgeApp.getActivity()), 0, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-				topbar.addView(new View(ForgeApp.getActivity()), 2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
 
 				// Add a button
 				size = 32;
@@ -341,8 +329,34 @@ public class ModalView {
 					text.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
 					button.addView(text);
 				}
+				button.setId(1);				
+				RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				buttonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+				buttonParams.rightMargin = Math.round(metrics.density * 9);
+				buttonParams.topMargin = Math.round(metrics.density * 9);
+				topbar.addView(button, buttonParams);
+				
+				// Add default title
+				TextView titleView = new TextView(ForgeApp.getActivity());
+				if (title != null) {
+					titleView.setText(title);
+				}
+				int titleColor = 0xFF000000;
+				if (titleTint != null) {
+					titleColor = Color.argb(titleTint.get(3).getAsInt(), titleTint.get(0).getAsInt(), titleTint.get(1).getAsInt(), titleTint.get(2).getAsInt());
+				}
+				titleView.setTextColor(titleColor);
+				titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
+				titleView.setGravity(Gravity.CENTER);
+				RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				titleParams.addRule(RelativeLayout.RIGHT_OF, button.getId());
+				topbar.addView(titleView, titleParams);
+				topbar.setPadding(margin, 0, margin, 0);
 
-				topbar.addView(button, 0);
+				// Add padding
+				//topbar.addView(new View(ForgeApp.getActivity()), 0, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+				//topbar.addView(new View(ForgeApp.getActivity()), 2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
+
 
 				layout.addView(topbar);
 
