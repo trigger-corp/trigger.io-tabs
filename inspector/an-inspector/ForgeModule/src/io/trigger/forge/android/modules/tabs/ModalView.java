@@ -262,6 +262,7 @@ public class ModalView {
 				}
 				ColorDrawable bgColor = new ColorDrawable(color);
 				topbar.setBackgroundDrawable(bgColor);
+				topbar.setPadding(margin, 0, margin, 0);
 
 				// Create default title
 				TextView titleView = new TextView(ForgeApp.getActivity());
@@ -277,9 +278,7 @@ public class ModalView {
 				titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
 				titleView.setGravity(Gravity.CENTER);
 				titleView.setSingleLine();
-				titleView.setEllipsize(TruncateAt.END);
-				
-				topbar.setPadding(margin, 0, margin, 0);
+				titleView.setEllipsize(TruncateAt.END);		
 				
 				// Create a button
 				size = 32;
@@ -300,7 +299,6 @@ public class ModalView {
 
 							// Send event
 							ForgeLog.i("Modal view close button pressed, returning to main webview.");
-
 							closeModal(ForgeApp.getActivity(), subView.getUrl(), true);
 						}
 						return false;
@@ -351,6 +349,7 @@ public class ModalView {
 				RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 				titleParams.addRule(RelativeLayout.RIGHT_OF, button.getId());				
 				topbar.addView(titleView, titleParams);
+				
 				layout.addView(topbar);
 
 				layout.addView(subView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
