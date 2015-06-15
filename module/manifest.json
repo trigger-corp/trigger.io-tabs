@@ -1,8 +1,8 @@
 {
-    "changes": "* New property: `titleTint` for `tabs.openWithOptions()`", 
+    "changes": "* Fixed: Long title text breaks the title bar layout (Android)\n* Fixed: Crash on pre-Honeycomb (API Level 11) Android devices", 
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.", 
     "min_platform_version": "v2.1.0", 
     "namespace": "tabs", 
     "platform_version": "v2.2.7", 
-    "version": "2.9"
+    "version": "2.10"
 }
