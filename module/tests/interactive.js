@@ -43,7 +43,7 @@ if (forge.is.android()) {
 	});
 
 	asyncTest("Truncate and ellipsize title text", 1, function() {
-		forge.tools.getURL("fixtures/tabs_dev/truncate.html", function (url) {
+		forge.tools.getURL("fixtures/tabs/truncate.html", function (url) {
 			forge.tabs.openWithOptions({
 				url: url,				
 				title: "This is a long title text which should be neatly truncated and ellipsized",
