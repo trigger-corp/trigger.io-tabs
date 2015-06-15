@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils.TruncateAt;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -40,6 +41,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
@@ -242,8 +244,8 @@ public class ModalView {
 				layout.addView(progress);
 
 				// Add a top bar
-				LinearLayout topbar = new LinearLayout(ForgeApp.getActivity());
-				topbar.setOrientation(LinearLayout.HORIZONTAL);
+				RelativeLayout topbar = new RelativeLayout(ForgeApp.getActivity());
+				//topbar.setOrientation(LinearLayout.HORIZONTAL);
 
 				int size = 50;
 				DisplayMetrics metrics = new DisplayMetrics();
@@ -260,9 +262,11 @@ public class ModalView {
 				}
 				ColorDrawable bgColor = new ColorDrawable(color);
 				topbar.setBackgroundDrawable(bgColor);
+				topbar.setPadding(margin, 0, margin, 0);
 
-				// Add default title
+				// Create default title
 				TextView titleView = new TextView(ForgeApp.getActivity());
+				titleView.setId(2);
 				if (title != null) {
 					titleView.setText(title);
 				}
@@ -273,21 +277,17 @@ public class ModalView {
 				titleView.setTextColor(titleColor);
 				titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
 				titleView.setGravity(Gravity.CENTER);
-				topbar.addView(titleView);
-				topbar.setPadding(margin, 0, margin, 0);
-
-				// Add padding
-				topbar.addView(new View(ForgeApp.getActivity()), 0, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-				topbar.addView(new View(ForgeApp.getActivity()), 2, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
-
-				// Add a button
+				titleView.setSingleLine();
+				titleView.setEllipsize(TruncateAt.END);		
+				
+				// Create a button
 				size = 32;
 				final int buttonMargin = Math.round(metrics.density * 4);
 				requiredSize = Math.round(metrics.density * size);
 
 				LinearLayout button = new LinearLayout(ForgeApp.getActivity());
+				button.setId(1);
 				button.setLongClickable(true);
-
 				button.setOnTouchListener(new OnTouchListener() {
 					public boolean onTouch(View v, MotionEvent event) {
 						if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
@@ -299,7 +299,6 @@ public class ModalView {
 
 							// Send event
 							ForgeLog.i("Modal view close button pressed, returning to main webview.");
-
 							closeModal(ForgeApp.getActivity(), subView.getUrl(), true);
 						}
 						return false;
@@ -312,8 +311,6 @@ public class ModalView {
 				}
 
 				button.setOrientation(LinearLayout.VERTICAL);
-				button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, requiredSize));
-				button.setGravity(Gravity.CENTER);
 
 				if (buttonIcon != null) {
 					ImageView image = new ImageView(ForgeApp.getActivity());
@@ -341,9 +338,18 @@ public class ModalView {
 					text.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
 					button.addView(text);
 				}
-
-				topbar.addView(button, 0);
-
+				
+				// Add button and title text to topbar
+				
+				RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, requiredSize);
+				buttonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);				
+				button.setGravity(Gravity.CENTER);
+				topbar.addView(button, buttonParams);
+				
+				RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+				titleParams.addRule(RelativeLayout.RIGHT_OF, button.getId());				
+				topbar.addView(titleView, titleParams);
+				
 				layout.addView(topbar);
 
 				layout.addView(subView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));

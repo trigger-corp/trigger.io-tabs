@@ -41,6 +41,30 @@ if (forge.is.android()) {
 			});
 		});
 	});
+
+	asyncTest("Truncate and ellipsize title text", 1, function() {
+		forge.tools.getURL("fixtures/tabs_dev/truncate.html", function (url) {
+			forge.tabs.openWithOptions({
+				url: url,				
+				title: "This is a long title text which should be neatly truncated and ellipsized",
+				buttonText: "Leave"
+			}, function () {
+				askQuestion("Did a tab open with truncated and ellipsized title text and a visible 'Leave' button?", {
+					Yes: function () {
+						ok(true, "Success");
+						start();
+					},
+					No: function () {
+						ok(false, "User claims failure");
+						start();
+					}
+				});
+			}, function (e) {
+				ok(false, "API call failure: "+e.message);
+				start();
+			});
+		});
+	});
 }
 
 if (forge.is.mobile()) {
