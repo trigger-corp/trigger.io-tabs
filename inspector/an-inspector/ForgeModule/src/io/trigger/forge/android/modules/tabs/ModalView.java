@@ -291,11 +291,15 @@ public class ModalView {
 				button.setOnTouchListener(new OnTouchListener() {
 					public boolean onTouch(View v, MotionEvent event) {
 						if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-							// Highlight
-							v.setAlpha(0.3f);
+							if (Build.VERSION.SDK_INT >= 11 /* HONEYCOMB */) {
+								// Highlight
+								v.setAlpha(0.3f);
+							}
 						} else if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
-							// Unhighlight
-							v.setAlpha(1);
+							if (Build.VERSION.SDK_INT >= 11 /* HONEYCOMB */) {
+								// Unhighlight
+								v.setAlpha(1);
+							}
 
 							// Send event
 							ForgeLog.i("Modal view close button pressed, returning to main webview.");
