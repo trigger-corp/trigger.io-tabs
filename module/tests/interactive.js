@@ -91,7 +91,8 @@ if (forge.is.mobile()) {
 				titleTint: [0, 0, 255, 255],
 				buttonTint: [0, 75, 0, 255],
 				title: "Hello",
-				buttonText: "Leave"
+				buttonText: "Leave",
+				translucent: true
 			}, function () {
 				askQuestion("Did a tab open and describe itself correctly?", {
 					Yes: function () {

@@ -49,6 +49,11 @@ static NSMutableDictionary* tabs_modal_map;
 		NSArray* color = [task.params objectForKey:@"buttonTint"];
 		[modalView setButtonTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255 green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255 blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255 alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
 	}
+    if ([task.params objectForKey:@"translucent"] != nil) {
+        [modalView setTranslucent:[[task.params objectForKey:@"translucent"] boolValue]];
+    } else {
+        [modalView setTranslucent:true];
+    }
 	
 	[modalView setTask:task];
 	

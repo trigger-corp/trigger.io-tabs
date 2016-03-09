@@ -19,7 +19,8 @@ asyncTest("openWithOptions - everything", 1, function() {
 		tint: [40, 20, 50, 255],
 		buttonText: "Test",
 		buttonIcon: "fixtures/tabs/1.png",
-		buttonTint: [10, 50, 100, 255]
+		buttonTint: [10, 50, 100, 255],
+		translucent: false
 	}, function (ret) {
 		if ("userCancelled" in ret) {
 			equal(ret.userCancelled, false);

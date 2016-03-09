@@ -23,6 +23,7 @@
 	UIColor *tint;
 	UIColor *titleTint;
 	UIColor *buttonTint;
+    bool translucent;
 	NSString *backImage;
 	NSDictionary *returnObj;
 }
@@ -37,6 +38,7 @@
 - (void)setTitleTintColor:(UIColor *)newTint;
 - (void)setTintColor:(UIColor *)newTint;
 - (void)setButtonTintColor:(UIColor *)newTint;
+- (void)setTranslucent:(bool)newTranslucent;
 - (void)setTask:(ForgeTask *)newTask;
 - (void)setPattern:(NSString *)newPattern;
 - (void)cancel:(id)nothing;

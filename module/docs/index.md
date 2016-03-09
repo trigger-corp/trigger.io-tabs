@@ -99,3 +99,32 @@ The ``modalBrowser`` returned in the success callback has the following methods:
         alert("Modal closed!");
       }
     });
+
+
+### Notes
+
+::iOS developers:: Beginning with iOS 7, navigation bars and tab bars are configured to be translucent by default.
+
+A translucent bar mixes its `tint` color with gray before combining it with a system-defined alpha value to produce the final background color that is used to composite the bar with the content it overlies.
+
+This can be challenging to work with if you need to maintain a consistent color scheme throughout your app or match a Corporate or Brand color.
+
+If your application needs to set the color of the Tabs top bar with greater precision there are two options available:
+
+1. Turn off top bar translucency: Set the `translucent` property in the options object passed to `tabs.openWithOptions` or `tabs.openAdvanced` to `false`. The color rendered will now match the value of `tint`.
+
+2. Compute a bar tint color to match a given color. Arriving at the correct color may require some experimentation. You may also need to take into account the app content passing under the bar. (e.g. photos, app background color etc.)
+
+> A starting point is to darken each of the RGB channels in your `tint` color by 30, For Example: 
+>         
+>     tint: [64, 64, 128, 255]  // starting color
+>     tint: [34, 34,  98, 255]  // adjusted color
+>
+>
+> Note that if the starting color in a channel is already less than 30, you may need to darken the other channels by more than 30, for instance:
+>            
+>     tint: [10, 102, 51, 255]  // starting color
+>     tint: [ 0,  62, 11, 255]  // adjusted color
+
+For more information see: [Technical Q&A QA1808 - Matching a Bar Tint Color To Your Corporate or Brand Color](https://developer.apple.com/library/ios/qa/qa1808/_index.html)
+

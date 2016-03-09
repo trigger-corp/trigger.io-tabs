@@ -43,6 +43,8 @@
 		[backButton setTitle:backLabel];
 	}
 	[navigationItem setTitle:title];
+
+    navBar.translucent = translucent;
     
 	if (tint != nil && [navBar respondsToSelector:@selector(setBarTintColor:)]) {
         [navBar setBarTintColor:tint];
@@ -120,6 +122,9 @@
 }
 - (void)setButtonTintColor:(UIColor *)newTint {
 	buttonTint = newTint;
+}
+- (void)setTranslucent:(bool)newTranslucent {
+    translucent = newTranslucent;
 }
 
 - (void)viewDidUnload {
