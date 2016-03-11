@@ -16,7 +16,7 @@ public class API {
 	
 	public static void executeJS(final ForgeTask task, @ForgeParam("modal") final String modal, @ForgeParam("script") final String script) {
 		if (modalViews.get(modal) != null) {
-			modalViews.get(modal).stringByEvaluatingJavaScriptFromString(task, script);
+			modalViews.get(modal).webViewProxy.stringByEvaluatingJavaScriptFromString(task, script); // TODO augh
 		}
 	}
 	
