@@ -41,7 +41,15 @@ public class ModalView {
 
     // UI Elements
     LinearLayout view = null;
+    RelativeLayout topbar = null;
+    LinearLayout buttonLeft = null;
+    LinearLayout buttonRight = null;
     ProgressBar progressBar = null;
+
+    final static int ID_TITLE  = 10;
+    final static int ID_BUTTON_LEFT = 11;
+    final static int ID_BUTTON_RIGHT = 12;
+
 
 
     // - ACCESSORS ---------------------------------------------------------------------------------
@@ -123,6 +131,7 @@ public class ModalView {
                 }
 
                 ForgeLog.i("Displaying modal view.");
+
                 // Create new view
                 view = new LinearLayout(ForgeApp.getActivity());
                 view.setOrientation(LinearLayout.VERTICAL);
@@ -142,15 +151,12 @@ public class ModalView {
                 ForgeApp.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
                 // Add a top bar
-                RelativeLayout topbar = createTopBar(metrics, tint);
-
-                // Create default title
-                TextView titleView = createTitle(metrics, titleText, titleTint);
+                topbar = createTopBar(metrics, tint);
 
                 // Create a button
-                LinearLayout button = null;
                 try {
-                    button = createButton(metrics, buttonText, buttonIcon, buttonTint);
+                    buttonLeft = createButton(metrics, buttonText, buttonIcon, buttonTint);
+                    buttonLeft.setId(ID_BUTTON_LEFT);
                 } catch (IOException e) {
                     task.error(e);
                     return;
@@ -158,22 +164,23 @@ public class ModalView {
 
                 // Add button to topbar
                 final int requiredSize = Math.round(metrics.density * 32);
+                //RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);//, requiredSize);
                 RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, requiredSize);
                 buttonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-                button.setGravity(Gravity.CENTER);
-                topbar.addView(button, buttonParams);
+                topbar.addView(buttonLeft, buttonParams);
 
                 // Add titleText to topbar
+                TextView titleView = createTitle(metrics, titleText, titleTint);
                 RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                titleParams.addRule(RelativeLayout.RIGHT_OF, button.getId());
+                titleParams.addRule(RelativeLayout.RIGHT_OF, buttonLeft.getId());
                 topbar.addView(titleView, titleParams);
 
                 // Add topbar to view
                 view.addView(topbar);
 
                 // add webview
-                webViewProxy = new WebViewProxy(ForgeApp.getActivity(), instance);
-                final ForgeWebView webView = webViewProxy.register(task, url);
+                webViewProxy = new WebViewProxy(instance);
+                final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
                 webView.loadUrl(url);
 
@@ -222,8 +229,11 @@ public class ModalView {
         ForgeApp.event("tabs." + task.callid + ".loadError", result);
     }
 
-    // TODO rename
-    public boolean checkMatchPattern(final String url) {
+    public boolean shouldOverrideUrlLoading(String url) {
+        return checkMatchPattern(url);
+    }
+
+    private boolean checkMatchPattern(final String url) {
         if (url != null && this.match_url_pattern != null && url.matches(this.match_url_pattern) && view != null) {
             ForgeLog.i("Match pattern hit in modal view, closing and returning current URL.");
             ForgeApp.getActivity().runOnUiThread(new Runnable() {
@@ -242,7 +252,6 @@ public class ModalView {
 
     private RelativeLayout createTopBar(DisplayMetrics metrics, JsonArray tint) {
         RelativeLayout topbar = new RelativeLayout(ForgeApp.getActivity());
-        //topbar.setOrientation(LinearLayout.HORIZONTAL);
 
         // calculate * set topbar sizes
         int requiredSize = Math.round(metrics.density * 50);
@@ -264,9 +273,11 @@ public class ModalView {
 
     private TextView createTitle(DisplayMetrics metrics, String title, JsonArray titleTint) {
         TextView titleView = new TextView(ForgeApp.getActivity());
-        titleView.setId(2);
+        titleView.setId(ID_TITLE);
         if (title != null) {
             titleView.setText(title);
+        } else {
+            titleView.setText("");
         }
         int titleColor = 0xFF000000;
         if (titleTint != null) {
@@ -280,10 +291,12 @@ public class ModalView {
 
         return titleView;
     }
-
     private LinearLayout createButton(DisplayMetrics metrics, String buttonText, JsonElement buttonIcon, JsonArray buttonTint) throws IOException {
+        return this.createButton(metrics, buttonText, buttonIcon, buttonTint, null);
+    }
+
+    private LinearLayout createButton(DisplayMetrics metrics, String buttonText, JsonElement buttonIcon, JsonArray buttonTint, final ForgeTask task) throws IOException {
         LinearLayout button = new LinearLayout(ForgeApp.getActivity());
-        button.setId(1);
         button.setLongClickable(true);
         button.setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
@@ -298,14 +311,18 @@ public class ModalView {
                         v.setAlpha(1);
                     }
 
-                    // Send event
-                    ForgeLog.i("Modal view close button pressed, returning to main webview.");
-                    ForgeApp.getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            closeModal(ForgeApp.getActivity(), webViewProxy.webView.getUrl(), true); // TODO augh
-                        }
-                    });
+                    if (task != null) {
+                        ForgeApp.event("tabs.buttonPressed." + task.callid);
+                    } else {
+                        // Send event
+                        ForgeLog.i("Modal view close button pressed, returning to main webview.");
+                        ForgeApp.getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                closeModal(ForgeApp.getActivity(), webViewProxy.webView.getUrl(), true);
+                            }
+                        });
+                    }
                 }
                 return false;
             }
@@ -317,9 +334,9 @@ public class ModalView {
         }
 
         button.setOrientation(LinearLayout.VERTICAL);
+        button.setGravity(Gravity.CENTER);
 
         final int buttonMargin = Math.round(metrics.density * 4);
-        final int requiredSize = Math.round(metrics.density * 32);
         if (buttonIcon != null) {
             ImageView image = new ImageView(ForgeApp.getActivity());
             image.setScaleType(ImageView.ScaleType.CENTER);
@@ -343,5 +360,95 @@ public class ModalView {
         }
 
         return button;
+    }
+
+    // - UI API's ----------------------------------------------------------------------------------
+    public void addButton(final ForgeTask task, final JsonObject params) {
+        task.performUI(new Runnable() {
+            public void run() {
+                String text = null;
+                String position = null;
+                JsonElement icon = null;
+                JsonArray tint = null;
+                if (params.has("text")) {
+                    text = params.get("text").getAsString();
+                }
+                if (params.has("position")) {
+                    position = params.get("position").getAsString();
+                }
+                if (params.has("icon")) {
+                    icon = params.get("icon");
+                }
+                if (params.has("tint")) {
+                    tint = params.getAsJsonArray("tint");
+                }
+
+                // create button
+                DisplayMetrics metrics = new DisplayMetrics();
+                ForgeApp.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                LinearLayout button = null;
+                try {
+                    button = createButton(metrics, text, icon, tint, task);
+                } catch (IOException e) {
+                    task.error(e);
+                    return;
+                }
+
+                // Add button to left or right of topbar
+                final int requiredSize = Math.round(metrics.density * 32);
+                RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, requiredSize);
+                if (position != null && position.equalsIgnoreCase("right")) {
+                    if (buttonRight != null) {
+                        topbar.removeView(buttonRight);
+                        buttonRight = null;
+                    }
+                    button.setId(ID_BUTTON_RIGHT);
+                    buttonParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                    buttonRight = button;
+                } else {
+                    if (buttonLeft != null) {
+                        topbar.removeView(buttonLeft);
+                        buttonLeft = null;
+                    }
+                    button.setId(ID_BUTTON_LEFT);
+                    buttonParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+                    buttonLeft = button;
+                }
+
+                // layout buttons relative to title
+                RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                if (buttonLeft != null) {
+                    titleParams.addRule(RelativeLayout.RIGHT_OF, buttonLeft.getId());
+                }
+                if (buttonRight != null) {
+                    titleParams.addRule(RelativeLayout.LEFT_OF, buttonRight.getId());
+                }
+                topbar.findViewById(ID_TITLE).setLayoutParams(titleParams);
+                topbar.addView(button, buttonParams);
+
+                task.success(task.callid);
+            }
+        });
+    }
+
+    public void removeButtons(final ForgeTask task) {
+        task.performUI(new Runnable() {
+            public void run() {
+
+                if (buttonLeft != null) {
+                    topbar.removeView(buttonLeft);
+                    buttonLeft = null;
+                }
+                if (buttonRight != null) {
+                    topbar.removeView(buttonRight);
+                    buttonRight = null;
+                }
+
+                RelativeLayout.LayoutParams titleParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                topbar.findViewById(ID_TITLE).setLayoutParams(titleParams);
+
+                task.success();
+            }
+        });
     }
 }

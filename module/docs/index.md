@@ -79,17 +79,57 @@ Optional:
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
 
-The ``modalBrowser`` returned in the success callback has the following methods:
 
-- ``modalBrowser.executeJS(script, success, error)``: This will execute the given string in the modal browser, the success callback will be called with the string result. It is recommended you only use this after the loadFinished event (see below) as in other situations JavaScript may not be ready and you may get undefined behaviour.
-- ``modalBrowser.close(success, error)``: Force the modal browser to close immediately.
+### Modal Browser API
+
+The ``modalBrowser`` object returned in the success callback has the following API:
+
+!method: modalBrowser.executeJS(script, success, error)
+!param: success `function(result)` callback to be invoked with the result when no errors occur
+!description: This will execute the given string in the modal browser, the success callback will be called with the string result. It is recommended you only use this after the loadFinished event (see below) as in other situations JavaScript may not be ready and you may get undefined behaviour.
+!platforms: iOS, Android
+!param: error `function(content)` called with details of any error which may occur
+
+!method: modalBrowser.close(success, error)
+!param: success `function()` callback to be invoked when no errors occur
+!description: Force the modal browser to close immediately.
+!platforms: iOS, Android
+!param: error `function(content)` called with details of any error which may occur
+
+!method: modalBrowser.addButton(params, callback, error)
+!param: params `object` button options, must contain at least ``icon`` or ``text``
+!param: callback `function()` callback to be invoked each time the button is pressed
+!description: Add a button to the modal browser's topbar. 
+!platforms: iOS, Android
+!param: error `function(content)` called with details of any error which may occur
+
+The first parameter is an object describing the button with the following properties:
+
+-  ``icon``: An icon to be shown on the button: this should be relative
+   to the ``src`` directory, e.g. ``"img/button.png"``.
+-  ``text``: Text to be shown on the button, either ``text`` or ``icon``
+   must be set.
+-  ``position``: The position to display the button, either ``left`` or
+   ``right``. If not specified the first free space will be used.
+-  ``tint``: The color of the button, defined as an array as used for ``tint``.
+
+!method: ``modalBrowser.removeButtons(success, error)``
+!description: This will remove all buttons from the browser's topbar.
+!param: success `function()` callback to be invoked when no errors occur
+!platforms: iOS, Android
+!param: error `function(content)` called with details of any error which may occur
+
+### Modal Browser Events
+
+Additionally, the following event listeners are supported:
+
 - ``modalBrowser.loadStarted.addListener(callback)``: This callback will be called whenever a page load is started. The callback will be passed an object with a ``url`` field for the pages url.
 - ``modalBrowser.loadFinished.addListener(callback)``: This callback will be called whenever a page load finishes. The callback will be passed an object with a ``url`` field for the pages url.
 - ``modalBrowser.loadError.addListener(callback)``: This callback will be called whenever a page load fails. The callback will be passed an object with a ``url`` field for the pages url and a ``description`` field with a text description of the error.
 - ``modalBrowser.closed.addListener(callback)``: This callback will be called whenever the modalBrowser is closed. The callback will be passed an object with a ``url`` field for the browsers final url and ``userCancelled`` which is a boolean to indicate whether the user closed the modal browser.
 
 
-**Example**:
+### Example:
 
     forge.tabs.openAdvanced({
       url: 'http://my.server.com/page/',
@@ -103,7 +143,7 @@ The ``modalBrowser`` returned in the success callback has the following methods:
     });
 
 
-### Notes
+## Notes
 
 ::iOS developers:: Beginning with iOS 7, navigation bars and tab bars are configured to be translucent by default.
 

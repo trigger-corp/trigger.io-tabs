@@ -113,6 +113,22 @@ forge['tabs'] = {
 					forge.internal.call("tabs.close", {
 						modal: cbId
 					}, success, error);
+				},
+				'addButton': function(params, callback, error) {
+					if (params.icon && params.icon[0] === "/") {
+						params.icon = params.icon.substr(1);
+					}
+					forge.internal.call("tabs.addButton", {
+						modal: cbId,
+						params: params
+					}, function (callId) {
+						callback && forge.internal.addEventListener('tabs.buttonPressed.' + callId, callback);
+					}, error);
+				},
+				'removeButtons': function(success, error) {
+					forge.internal.call("tabs.removeButtons", {
+						modal: cbId
+					}, success, error);
 				}
 			});
 		}, error);

@@ -31,15 +31,12 @@ import com.google.gson.JsonElement;
 public class WebViewProxy {
 	public ForgeWebView webView = null; // TODO private
 	ModalView parentView = null; // TODO better name e.g. parentView
-	ForgeActivity activity = null;
 
-	public WebViewProxy(ForgeActivity forgeActivity, ModalView parentView) {
-		activity = forgeActivity;
+	public WebViewProxy(ModalView parentView) {
 		this.parentView = parentView;
-		//webView = new ForgeWebView(ForgeApp.getActivity());
 	}
 
-	public ForgeWebView register(final ForgeTask task, final String url) {
+	public ForgeWebView register(final ForgeActivity activity, final String url) {
 		// Create webview
 		final ForgeWebView forgeWebView = new ForgeWebView(activity);
 		// Save static reference - TODO lose one of these surely?
@@ -90,8 +87,7 @@ public class WebViewProxy {
 
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				ForgeLog.i("subView load " + url);
-				if (parentView.checkMatchPattern(url)) { // TODO yeaugh
+				if (parentView.shouldOverrideUrlLoading(url)) {
 					return true;
 				}
 
@@ -139,7 +135,6 @@ public class WebViewProxy {
 					return true;
 				}
 			}
-
 		});
 
 		// Add JSBridge for whitelisted remote URLs

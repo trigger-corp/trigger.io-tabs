@@ -28,21 +28,19 @@ import org.xwalk.core.internal.XWalkSettings;
 public class WebViewProxy {
 	ForgeWebView webView = null;
 	ModalView parentView = null;
-	ForgeActivity activity = null;
 
 	protected final ForgeWebView getWebView() {
 		return webView;
 	}
 
-	public WebViewProxy(ForgeActivity forgeActivity, ModalView parentView) {
-		this.activity = forgeActivity;
+	public WebViewProxy(ModalView parentView) {
 		this.parentView = parentView;
 	}
 
-	public ForgeWebView register(final ForgeTask task, final String url) {
+	public ForgeWebView register(final ForgeActivity activity, final String url) {
 
 		// Create webview
-		final ForgeWebView forgeWebView = new ForgeWebView(ForgeApp.getActivity(), null);
+		final ForgeWebView forgeWebView = new ForgeWebView(activity, null);
 		this.webView = forgeWebView;
 
 		// Configure ForgeWebView
@@ -102,9 +100,7 @@ public class WebViewProxy {
 
 			@Override
 			public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
-				ForgeLog.i("subView load " + url);
-
-				if (parentView.checkMatchPattern(url)) {
+				if (parentView.shouldOverrideUrlLoading(url)) {
 					return true;
 				}
 

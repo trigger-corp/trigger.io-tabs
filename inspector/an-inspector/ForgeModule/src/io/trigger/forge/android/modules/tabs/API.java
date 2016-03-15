@@ -1,5 +1,7 @@
 package io.trigger.forge.android.modules.tabs;
 
+import com.google.gson.JsonObject;
+
 import java.util.WeakHashMap;
 
 import io.trigger.forge.android.core.ForgeParam;
@@ -24,6 +26,18 @@ public class API {
 		if (modalViews.get(modal) != null) {
 			modalViews.get(modal).close();
 			task.success();
+		}
+	}
+
+	public static void addButton(final ForgeTask task, @ForgeParam("modal") final String modal, @ForgeParam("params") final JsonObject params) {
+		if (modalViews.get(modal) != null) {
+			modalViews.get(modal).addButton(task, params);
+		}
+	}
+
+	public static void removeButtons(final ForgeTask task, @ForgeParam("modal") final String modal) {
+		if (modalViews.get(modal) != null) {
+			modalViews.get(modal).removeButtons(task);
 		}
 	}
 }
