@@ -30,11 +30,12 @@ asyncTest("Test Title Text", 1, function() {
 
 
 asyncTest("Add an extra button", 1, function() {
-	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
+	forge.tools.getURL("fixtures/tabs/buttons.html", function (url) {
 		forge.tabs.openAdvanced({
 			url: url,
 			title: "Test buttons",
-			buttonText: "default"
+			buttonText: "default",
+            pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.addButton({
 				position: "right",
@@ -67,11 +68,12 @@ asyncTest("Add an extra button", 1, function() {
 
 
 asyncTest("Remove buttons", 1, function() {
-	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
+	forge.tools.getURL("fixtures/tabs/buttons.html", function (url) {
 		forge.tabs.openAdvanced({
 			url: url,
 			title: "Test buttons",
-			buttonText: "default"
+			buttonText: "default",
+			pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				askQuestion("Did a tab/view just open with no buttons?", {
@@ -94,11 +96,12 @@ asyncTest("Remove buttons", 1, function() {
 
 
 asyncTest("Left Button", 1, function() {
-	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
+	forge.tools.getURL("fixtures/tabs/buttons.html", function (url) {
 		forge.tabs.openAdvanced({
 			url: url,
 			title: "Test buttons",
-			buttonText: "default"
+			buttonText: "default",
+            pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
@@ -135,11 +138,12 @@ asyncTest("Left Button", 1, function() {
 
 
 asyncTest("Right Button", 1, function() {
-	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
+	forge.tools.getURL("fixtures/tabs/buttons.html", function (url) {
 		forge.tabs.openAdvanced({
 			url: url,
 			title: "Test buttons",
-			buttonText: "default"
+			buttonText: "default",
+            pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
@@ -175,11 +179,12 @@ asyncTest("Right Button", 1, function() {
 });
 
 asyncTest("Both Buttons", 1, function() {
-	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
+	forge.tools.getURL("fixtures/tabs/buttons.html", function (url) {
 		forge.tabs.openAdvanced({
 			url: url,
 			title: "Test buttons",
-			buttonText: "default"
+			buttonText: "default",
+            pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
