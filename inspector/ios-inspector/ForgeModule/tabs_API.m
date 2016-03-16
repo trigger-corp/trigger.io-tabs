@@ -76,4 +76,35 @@ static NSMutableDictionary* tabs_modal_map;
 	[task success:nil];
 }
 
++ (void)addButton:(ForgeTask*)task modal:(NSString*)modal params:(NSDictionary*)params {
+    NSString* text = nil;
+    NSString* icon = nil;
+    NSString* position = nil;
+    UIColor*  tint = nil;
+    
+    if ([params objectForKey:@"text"] != nil) {
+        text = [params objectForKey:@"text"];
+    }
+    if ([params objectForKey:@"icon"] != nil) {
+        icon = [params objectForKey:@"icon"];
+    }
+    if ([params objectForKey:@"position"] != nil) {
+        position = [params objectForKey:@"position"];
+    }
+    if ([params objectForKey:@"tint"] != nil) {
+        NSArray* array = [params objectForKey:@"tint"];
+        tint = [UIColor colorWithRed:[(NSNumber*)[array objectAtIndex:0] floatValue]/255
+                               green:[(NSNumber*)[array objectAtIndex:1] floatValue]/255
+                                blue:[(NSNumber*)[array objectAtIndex:2] floatValue]/255
+                               alpha:[(NSNumber*)[array objectAtIndex:3] floatValue]/255];
+    }
+
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position tint:tint];
+}
+
++ (void)removeButtons:(ForgeTask*)task modal:(NSString*)modal {
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtons:task];
+}
+
+
 @end

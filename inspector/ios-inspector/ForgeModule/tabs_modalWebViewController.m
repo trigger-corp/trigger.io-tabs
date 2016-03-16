@@ -7,6 +7,7 @@
 //
 
 #import "tabs_modalWebViewController.h"
+#import "tabs_Delegate.h"
 
 @implementation tabs_modalWebViewController
 @synthesize navigationItem;
@@ -26,9 +27,9 @@
 	[super viewDidLoad];
 	
 	[backButton setAction:@selector(cancel:)];
-	
+
 	if (url == nil) {
-		url = [NSURL URLWithString:@"https://trigger.io"];
+		url = [NSURL URLWithString:@"about:blank"];
 	}
 	[webView loadRequest:[NSURLRequest requestWithURL:url]];
 	if (backImage != nil) {
@@ -102,12 +103,17 @@
 - (void)setTitle:(NSString *)newTitle {
 	title = newTitle;
 }
-- (void)setBackLabel:(NSString *)newBackLabel {
-	backLabel = newBackLabel;
+
+- (void)setBackLabel:(NSString *)newLabel {
+	backLabel = newLabel;
 }
-- (void)setBackImage:(NSString *)newBackImage {
-	backImage = newBackImage;
+- (void)setBackImage:(NSString *)newImage {
+	backImage = newImage;
 }
+- (void)setButtonTintColor:(UIColor *)newTint {
+    buttonTint = newTint;
+}
+
 - (void)setTask:(ForgeTask *)newTask {
 	task = newTask;
 }
@@ -119,9 +125,6 @@
 }
 - (void)setTintColor:(UIColor *)newTint {
 	tint = newTint;
-}
-- (void)setButtonTintColor:(UIColor *)newTint {
-	buttonTint = newTint;
 }
 - (void)setTranslucent:(bool)newTranslucent {
     translucent = newTranslucent;
@@ -245,6 +248,62 @@
 
 - (BOOL)prefersStatusBarHidden {
 	return [[ForgeApp sharedApp].viewController prefersStatusBarHidden];
+}
+
+-(void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition tint:(UIColor*)newTint {
+    UIBarButtonItem* buttonItem = [[UIBarButtonItem alloc] init];
+    [buttonItem setStyle:UIBarButtonItemStyleBordered];
+
+    if (newText != nil) {
+        [buttonItem setTitle:newText];
+
+    } else if (newIcon != nil) {
+        [[[ForgeFile alloc] initWithObject:newIcon] data:^(NSData *data) {
+            UIImage *icon = [[UIImage alloc] initWithData:data];
+            icon = [icon imageWithWidth:0 andHeight:28 andRetina:YES];
+            [buttonItem setImage:icon];
+        } errorBlock:^(NSError *error) {
+        }];
+
+    } else {
+        [task error:@"You need to specify either a 'text' or 'icon' property for your button."];
+        return;
+    }
+
+    if (newTint != nil) {
+        [buttonItem setTintColor:newTint];
+    }
+
+    tabs_Delegate* delegate = [[tabs_Delegate alloc] initWithId:newTask.callid];
+    [buttonItem setTarget:delegate];
+    [buttonItem setAction:@selector(clicked)];
+    
+
+    UINavigationItem *navItem = ((UINavigationItem*)[navBar.items objectAtIndex:0]);
+    if (newPosition != nil && [newPosition isEqualToString:@"right"]) {
+        [navItem setRightBarButtonItem:buttonItem];
+    } else {
+        [navItem setLeftBarButtonItem:buttonItem];
+    }
+
+    [newTask success:newTask.callid];
+}
+
+-(void)removeButtons:(ForgeTask*)newTask {
+    UINavigationItem *navItem = ((UINavigationItem*)[navBar.items objectAtIndex:0]);
+
+    if (navItem.leftBarButtonItem.target != nil) {
+        [((tabs_Delegate*)navItem.leftBarButtonItem.target) releaseDelegate];
+    }
+    [navItem setLeftBarButtonItem:nil];
+
+    if (navItem.rightBarButtonItem.target != nil) {
+        [((tabs_Delegate*)navItem.rightBarButtonItem.target) releaseDelegate];
+    }
+    [navItem setRightBarButtonItem:nil];
+
+
+    [newTask success:nil];
 }
 
 @end
