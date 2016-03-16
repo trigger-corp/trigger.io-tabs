@@ -285,7 +285,7 @@ public class ModalView {
         }
         titleView.setTextColor(titleColor);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
-        titleView.setGravity(Gravity.CENTER);
+        titleView.setGravity(Gravity.LEFT);
         titleView.setSingleLine();
         titleView.setEllipsize(TextUtils.TruncateAt.END);
 
