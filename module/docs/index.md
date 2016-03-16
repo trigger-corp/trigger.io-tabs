@@ -113,7 +113,7 @@ The first parameter is an object describing the button with the following proper
    ``right``. If not specified the first free space will be used.
 -  ``tint``: The color of the button, defined as an array as used for ``tint``.
 
-!method: ``modalBrowser.removeButtons(success, error)``
+!method: modalBrowser.removeButtons(success, error)
 !description: This will remove all buttons from the browser's topbar.
 !param: success `function()` callback to be invoked when no errors occur
 !platforms: iOS, Android
