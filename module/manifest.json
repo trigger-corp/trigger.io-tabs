@@ -1,5 +1,5 @@
 {
-    "changes": "* Added support for Crosswalk webview in tabs when running app as a `crosswalk` target.\n* New modal browser methods: `addButton` and `removeButtons`.\n* Added new option: `translucent` to configure iOS top bar translucency.", 
+    "changes": "* New modal browser methods: `addButton` and `removeButtons`.\n* Added new option: `translucent` to configure iOS top bar translucency.\n* Added support for Crosswalk webview in tabs when running app as a `crosswalk` target.", 
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.", 
     "min_platform_version": "v2.4.1", 
     "namespace": "tabs", 
