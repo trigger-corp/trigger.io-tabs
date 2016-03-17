@@ -45,15 +45,10 @@ public class WebViewProxy {
 
 		// Configure ForgeWebView
 		XWalkSettingsInternal webSettings = forgeWebView.getSettingsInternal();
-		// webSettings.setSupportMultipleWindows(true);
 		webSettings.setJavaScriptEnabled(true);
-		webSettings.setDomStorageEnabled(true);
-		webSettings.setDatabaseEnabled(true);
-		webSettings.setGeolocationEnabled(true);
-		webSettings.setAllowContentAccess(true);
-		webSettings.setAllowFileAccess(true);
-		//webSettings.setAllowFileAccessFromFileURLs(true);       // TODO https://crosswalk-project.org/jira/browse/XWALK-6145
-		//webSettings.setAllowUniversalAccessFromFileURLs(true);  // TODO https://crosswalk-project.org/jira/browse/XWALK-6145
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
+			webSettings.setDomStorageEnabled(true);
+		}
 		webSettings.setUseWideViewPort(true);
 		// TODO webSettings.setBuiltInZoomControls(true); // Make webview behave more like Android browser
 

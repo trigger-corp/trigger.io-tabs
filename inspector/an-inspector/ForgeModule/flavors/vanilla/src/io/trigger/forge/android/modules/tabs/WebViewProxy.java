@@ -43,7 +43,7 @@ public class WebViewProxy {
 		webView = forgeWebView;
 
 		// Configure ForgeWebView
-		WebSettings webSettings = forgeWebView.getSettings();
+		WebSettings webSettings = forgeWebView.getSettingsInternal();
 		webSettings.setJavaScriptEnabled(true);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR_MR1) {
 			webSettings.setDomStorageEnabled(true);
