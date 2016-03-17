@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
-import org.xwalk.core.internal.XWalkSettings;
+import org.xwalk.core.internal.XWalkSettingsInternal;
 
 public class WebViewProxy {
 	ForgeWebView webView = null;
@@ -44,16 +44,16 @@ public class WebViewProxy {
 		this.webView = forgeWebView;
 
 		// Configure ForgeWebView
-		XWalkSettings webSettings = forgeWebView.getSettings();
-		webSettings.setSupportMultipleWindows(true);
+		XWalkSettingsInternal webSettings = forgeWebView.getSettingsInternal();
+		// webSettings.setSupportMultipleWindows(true);
 		webSettings.setJavaScriptEnabled(true);
 		webSettings.setDomStorageEnabled(true);
 		webSettings.setDatabaseEnabled(true);
 		webSettings.setGeolocationEnabled(true);
 		webSettings.setAllowContentAccess(true);
 		webSettings.setAllowFileAccess(true);
-		webSettings.setAllowFileAccessFromFileURLs(true);
-		webSettings.setAllowUniversalAccessFromFileURLs(true);
+		//webSettings.setAllowFileAccessFromFileURLs(true);       // TODO https://crosswalk-project.org/jira/browse/XWALK-6145
+		//webSettings.setAllowUniversalAccessFromFileURLs(true);  // TODO https://crosswalk-project.org/jira/browse/XWALK-6145
 		webSettings.setUseWideViewPort(true);
 		// TODO webSettings.setBuiltInZoomControls(true); // Make webview behave more like Android browser
 
@@ -132,7 +132,7 @@ public class WebViewProxy {
 					if (ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").has("trusted_urls")) {
 						for (JsonElement whitelistPattern : ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls")) {
 							if (ForgeUtil.urlMatchesPattern(url, whitelistPattern.getAsString())) {
-								ForgeLog.i("Enabling forge JavaScript API for whitelisted URL in tabs browser: " + url);
+								ForgeLog.i("Enabling forge JavaScript API for new whitelisted URL in tabs browser: " + url);
 								forgeWebView.addJavascriptInterface(new ForgeJSBridge(forgeWebView), "__forge");
 								break;
 							}
