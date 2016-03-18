@@ -52,6 +52,11 @@ public class WebViewProxy {
 		}
 		webSettings.setUseWideViewPort(true);
 		// TODO webSettings.setBuiltInZoomControls(true); // Make webview behave more like Android browser
+		/*if (Build.VERSION.SDK_INT >= 16) {
+			// TODO https://crosswalk-project.org/jira/browse/XWALK-6145
+			webSettings.setAllowFileAccessFromFileURLs(true);
+			webSettings.setAllowUniversalAccessFromFileURLs(true);
+		}*/
 
 		forgeWebView.setUIClient(new XWalkUIClient(webView) {
 			@Override
@@ -124,7 +129,7 @@ public class WebViewProxy {
 				} else if (url.startsWith("http:") || url.startsWith("https:")) {
 					// Normal urls
 					// can't use removeJavascriptInterface on 2.x
-					forgeWebView.addJavascriptInterface(new Object(), "__forge");
+					forgeWebView.addJavascriptInterface(new DummyJSBridge(), "__forge");
 					if (ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").has("trusted_urls")) {
 						for (JsonElement whitelistPattern : ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls")) {
 							if (ForgeUtil.urlMatchesPattern(url, whitelistPattern.getAsString())) {

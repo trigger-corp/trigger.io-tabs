@@ -39,7 +39,7 @@ public class WebViewProxy {
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 		// Create webview
 		final ForgeWebView forgeWebView = new ForgeWebView(activity);
-		// Save static reference - TODO lose one of these surely?
+		// Save static reference
 		webView = forgeWebView;
 
 		// Configure ForgeWebView
@@ -51,6 +51,10 @@ public class WebViewProxy {
 		webSettings.setGeolocationEnabled(true);
 		webSettings.setBuiltInZoomControls(true); // Make webview behave more like Android browser
 		webSettings.setUseWideViewPort(true);     // Make webview behave more like Android browser
+		if (Build.VERSION.SDK_INT >= 16) {
+			webSettings.setAllowFileAccessFromFileURLs(true);
+			webSettings.setAllowUniversalAccessFromFileURLs(true);
+		}
 
 		forgeWebView.setWebChromeClient(new WebChromeClient() {
 			@Override
@@ -107,8 +111,7 @@ public class WebViewProxy {
 				} else if (url.startsWith("http:") || url.startsWith("https:")) {
 					// Normal urls
 					// can't use removeJavascriptInterface on 2.x
-					// TODO we need a DummyForgeJSBridge object probably
-					// subView.addJavascriptInterface(new Object(), "__forge");
+					forgeWebView.addJavascriptInterface(new DummyJSBridge(), "__forge");
 					if (ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").has("trusted_urls")) {
 						for (JsonElement whitelistPattern : ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls")) {
 							if (ForgeUtil.urlMatchesPattern(url, whitelistPattern.getAsString())) {
