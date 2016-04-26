@@ -1,0 +1,7 @@
+[
+	{
+		"do": {
+			"set_in_info_plist": { "key": "UIViewControllerBasedStatusBarAppearance", "value": false}
+		}
+	}
+]

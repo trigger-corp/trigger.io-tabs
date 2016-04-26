@@ -22,6 +22,24 @@
 
 #pragma mark - View lifecycle
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+
+    // save app status bar style
+    savedStatusBarStyle = [[[[UIApplication sharedApplication] keyWindow] rootViewController] preferredStatusBarStyle];
+
+    [[UIApplication sharedApplication] setStatusBarStyle:statusBarStyle animated:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    // restore app status bar style
+    [[UIApplication sharedApplication] setStatusBarStyle:savedStatusBarStyle animated:YES];
+}
+
 - (void)viewDidLoad
 {
 	[super viewDidLoad];
@@ -46,6 +64,7 @@
 	[navigationItem setTitle:title];
 
     navBar.translucent = translucent;
+    
     
 	if (tint != nil && [navBar respondsToSelector:@selector(setBarTintColor:)]) {
         [navBar setBarTintColor:tint];
@@ -128,6 +147,10 @@
 }
 - (void)setTranslucent:(bool)newTranslucent {
     translucent = newTranslucent;
+}
+
+- (void)setStatusBarStyle:(UIStatusBarStyle)newStatusBarStyle {
+    statusBarStyle = newStatusBarStyle;
 }
 
 - (void)viewDidUnload {

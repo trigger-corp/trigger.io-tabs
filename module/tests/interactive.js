@@ -35,7 +35,7 @@ asyncTest("Add an extra button", 1, function() {
 			url: url,
 			title: "Test buttons",
 			buttonText: "default",
-            pattern: "http://localhost/close.me.now"
+			pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.addButton({
 				position: "right",
@@ -86,7 +86,7 @@ asyncTest("Remove buttons", 1, function() {
 						start();
 					}
 				});
-        	});
+			});
 		}, function (e) {
 			ok(false, "API call failure: "+e.message);
 			start();
@@ -101,7 +101,7 @@ asyncTest("Left Button", 1, function() {
 			url: url,
 			title: "Test buttons",
 			buttonText: "default",
-            pattern: "http://localhost/close.me.now"
+			pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
@@ -110,14 +110,14 @@ asyncTest("Left Button", 1, function() {
 					tint: [255, 0, 0, 255]
 				}, function () {
 					forge.logging.log("clicked left");
-                	alert("clicked left");
-                	modal.close();
+					alert("clicked left");
+					modal.close();
 				}, function (e) {
 					ok(false, "API call failure: " + e.message);
 					start();
 				});
-        	});
-        	modal.closed.addListener(function () {
+			});
+			modal.closed.addListener(function () {
 				askQuestion("Did a tab/view just open with a button on the left?", {
 					Yes: function () {
 						ok(true, "Success");
@@ -143,7 +143,7 @@ asyncTest("Right Button", 1, function() {
 			url: url,
 			title: "Test buttons",
 			buttonText: "default",
-            pattern: "http://localhost/close.me.now"
+			pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
@@ -152,14 +152,14 @@ asyncTest("Right Button", 1, function() {
 					tint: [255, 0, 0, 255]
 				}, function () {
 					forge.logging.log("clicked right");
-                     alert("clicked right");
-                     modal.close();
+					 alert("clicked right");
+					 modal.close();
 				}, function (e) {
 					ok(false, "API call failure: " + e.message);
 					start();
 				});
-        	});
-        	modal.closed.addListener(function () {
+			});
+			modal.closed.addListener(function () {
 				askQuestion("Did a tab/view just open with a button on the right?", {
 					Yes: function () {
 						ok(true, "Success");
@@ -184,7 +184,7 @@ asyncTest("Both Buttons", 1, function() {
 			url: url,
 			title: "Test buttons",
 			buttonText: "default",
-            pattern: "http://localhost/close.me.now"
+			pattern: "http://localhost/close.me.now"
 		}, function (modal) {
 			modal.removeButtons(function ()	{
 				modal.addButton({
@@ -193,7 +193,7 @@ asyncTest("Both Buttons", 1, function() {
 					tint: [0, 0, 255, 255]
 				}, function () {
 					forge.logging.log("clicked left");
-                    alert("clicked left");
+					alert("clicked left");
 				}, function (e) {
 					ok(false, "API call failure: " + e.message);
 					start();
@@ -204,13 +204,13 @@ asyncTest("Both Buttons", 1, function() {
 					tint: [255, 0, 0, 255]
 				}, function () {
 					forge.logging.log("clicked right");
-                    alert("clicked right");
+					alert("clicked right");
 				}, function (e) {
 					ok(false, "API call failure: " + e.message);
 					start();
 				});
-        	});
-        	modal.closed.addListener(function () {
+			});
+			modal.closed.addListener(function () {
 				askQuestion("Did a tab/view just open with a button on the left and right?", {
 					Yes: function () {
 						ok(true, "Success");
@@ -320,7 +320,8 @@ asyncTest("Tab with options", 1, function() {
 			buttonTint: [0, 75, 0, 255],
 			title: "Hello",
 			buttonText: "Leave",
-			translucent: true
+			translucent: true,
+			statusBarStyle: "light_content"
 		}, function () {
 			askQuestion("Did a tab open and describe itself correctly?", {
 				Yes: function () {

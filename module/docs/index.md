@@ -31,7 +31,8 @@ Optional:
 -  ``tint``: Color to tint the top bar of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
--  ``transparent``: Turn off the top bar transparency effect (iOS Only)
+-  ``translucent``: Turn off the top bar translucency effect (iOS Only)
+-  ``statusBarStyle``: Set status bar style. Either ``"default"`` or ``"light_content"`` (iOS Only)
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
@@ -43,13 +44,13 @@ Optional:
 
 **Example**:
 
-    forge.tabs.openWithOptions({
-      url: 'http://my.server.com/login/',
-      pattern: 'http://my.server.com/loggedin/*',
-      title: 'Login Page'
-    }, function (data) {
-      forge.logging.log(data.url);
-    });
+	forge.tabs.openWithOptions({
+	  url: 'http://my.server.com/login/',
+	  pattern: 'http://my.server.com/loggedin/*',
+	  title: 'Login Page'
+	}, function (data) {
+	  forge.logging.log(data.url);
+	});
 
 !method: forge.tabs.openAdvanced(options, success, error)
 !platforms: iOS, Android
@@ -72,7 +73,8 @@ Optional:
 -  ``tint``: Color to tint the top bar of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
--  ``transparent``: Turn off the top bar transparency effect (iOS Only)
+-  ``translucent``: Turn off the top bar translucency effect (iOS Only)
+-  ``statusBarStyle``: Set status bar style. Either ``"default"`` or ``"light_content"`` (iOS Only)
 -  ``buttonText``: Text to show in the button to close the modal view.
 -  ``buttonIcon``: Icon to show in the button to close the modal view,
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
@@ -99,7 +101,7 @@ The ``modalBrowser`` object returned in the success callback has the following A
 !method: modalBrowser.addButton(params, callback, error)
 !param: params `object` button options, must contain at least ``icon`` or ``text``
 !param: callback `function()` callback to be invoked each time the button is pressed
-!description: Add a button to the modal browser's topbar. 
+!description: Add a button to the modal browser's topbar.
 !platforms: iOS, Android
 !param: error `function(content)` called with details of any error which may occur
 
@@ -131,16 +133,16 @@ Additionally, the following event listeners are supported:
 
 ### Example:
 
-    forge.tabs.openAdvanced({
-      url: 'http://my.server.com/page/',
-    }, function (modal) {
-      modal.loadFinished.addListener(function () {
-        modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
-      });
-      modal.closed.addListener(function () {
-        alert("Modal closed!");
-      }
-    });
+	forge.tabs.openAdvanced({
+	  url: 'http://my.server.com/page/',
+	}, function (modal) {
+	  modal.loadFinished.addListener(function () {
+		modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
+	  });
+	  modal.closed.addListener(function () {
+		alert("Modal closed!");
+	  }
+	});
 
 
 ## Notes
@@ -157,16 +159,15 @@ If your application needs to set the color of the Tabs top bar with greater prec
 
 2. Compute a bar tint color to match a given color. Arriving at the correct color may require some experimentation. You may also need to take into account the app content passing under the bar. (e.g. photos, app background color etc.)
 
-> A starting point is to darken each of the RGB channels in your `tint` color by 30, For Example: 
->         
+> A starting point is to darken each of the RGB channels in your `tint` color by 30, For Example:
+>
 >     tint: [64, 64, 128, 255]  // starting color
 >     tint: [34, 34,  98, 255]  // adjusted color
 >
 >
 > Note that if the starting color in a channel is already less than 30, you may need to darken the other channels by more than 30, for instance:
->            
+>
 >     tint: [10, 102, 51, 255]  // starting color
 >     tint: [ 0,  62, 11, 255]  // adjusted color
 
 For more information see: [Technical Q&A QA1808 - Matching a Bar Tint Color To Your Corporate or Brand Color](https://developer.apple.com/library/ios/qa/qa1808/_index.html)
-

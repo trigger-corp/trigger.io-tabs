@@ -11,6 +11,7 @@
 
 static NSMutableDictionary* tabs_modal_map;
 
+
 @implementation tabs_API
 
 + (void)open:(ForgeTask*)task {
@@ -54,10 +55,19 @@ static NSMutableDictionary* tabs_modal_map;
     } else {
         [modalView setTranslucent:true];
     }
+
+    if (([task.params objectForKey:@"statusBarStyle"] != nil) && 
+        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
+            [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
+    } else {
+        [modalView setStatusBarStyle:UIStatusBarStyleDefault];
+    }
 	
 	[modalView setTask:task];
 	
 	[[[ForgeApp sharedApp] viewController] presentModalViewController:modalView animated:YES];
+
+    
 	
 	[task success:task.callid];
 	
