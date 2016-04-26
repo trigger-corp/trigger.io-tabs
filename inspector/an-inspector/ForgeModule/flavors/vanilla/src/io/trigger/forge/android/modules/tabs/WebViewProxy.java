@@ -189,10 +189,13 @@ public class WebViewProxy {
 			});
 		} else {
 			Object wvObj = webView;
+			Object mProvider = null;
+
 			try {
-				Field f = wvObj.getClass().getDeclaredField("mProvider");
+				Field f = wvObj.getClass().getSuperclass().getDeclaredField("mProvider");
 				f.setAccessible(true);
-				wvObj = f.get(wvObj);
+				mProvider = f.get(wvObj);
+				wvObj = mProvider;
 			} catch (NoSuchFieldException e) {
 			} catch (IllegalArgumentException e) {
 				return;
@@ -201,7 +204,12 @@ public class WebViewProxy {
 			}
 
 			try {
-				Field f = wvObj.getClass().getDeclaredField("mWebViewCore");
+				Field f = null;
+				if (mProvider != null) {
+					f = mProvider.getClass().getDeclaredField("mWebViewCore");
+				} else { // we need WebView, not ForgeWebView
+					f = wvObj.getClass().getSuperclass().getDeclaredField("mWebViewCore");
+				}
 				f.setAccessible(true);
 				wvObj = f.get(wvObj);
 
