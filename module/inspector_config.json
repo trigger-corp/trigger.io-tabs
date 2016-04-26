@@ -6,7 +6,12 @@
 	},
 	"core": {
 		"general": {
-			"trusted_urls": [ "<all_urls>" ]
+			"trusted_urls": [ "<all_urls>",
+							  "http://*/*",
+							  "https://*/*" ]
+		},
+		"android": {
+			"remote_debugging": true
 		}
 	}
 }

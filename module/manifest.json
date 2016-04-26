@@ -1,5 +1,5 @@
 {
-	"changes": "* Fixed: `modal.executeJS` failing on Android 4.1 and older devices.\n* New option: `statusBarStyle` to control iOS status bar appearance when tabs are open.",
+	"changes": "* Fixed: `modal.executeJS` failing on Android 4.1 and older devices.\n",
 	"description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
 	"min_platform_version": "v2.4.4",
 	"namespace": "tabs",

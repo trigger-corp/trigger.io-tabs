@@ -32,7 +32,6 @@ Optional:
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
 -  ``translucent``: Turn off the top bar translucency effect (iOS Only)
--  ``statusBarStyle``: Set status bar style. Either ``"default"`` or ``"light_content"`` (iOS Only)
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
@@ -74,7 +73,6 @@ Optional:
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
 -  ``translucent``: Turn off the top bar translucency effect (iOS Only)
--  ``statusBarStyle``: Set status bar style. Either ``"default"`` or ``"light_content"`` (iOS Only)
 -  ``buttonText``: Text to show in the button to close the modal view.
 -  ``buttonIcon``: Icon to show in the button to close the modal view,
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
