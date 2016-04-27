@@ -145,6 +145,38 @@ Additionally, the following event listeners are supported:
 
 ## Notes
 
+::Crosswalk developers::
+
+There is currently an issue with Crosswalk WebView versions 16 and higher that causes the app display to flicker when opening the on-screen keyboard.
+
+One workaround for this issue is to force Crosswalk to use SurfaceView instead of TextureView by setting ANIMATABLE_XWALK_VIEW to false. This does, however, come at the cost of breaking modules that need to launch additional Crosswalk windows. For example, `forge.tabs`.
+
+Therefore, if you are using the `forge.tabs` module with a `crosswalk` build you will need to set the value of the "Enable Animatable Xwalk View" property to `true` in your `src/config.json` file:
+
+	"crosswalk": {
+		"enable_animatable_xwalk_view": true
+	}
+
+If you are experiencing flickering when opening the on-screen keyboard you can use the second workaround for this issue which is to set the "Window Soft Input Mode" property to `"adjustPan"` in your `src/config.json` file:
+
+	"android" {
+		"windowSoftInputMode": "adjustPan"
+	}
+
+This workaround will resolve the flickering, albeit at the cost of the WebView no longer scrolling up when the on-screen keyboard is opened.
+
+The workaround for this depends on your web framework of choice, but a good place to start would be [StackOverflow](http://stackoverflow.com/search?q=%5Bjavascript%5D+%5Bandroid%5D+scroll+page+keyboard).
+
+**tl;dr** If you want to use `forge.tabs` with the `crosswalk` target you need to:
+> 1. Set `crosswalk.enable_animatable_xwalk_view` to `true`.
+> 2. Set `android.windowSoftInputMode` to `"adjustPan"`.
+> 3. Manually handle keyboard show/hide events to ensure your form inputs aren't obscured.
+
+For more information see: [XWALK-3547 -
+XWalkView window stretches momentarily when hiding native ui elements](https://crosswalk-project.org/jira/browse/XWALK-3547).
+
+----
+
 ::iOS developers:: Beginning with iOS 7, navigation bars and tab bars are configured to be translucent by default.
 
 A translucent bar mixes its `tint` color with gray before combining it with a system-defined alpha value to produce the final background color that is used to composite the bar with the content it overlies.
