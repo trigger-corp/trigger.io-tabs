@@ -1,3 +1,29 @@
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+local.properties
+xcuserdata
+xcschemes
+
+# Eclipse project files
+.classpath
+.project
+.DS_Store
+
+# trigger stuff
+.lib
 .trigger
 identity.json
 inspector/an-inspector.*
