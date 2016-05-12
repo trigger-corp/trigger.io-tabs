@@ -53,7 +53,7 @@
 - (void)stringByEvaluatingJavaScriptFromString:(ForgeTask*)evalTask string:(NSString*)string;
 - (void)close;
 
-- (void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition tint:(UIColor*)newTint;
+- (void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition style:(NSString*)newStyle tint:(UIColor*)newTint;
 - (void)removeButtons:(ForgeTask*)newTask;
 
 @end
