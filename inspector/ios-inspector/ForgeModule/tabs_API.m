@@ -62,13 +62,11 @@ static NSMutableDictionary* tabs_modal_map;
     } else {
         [modalView setStatusBarStyle:UIStatusBarStyleDefault];
     }
-	
-	[modalView setTask:task];
-	
-	[[[ForgeApp sharedApp] viewController] presentModalViewController:modalView animated:YES];
 
-    
-	
+	[modalView setTask:task];
+
+	[[[ForgeApp sharedApp] viewController] presentViewController:modalView animated:YES completion:nil];
+
 	[task success:task.callid];
 	
 	if (tabs_modal_map == nil) {
