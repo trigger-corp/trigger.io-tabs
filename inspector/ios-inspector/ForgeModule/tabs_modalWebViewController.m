@@ -280,9 +280,14 @@
 	return [[ForgeApp sharedApp].viewController prefersStatusBarHidden];
 }
 
--(void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition tint:(UIColor*)newTint {
+-(void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition style:(NSString*)newStyle tint:(UIColor*)newTint {
     UIBarButtonItem* buttonItem = [[UIBarButtonItem alloc] init];
-    [buttonItem setStyle:UIBarButtonItemStyleBordered];
+
+    if (newStyle != nil && [newStyle isEqualToString:@"done"]) {
+        [buttonItem setStyle:UIBarButtonItemStyleDone];
+    } else {
+        [buttonItem setStyle:UIBarButtonItemStyleBordered];
+    }
 
     if (newText != nil) {
         [buttonItem setTitle:newText];
