@@ -88,6 +88,7 @@ static NSMutableDictionary* tabs_modal_map;
     NSString* text = nil;
     NSString* icon = nil;
     NSString* position = nil;
+    NSString* style = nil;
     UIColor*  tint = nil;
     
     if ([params objectForKey:@"text"] != nil) {
@@ -99,6 +100,9 @@ static NSMutableDictionary* tabs_modal_map;
     if ([params objectForKey:@"position"] != nil) {
         position = [params objectForKey:@"position"];
     }
+    if ([params objectForKey:@"style"] != nil) {
+        style = [params objectForKey:@"style"];
+    }
     if ([params objectForKey:@"tint"] != nil) {
         NSArray* array = [params objectForKey:@"tint"];
         tint = [UIColor colorWithRed:[(NSNumber*)[array objectAtIndex:0] floatValue]/255
@@ -107,7 +111,7 @@ static NSMutableDictionary* tabs_modal_map;
                                alpha:[(NSNumber*)[array objectAtIndex:3] floatValue]/255];
     }
 
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position tint:tint];
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position style:style tint:tint];
 }
 
 + (void)removeButtons:(ForgeTask*)task modal:(NSString*)modal {

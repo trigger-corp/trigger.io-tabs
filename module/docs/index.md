@@ -73,6 +73,9 @@ Optional:
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
 -  ``translucent``: Turn off the top bar translucency effect (iOS Only)
+-  ``titleTint``: Color to tint the top bar title of the modal view. An array of
+   four integers in the range [0,255] that make up the RGBA color. For
+   example, opaque red is [255, 0, 0, 255].
 -  ``buttonText``: Text to show in the button to close the modal view.
 -  ``buttonIcon``: Icon to show in the button to close the modal view,
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
@@ -112,6 +115,7 @@ The first parameter is an object describing the button with the following proper
 -  ``position``: The position to display the button, either ``left`` or
    ``right``. If not specified the first free space will be used.
 -  ``tint``: The color of the button, defined as an array as used for ``tint``.
+-  ``style``: The style of the button on iOS, ``done`` (bold text) or default (iOS Only)
 
 !method: modalBrowser.removeButtons(success, error)
 !description: This will remove all buttons from the browser's topbar.
