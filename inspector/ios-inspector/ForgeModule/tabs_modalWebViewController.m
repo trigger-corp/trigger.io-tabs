@@ -22,6 +22,13 @@
 
 #pragma mark - View lifecycle
 
+- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
+{
+    if ( self.presentedViewController) {
+        [super dismissViewControllerAnimated:flag completion:completion];
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -109,7 +116,7 @@
 							   nil
 							   ];
 
-	[[[ForgeApp sharedApp] viewController] dismissModalViewControllerAnimated:YES];
+	[[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
 	[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
 }
 
@@ -201,7 +208,7 @@
 		}
 
 		returnObj = [NSDictionary dictionary];
-		[[[ForgeApp sharedApp] viewController] dismissModalViewControllerAnimated:YES];
+		[[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
 		[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
 		
 		return NO;
@@ -217,7 +224,7 @@
 										   nil
 										   ];
 				
-				[[[ForgeApp sharedApp] viewController] dismissModalViewControllerAnimated:YES];
+				[[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
 				[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
 			
 				return NO;
@@ -265,7 +272,7 @@
 							   nil
 							   ];
 	
-	[[[ForgeApp sharedApp] viewController] dismissModalViewControllerAnimated:YES];
+	[[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
 	[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
 }
 
