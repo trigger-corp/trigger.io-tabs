@@ -129,7 +129,13 @@ forge['tabs'] = {
 					forge.internal.call("tabs.removeButtons", {
 						modal: cbId
 					}, success, error);
-				}
+				},
+        'setTitle': function (title, success, error) {
+          forge.internal.call("tabs.setTitle", {
+            modal: cbId,
+            title: title
+          }, success, error);
+        }
 			});
 		}, error);
 	}
