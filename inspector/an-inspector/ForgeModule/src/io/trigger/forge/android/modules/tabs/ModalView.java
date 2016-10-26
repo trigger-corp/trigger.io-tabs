@@ -158,7 +158,7 @@ public class ModalView {
                     buttonLeft = createButton(metrics, buttonText, buttonIcon, buttonTint);
                     buttonLeft.setId(ID_BUTTON_LEFT);
                 } catch (IOException e) {
-                    task.error(e);
+                    task.error(e.getLocalizedMessage());
                     return;
                 }
 
@@ -341,7 +341,14 @@ public class ModalView {
             ImageView image = new ImageView(ForgeApp.getActivity());
             image.setScaleType(ImageView.ScaleType.CENTER);
             Drawable icon;
-            icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), new ForgeFile(ForgeApp.getActivity(), buttonIcon).fd().createInputStream(), 0, 32, buttonColor);
+            ForgeFile buttonFile = new ForgeFile(ForgeApp.getActivity(), buttonIcon);
+            String error = "Could not create button from image file: '" +
+                    buttonIcon.getAsString() +
+                    "' Please check that this file exists in your app's src/config.json directory and that it is a valid PNG file.";
+            if (buttonFile == null || buttonFile.fd() == null) {
+                throw new IOException(error);
+            }
+            icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), buttonFile.fd().createInputStream(), 0, 32, buttonColor);
             image.setImageDrawable(icon);
             image.setPadding(buttonMargin, 0, buttonMargin, 0);
             button.addView(image);
@@ -390,7 +397,7 @@ public class ModalView {
                 try {
                     button = createButton(metrics, text, icon, tint, task);
                 } catch (IOException e) {
-                    task.error(e);
+                    task.error(e.getLocalizedMessage());
                     return;
                 }
 
