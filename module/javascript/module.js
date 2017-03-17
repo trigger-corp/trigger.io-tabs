@@ -35,10 +35,10 @@ var patternToReStr = function (str) {
 	} else {
 		re += host;
 	}
-	
+
 	// Path
 	re += path.replace(/\*/g, '.*');
-	
+
 	return "^"+re+"$";
 };
 
@@ -132,6 +132,12 @@ forge['tabs'] = {
 				}
 			});
 		}, error);
-	}
+	},
 
+	/**
+	 * Clear credential storage for app
+	 */
+	'clearCredentialStorage': function (success, error) {
+		forge.internal.call("tabs.clearCredentialStorage", {}, success, error);
+	}
 };
