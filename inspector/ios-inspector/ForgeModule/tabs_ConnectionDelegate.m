@@ -80,7 +80,7 @@
 - (BOOL)connectionShouldUseCredentialStorage:(NSURLConnection*)connection;
 {
     [ForgeLog d:@"Received callback: ConnectionDelegate::connectionShouldUseCredentialStorage"];
-    return NO;
+    return YES;
 }
 
 
