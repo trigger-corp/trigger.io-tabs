@@ -15,7 +15,8 @@
 
     bool             _basic_authorized;
     bool             _basic_authorized_failed;
-    bool             _basic_authorized_unsupported;
+    bool             _basic_authorized_did_ask;
+    bool             _basic_authorized_embedded;
     NSURLRequest    *_basic_request;
     NSURLConnection *_basic_connection;
 
