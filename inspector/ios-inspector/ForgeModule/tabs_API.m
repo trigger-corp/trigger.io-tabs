@@ -11,7 +11,6 @@
 
 static NSMutableDictionary* tabs_modal_map;
 
-
 @implementation tabs_API
 
 + (void)open:(ForgeTask*)task {
@@ -61,6 +60,13 @@ static NSMutableDictionary* tabs_modal_map;
             [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
     } else {
         [modalView setStatusBarStyle:UIStatusBarStyleDefault];
+    }
+
+    // basic auth options
+    if ([task.params objectForKey:@"basicAuth"] != nil) {
+        modalView.enableBasicAuth = [NSNumber numberWithBool:[[task.params objectForKey:@"basicAuth"] boolValue]];
+    } else {
+        modalView.enableBasicAuth = [NSNumber numberWithBool:NO];
     }
 
 	[modalView setTask:task];

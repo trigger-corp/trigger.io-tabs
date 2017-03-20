@@ -135,10 +135,11 @@
                 [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
                 return;
             }
-            [[challenge sender] useCredential:[NSURLCredential credentialWithUser:[[alert textFieldAtIndex:0] text]
-                                                                         password:[[alert textFieldAtIndex:1] text]
-                                                                      //persistence:NSURLCredentialPersistenceForSession]
-                                                                      persistence:NSURLCredentialPersistencePermanent]
+            NSString *username = [[alert textFieldAtIndex:0] text];
+            NSString *password = [[alert textFieldAtIndex:1] text];
+            [[challenge sender] useCredential:[NSURLCredential credentialWithUser:username
+                                                                         password:password
+                                                                      persistence:NSURLCredentialPersistenceForSession]
                    forAuthenticationChallenge:challenge];
         }];
 

@@ -33,6 +33,8 @@
 	NSDictionary *returnObj;
 }
 
+@property (nonatomic, strong) IBOutlet NSNumber* enableBasicAuth;
+
 @property (nonatomic, strong) IBOutlet UINavigationItem *navigationItem;
 
 - (void)setUrl:(NSURL*)newUrl;

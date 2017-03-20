@@ -9,6 +9,7 @@
 #import "tabs_modalWebViewController.h"
 #import "tabs_Delegate.h"
 #import "tabs_ConnectionDelegate.h"
+#import "tabs_API.h"
 
 @implementation tabs_modalWebViewController
 @synthesize navigationItem;
@@ -238,7 +239,13 @@ static ConnectionDelegate *connectionDelegate = nil;
         }
     }
 
-    // delegate remaining processing for request
+    // we're done if basic auth is not enabled
+    if (self.enableBasicAuth == NO) {
+        return YES;
+    }
+
+    // otherwise, delegate remaining processing for request
+    [ForgeLog d:@"shouldStartLoadWithRequest processing using basic auth"];
     if (connectionDelegate == nil) {
         connectionDelegate = [[ConnectionDelegate alloc] initWithWebView:webView];
     }
