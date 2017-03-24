@@ -11,6 +11,8 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.HttpAuthHandler;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -49,6 +51,8 @@ public class ModalView {
     final static int ID_TITLE  = 10;
     final static int ID_BUTTON_LEFT = 11;
     final static int ID_BUTTON_RIGHT = 12;
+
+    public boolean terminateBasicAuthHandling = false;
 
 
 
@@ -244,6 +248,50 @@ public class ModalView {
             });
             return true;
         }
+        return false;
+    }
+
+    public boolean onReceivedHttpAuthRequest(final WebView webView, final HttpAuthHandler handler, final String host, final String realm) {
+        ForgeLog.i("ModalView::onReceivedHttpAuthRequest");
+
+        // check if basicAuth is enabled
+        if (!task.params.has("basicAuth")) {
+            ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 1");
+            return true;
+        } else if (task.params.get("basicAuth").getAsBoolean() == false) {
+            ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 2");
+            return true;
+        } else if (instance.terminateBasicAuthHandling == true) {
+            return true;
+        }
+
+        // try existing credentials
+        String [] storedCredentials = webView.getHttpAuthUsernamePassword(host, realm);
+        if (handler.useHttpAuthUsernamePassword() && storedCredentials != null && storedCredentials.length >= 2) {
+            ForgeLog.i("ModalView::onReceivedHttpAuthRequest useHttpAuthUsernamePassword is TRUE");
+            ForgeLog.i("\tStored credentials are: " + storedCredentials[0] + " " + storedCredentials[1]);
+            handler.proceed(storedCredentials[0], storedCredentials[1]);
+            return false;
+        }
+
+        // prompt user for credentials
+        task.performUI(new Runnable() {
+            public void run() {
+                final LoginDialog dialog = new LoginDialog(ForgeApp.getActivity(), instance, webView, handler, host, realm);
+                if (task.params.has("basicAuthConfig")) {
+                    JsonObject cfg = task.params.getAsJsonObject("basicAuthConfig");
+                    dialog.i8n.title = cfg.has("titleText") ? cfg.get("titleText").getAsString() : dialog.i8n.title;
+                    dialog.i8n.usernameHint = cfg.has("usernameHintText") ? cfg.get("usernameHintText").getAsString() : dialog.i8n.usernameHint;
+                    dialog.i8n.passwordHint = cfg.has("passwordHintText") ? cfg.get("passwordHintText").getAsString() : dialog.i8n.passwordHint;
+                    dialog.i8n.loginButton = cfg.has("loginButtonText") ? cfg.get("loginButtonText").getAsString() : dialog.i8n.loginButton;
+                    dialog.i8n.cancelButton = cfg.has("cancelButtonText") ? cfg.get("cancelButtonText").getAsString() : dialog.i8n.cancelButton;
+                    dialog.closeTabOnCancel = cfg.has("closeTabOnCancel") ? cfg.get("closeTabOnCancel").getAsBoolean() : false;
+                }
+
+                dialog.show();
+            }
+        });
+
         return false;
     }
 
@@ -458,4 +506,6 @@ public class ModalView {
             }
         });
     }
+
+
 }

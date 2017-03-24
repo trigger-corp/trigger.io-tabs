@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.webkit.HttpAuthHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -30,7 +31,7 @@ import com.google.gson.JsonElement;
 
 public class WebViewProxy {
 	public ForgeWebView webView = null; // TODO private
-	ModalView parentView = null; // TODO better name e.g. parentView
+	ModalView parentView = null;
 
 	public WebViewProxy(ModalView parentView) {
 		this.parentView = parentView;
@@ -136,6 +137,14 @@ public class WebViewProxy {
 						ForgeLog.w("Attempted to open a URL which could not be handled: " + url);
 					}
 					return true;
+				}
+			}
+
+			@Override
+			public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+				ForgeLog.i("WebViewProxy::onReceivedHttpAuthRequest");
+				if (parentView.onReceivedHttpAuthRequest(view, handler, host, realm)) {
+					super.onReceivedHttpAuthRequest(view, handler, host, realm);
 				}
 			}
 		});
