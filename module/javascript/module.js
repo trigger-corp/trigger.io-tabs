@@ -132,12 +132,5 @@ forge['tabs'] = {
 				}
 			});
 		}, error);
-	},
-
-	/**
-	 * Clear credential storage for app
-	 */
-	'clearCredentialStorage': function (success, error) {
-		forge.internal.call("tabs.clearCredentialStorage", {}, success, error);
 	}
 };

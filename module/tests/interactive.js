@@ -20,19 +20,19 @@ asyncTest("Open tab with website", 1, function() {
 	});
 });
 
-asyncTest("Test clearing credential storage for app", 1, function() {
-	forge.tabs.clearCredentialStorage(function () {
-		ok(true, "Success");
-	}, function (e) {
-		ok(false, "API call failure: "+e.message);
-		start();
-	});
-});
-
 asyncTest("Test HTTP Basic Auth Advanced", 1, function() {
 	forge.tabs.openWithOptions({
 		url: "http://docker.trigger.io/staffbase/A.html",
-		pattern: "http://docker.trigger.io/staffbase/D-close-tab.html?*"
+		pattern: "http://docker.trigger.io/staffbase/D-close-tab.html?*",
+		basicAuth: true,
+		basicAuthConfig: {
+			titleText: "titleText %host%",
+			usernameHintText: "usernameHintText",
+			passwordHintText: "passwordHintText",
+			loginButtonText: "loginButtonText",
+			cancelButtonText: "cancelButtonText",
+			closeTabOnCancel: true
+		}
 	}, function (response) {
 		askQuestion("Did a tab/view just open in the foreground and respond with: " + JSON.stringify(response), {
 			Yes: function () {
@@ -53,7 +53,8 @@ asyncTest("Test HTTP Basic Auth Advanced", 1, function() {
 asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
 	forge.tabs.openAdvanced({
 		url: "https://docker.trigger.io/staffbase/A.html",
-		pattern: "https://docker.trigger.io/staffbase/D-close-tab.html?*"
+		pattern: "https://docker.trigger.io/staffbase/D-close-tab.html?*",
+		basicAuth: true
 	}, function (modal) {
 		modal.closed.addListener(function (response) {
 			askQuestion("Did a tab/view just open in the foreground with a basic auth prompt and respond with: " + JSON.stringify(response), {
