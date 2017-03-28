@@ -124,30 +124,4 @@ static NSMutableDictionary* tabs_modal_map;
     [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtons:task];
 }
 
-
-+ (void)clearCredentialStorage:(ForgeTask*)task {
-    [ForgeLog d:@"tabs.clearCredentialStorage will now attempt to clear the credential storage and fail miserably every time"];
-
-    NSURLCredentialStorage *credentialStorage = [NSURLCredentialStorage sharedCredentialStorage];
-    NSDictionary *credentialProtectionSpaces = [credentialStorage allCredentials];
-
-    for (NSURLProtectionSpace *protectionSpace in [credentialProtectionSpaces allKeys]) {
-        [ForgeLog d:[NSString stringWithFormat:@"tabs.clearCredentialStorage clearing protection space: %@", protectionSpace]];
-        NSDictionary *credentials = [credentialProtectionSpaces objectForKey:protectionSpace];
-        for (id username in [credentials allKeys]) {
-            [ForgeLog d:[NSString stringWithFormat:@"tabs.clearCredentialStorage clearing: %@", username]];
-            NSURLCredential *credential = [credentials objectForKey:username];
-            [credentialStorage removeCredential:credential forProtectionSpace:protectionSpace];
-        }
-    }
-
-    /*NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *cookie in [storage cookies]) {
-        [storage deleteCookie:cookie];
-    }*/
-
-    [task success:nil];
-}
-
-
 @end

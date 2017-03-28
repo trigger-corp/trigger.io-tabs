@@ -12,12 +12,21 @@
 
 @implementation ConnectionDelegate
 
-- (ConnectionDelegate*) initWithWebView:(UIWebView *)newWebView {
+- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView {
     if (self = [super init]) {
+        modalInstance = newModalInstance;
         webView = newWebView;
         // "retain"
         me = self;
     }
+
+    i8n.title = @"Log in to %host%";
+    i8n.usernameHint = @"Login";
+    i8n.passwordHint = @"Password";
+    i8n.loginButton = @"Log In";
+    i8n.cancelButton = @"Cancel";
+
+    closeTabOnCancel = NO;
     
     _basic_authorized = NO;
     _basic_authorized_failed = NO;
@@ -122,19 +131,22 @@
 
     // respond to initial challenge
     if ([challenge previousFailureCount] == 0) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Log in to %@", host]
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
                                                         message:nil
                                                        delegate:nil
-                                              cancelButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"Log In", nil];
+                                              cancelButtonTitle:i8n.cancelButton
+                                              otherButtonTitles:i8n.loginButton, nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
         [LoginDialogDelegate showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
-                [ForgeLog d:@"User cancelled login"];
                 _basic_authorized_failed = YES;
                 [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+                if (closeTabOnCancel == YES) {
+                    [modalInstance cancel:nil];
+                }
                 return;
             }
+
             NSString *username = [[alert textFieldAtIndex:0] text];
             NSString *password = [[alert textFieldAtIndex:1] text];
             [[challenge sender] useCredential:[NSURLCredential credentialWithUser:username

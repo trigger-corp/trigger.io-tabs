@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "tabs_modalWebViewController.h"
+
 // good overview: http://mikeabdullah.net/history-of-nsurlconnection-auth.html
 
 @interface ConnectionDelegate : NSObject <NSURLConnectionDelegate> {
@@ -20,10 +22,21 @@
     NSURLRequest    *_basic_request;
     NSURLConnection *_basic_connection;
 
+    tabs_modalWebViewController *modalInstance;
     ConnectionDelegate *me;
+
+@public
+    struct Text {
+        __unsafe_unretained NSString *title;
+        __unsafe_unretained NSString *usernameHint;
+        __unsafe_unretained NSString *passwordHint;
+        __unsafe_unretained NSString *loginButton;
+        __unsafe_unretained NSString *cancelButton;
+    } i8n;
+    bool closeTabOnCancel;
 }
 
-- (ConnectionDelegate*) initWithWebView:(UIWebView *)newWebView;
+- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView;
 - (void) releaseDelegate;
 
 - (BOOL)handleRequest:(NSURLRequest *)request;

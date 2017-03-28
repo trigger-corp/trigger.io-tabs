@@ -11,6 +11,5 @@
 @interface tabs_API : NSObject
 
 + (void)open:(ForgeTask*)task;
-+ (void)clearCredentialStorage:(ForgeTask*)task;
 
 @end
