@@ -27,6 +27,7 @@
     i8n.cancelButton = @"Cancel";
 
     closeTabOnCancel = NO;
+    useCredentialStorage = YES;
     
     _basic_authorized = NO;
     _basic_authorized_failed = NO;
@@ -88,8 +89,9 @@
 
 - (BOOL)connectionShouldUseCredentialStorage:(NSURLConnection*)connection;
 {
-    [ForgeLog d:@"Received callback: ConnectionDelegate::connectionShouldUseCredentialStorage"];
-    return YES;
+    [ForgeLog d:[NSString stringWithFormat:@"Received callback: ConnectionDelegate::connectionShouldUseCredentialStorage => %d", useCredentialStorage]];
+
+    return useCredentialStorage;
 }
 
 

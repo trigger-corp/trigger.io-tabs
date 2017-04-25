@@ -41,17 +41,17 @@ Optional:
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
 - ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
-- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
+- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
 
 **Example**:
 
-    forge.tabs.openWithOptions({
-      url: 'http://my.server.com/login/',
-      pattern: 'http://my.server.com/loggedin/*',
-      title: 'Login Page'
-    }, function (data) {
-      forge.logging.log(data.url);
-    });
+	forge.tabs.openWithOptions({
+	  url: 'http://my.server.com/login/',
+	  pattern: 'http://my.server.com/loggedin/*',
+	  title: 'Login Page'
+	}, function (data) {
+	  forge.logging.log(data.url);
+	});
 
 !method: forge.tabs.openAdvanced(options, success, error)
 !platforms: iOS, Android
@@ -84,7 +84,7 @@ Optional:
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
 - ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
-- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
+- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
 
 
 
@@ -140,16 +140,16 @@ Additionally, the following event listeners are supported:
 
 ### Example:
 
-    forge.tabs.openAdvanced({
-      url: 'http://my.server.com/page/',
-    }, function (modal) {
-      modal.loadFinished.addListener(function () {
-        modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
-      });
-      modal.closed.addListener(function () {
-        alert("Modal closed!");
-      }
-    });
+	forge.tabs.openAdvanced({
+	  url: 'http://my.server.com/page/',
+	}, function (modal) {
+	  modal.loadFinished.addListener(function () {
+		modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
+	  });
+	  modal.closed.addListener(function () {
+		alert("Modal closed!");
+	  }
+	});
 
 
 ## Notes
@@ -162,15 +162,15 @@ One workaround for this issue is to force Crosswalk to use SurfaceView instead o
 
 Therefore, if you are using the `forge.tabs` module with a `crosswalk` build you will need to set the value of the "Enable Animatable Xwalk View" property to `true` in your `src/config.json` file:
 
-    "crosswalk": {
-        "enable_animatable_xwalk_view": true
-    }
+	"crosswalk": {
+		"enable_animatable_xwalk_view": true
+	}
 
 If you are experiencing flickering when opening the on-screen keyboard you can use the second workaround for this issue which is to set the "Window Soft Input Mode" property to `"adjustPan"` in your `src/config.json` file:
 
-    "android" {
-        "windowSoftInputMode": "adjustPan"
-    }
+	"android" {
+		"windowSoftInputMode": "adjustPan"
+	}
 
 This workaround will resolve the flickering, albeit at the cost of the WebView no longer scrolling up when the on-screen keyboard is opened.
 

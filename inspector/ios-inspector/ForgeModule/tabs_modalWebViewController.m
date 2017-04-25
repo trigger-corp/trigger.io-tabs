@@ -258,6 +258,7 @@ static ConnectionDelegate *connectionDelegate = nil;
         connectionDelegate->i8n.loginButton = [cfg objectForKey:@"loginButtonText"] ?: connectionDelegate->i8n.loginButton;
         connectionDelegate->i8n.cancelButton = [cfg objectForKey:@"cancelButtonText"] ?: connectionDelegate->i8n.cancelButton;
         connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue] ?: connectionDelegate->closeTabOnCancel;
+        connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"closeTabOnCancel"] boolValue] ?: connectionDelegate->useCredentialStorage;
     }
 
     return [connectionDelegate handleRequest:request];

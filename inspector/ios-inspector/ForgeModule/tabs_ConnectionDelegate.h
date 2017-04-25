@@ -34,6 +34,7 @@
         __unsafe_unretained NSString *cancelButton;
     } i8n;
     bool closeTabOnCancel;
+    bool useCredentialStorage;
 }
 
 - (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView;
