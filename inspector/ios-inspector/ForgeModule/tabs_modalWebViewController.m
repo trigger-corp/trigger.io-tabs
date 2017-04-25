@@ -257,8 +257,12 @@ static ConnectionDelegate *connectionDelegate = nil;
         connectionDelegate->i8n.passwordHint = [cfg objectForKey:@"passwordHintText"] ?: connectionDelegate->i8n.passwordHint;
         connectionDelegate->i8n.loginButton = [cfg objectForKey:@"loginButtonText"] ?: connectionDelegate->i8n.loginButton;
         connectionDelegate->i8n.cancelButton = [cfg objectForKey:@"cancelButtonText"] ?: connectionDelegate->i8n.cancelButton;
-        connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue] ?: connectionDelegate->closeTabOnCancel;
-        connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"closeTabOnCancel"] boolValue] ?: connectionDelegate->useCredentialStorage;
+        if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
+            connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
+        }
+        if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
+            connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
+        }
     }
 
     return [connectionDelegate handleRequest:request];
