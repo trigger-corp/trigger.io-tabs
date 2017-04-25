@@ -260,8 +260,8 @@ static ConnectionDelegate *connectionDelegate = nil;
         if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
             connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
         }
-        if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
-            connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
+        if ([cfg objectForKey:@"useCredentialStorage"] != nil) {
+            connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"useCredentialStorage"] boolValue];
         }
     }
 
