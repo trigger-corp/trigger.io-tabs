@@ -49,11 +49,6 @@
 
     [ForgeLog d:[NSString stringWithFormat:@"Invocation: ConnectionDelegate::handleRequest %@ authorized: %d asked: %d", requestURL, _basic_authorized, _basic_authorized_did_ask]];
 
-    // TODO API method to disable basicAuth support
-    // if (disabled) {
-    //     return YES;
-    // }
-
     // assume requests coming through while webview is loading are embedded content
     if (webView.isLoading) {
         [ForgeLog d:@"Returning ConnectionDelegate::handleRequest YES - embedded content"];
@@ -118,8 +113,14 @@
         server = [response.allHeaderFields valueForKey:@"Server"];
     }
 
-    // check that it's basic auth and fall back to default handling if it's not
-    if ([[challenge protectionSpace] authenticationMethod] != NSURLAuthenticationMethodHTTPBasic) {
+    // handle non Basic Auth challenges
+    if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodNTLM]) {
+        [ForgeLog d:@"Rejecting authentication method: NSURLAuthenticationMethodNTLM"];
+        _basic_authorized = NO;
+        [[challenge sender] rejectProtectionSpaceAndContinueWithChallenge:challenge];
+        return;
+
+    } else if (![[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodHTTPBasic]) {
         NSString *message = [NSString stringWithFormat:@"Unsupported authentication method: %@", [[challenge protectionSpace] authenticationMethod]];
         [ForgeLog d:message];
         _basic_authorized = YES;
@@ -133,6 +134,7 @@
 
     // respond to initial challenge
     if ([challenge previousFailureCount] == 0) {
+        [ForgeLog d:@"Requesting username/password for basic auth"];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
                                                         message:nil
                                                        delegate:nil
@@ -141,6 +143,7 @@
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
         [LoginDialogDelegate showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
+                [ForgeLog d:@"User cancelled username/password request for basic auth"];
                 _basic_authorized_failed = YES;
                 [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
                 if (closeTabOnCancel == YES) {
@@ -149,6 +152,7 @@
                 return;
             }
 
+            [ForgeLog d:@"Sending username/password challenge response for basic auth"];
             NSString *username = [[alert textFieldAtIndex:0] text];
             NSString *password = [[alert textFieldAtIndex:1] text];
             [[challenge sender] useCredential:[NSURLCredential credentialWithUser:username
@@ -161,7 +165,7 @@
     }
 
     // user supplied invalid credentials
-    [ForgeLog d:@"Invalid username/password"];
+    [ForgeLog d:@"Invalid username/password for basic auth"];
     _basic_authorized_failed = YES;
     [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
 }
