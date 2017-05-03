@@ -14,11 +14,12 @@ static NSMutableDictionary* tabs_modal_map;
 @implementation tabs_API
 
 + (void)open:(ForgeTask*)task {
+
 	if (![task.params objectForKey:@"url"]) {
 		[task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
 		return;
 	}
-	
+
 	tabs_modalWebViewController *modalView = [[tabs_modalWebViewController alloc] initWithNibName:@"tabs_modalWebViewController" bundle:[NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"tabs" ofType:@"bundle"]]];
 
 	[modalView setUrl:[NSURL URLWithString:[task.params objectForKey:@"url"]]];

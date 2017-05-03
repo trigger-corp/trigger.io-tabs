@@ -245,23 +245,22 @@ static ConnectionDelegate *connectionDelegate = nil;
     }
 
     // otherwise, delegate remaining processing for request
-    [ForgeLog d:@"shouldStartLoadWithRequest processing using basic auth"];
+    [ForgeLog d:@"shouldStartLoadWithRequest processing using custom auth"];
     if (connectionDelegate == nil) {
         connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView];
-    }
-
-    if ([task.params objectForKey:@"basicAuthConfig"]) {
-        NSDictionary *cfg = [task.params objectForKey:@"basicAuthConfig"];
-        connectionDelegate->i8n.title = [cfg objectForKey:@"titleText"] ?: connectionDelegate->i8n.title;
-        connectionDelegate->i8n.usernameHint = [cfg objectForKey:@"usernameHintText"] ?: connectionDelegate->i8n.usernameHint;
-        connectionDelegate->i8n.passwordHint = [cfg objectForKey:@"passwordHintText"] ?: connectionDelegate->i8n.passwordHint;
-        connectionDelegate->i8n.loginButton = [cfg objectForKey:@"loginButtonText"] ?: connectionDelegate->i8n.loginButton;
-        connectionDelegate->i8n.cancelButton = [cfg objectForKey:@"cancelButtonText"] ?: connectionDelegate->i8n.cancelButton;
-        if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
-            connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
-        }
-        if ([cfg objectForKey:@"useCredentialStorage"] != nil) {
-            connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"useCredentialStorage"] boolValue];
+        if ([task.params objectForKey:@"basicAuthConfig"]) {
+            NSDictionary *cfg = [task.params objectForKey:@"basicAuthConfig"];
+            connectionDelegate->i8n.title = [cfg objectForKey:@"titleText"] ?: connectionDelegate->i8n.title;
+            connectionDelegate->i8n.usernameHint = [cfg objectForKey:@"usernameHintText"] ?: connectionDelegate->i8n.usernameHint;
+            connectionDelegate->i8n.passwordHint = [cfg objectForKey:@"passwordHintText"] ?: connectionDelegate->i8n.passwordHint;
+            connectionDelegate->i8n.loginButton = [cfg objectForKey:@"loginButtonText"] ?: connectionDelegate->i8n.loginButton;
+            connectionDelegate->i8n.cancelButton = [cfg objectForKey:@"cancelButtonText"] ?: connectionDelegate->i8n.cancelButton;
+            if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
+                connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
+            }
+            if ([cfg objectForKey:@"useCredentialStorage"] != nil) {
+                connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"useCredentialStorage"] boolValue];
+            }
         }
     }
 
