@@ -12,6 +12,12 @@
 
 @implementation ConnectionDelegate
 
+- (void) log:(NSString*)message {
+    if (verboseLogging) {
+        [ForgeLog d:message];
+    }
+}
+
 - (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView {
     if (self = [super init]) {
         modalInstance = newModalInstance;
@@ -28,6 +34,7 @@
 
     closeTabOnCancel = NO;
     useCredentialStorage = YES;
+    verboseLogging = NO;
     
     _basic_authorized = NO;
     _basic_authorized_failed = NO;
@@ -47,11 +54,11 @@
 {
     NSString *requestURL = [[request URL] absoluteString];
 
-    [ForgeLog d:[NSString stringWithFormat:@"[1] Invocation: ConnectionDelegate::handleRequest v2.5.10 %@ authorized: %d asked: %d", requestURL, _basic_authorized, _basic_authorized_did_ask]];
+    [self log:[NSString stringWithFormat:@"[1] Invocation: ConnectionDelegate::handleRequest v2.5.10 %@ authorized: %d asked: %d", requestURL, _basic_authorized, _basic_authorized_did_ask]];
 
     // assume requests coming through while webview is loading are embedded content
     if (webView.isLoading) {
-        [ForgeLog d:@"Returning ConnectionDelegate::handleRequest YES - embedded content"];
+        [self log:@"Returning ConnectionDelegate::handleRequest YES - embedded content"];
         _basic_authorized = YES;
         _basic_authorized_embedded = YES;
         return YES;
@@ -67,7 +74,7 @@
     if (_basic_authorized == NO) {
         _basic_request = request;
         _basic_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-        [ForgeLog d:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
+        [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
         return NO;
     }
 
@@ -76,7 +83,7 @@
       _basic_authorized = NO; // reset basic auth for next request
     }
 
-    [ForgeLog d:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
+    [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
 
     return YES;
 }
@@ -84,7 +91,7 @@
 
 - (BOOL)connectionShouldUseCredentialStorage:(NSURLConnection*)connection;
 {
-    [ForgeLog d:[NSString stringWithFormat:@"[2] Received callback: ConnectionDelegate::connectionShouldUseCredentialStorage => %d", useCredentialStorage]];
+    [self log:[NSString stringWithFormat:@"[2] Received callback: ConnectionDelegate::connectionShouldUseCredentialStorage => %d", useCredentialStorage]];
 
     return useCredentialStorage;
 }
@@ -102,16 +109,16 @@
 
 - (void) connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-    [ForgeLog d:[NSString stringWithFormat:@"[3] Received callback: ConnectionDelegate::willSendRequestForAuthenticationChallenge %@ authorized: %d embedded: %d", [challenge.protectionSpace host], _basic_authorized, _basic_authorized_embedded]];
-    [ForgeLog d:[NSString stringWithFormat:@"  Error: %@", challenge.error]];                                  // NSError
-    [ForgeLog d:[NSString stringWithFormat:@"  Failure Response: %@", challenge.failureResponse]];             // NSURLResponse
-    [ForgeLog d:[NSString stringWithFormat:@"  Previous Failure Count: %ld", challenge.previousFailureCount]]; // int
-    [ForgeLog d:[NSString stringWithFormat:@"  Proposed Credential: %@", challenge.proposedCredential]];       // NSURLCredential
-    [ForgeLog d:[NSString stringWithFormat:@"  Protection Space: %@", challenge.protectionSpace]];             // NSURLProtectionSpace
-    [ForgeLog d:[NSString stringWithFormat:@"    protocol = %@", [[challenge protectionSpace] protocol]]];
-    [ForgeLog d:[NSString stringWithFormat:@"    realm = %@", [[challenge protectionSpace] realm]]];
-    [ForgeLog d:[NSString stringWithFormat:@"    authenticationMethod = %@", [[challenge protectionSpace] authenticationMethod]]];
-    [ForgeLog d:[NSString stringWithFormat:@"  Sender: %@", challenge.sender]];                                // NSURLAuthenticationChallengeSender
+    [self log:[NSString stringWithFormat:@"[3] Received callback: ConnectionDelegate::willSendRequestForAuthenticationChallenge %@ authorized: %d embedded: %d", [challenge.protectionSpace host], _basic_authorized, _basic_authorized_embedded]];
+    [self log:[NSString stringWithFormat:@"  Error: %@", challenge.error]];                                  // NSError
+    [self log:[NSString stringWithFormat:@"  Failure Response: %@", challenge.failureResponse]];             // NSURLResponse
+    [self log:[NSString stringWithFormat:@"  Previous Failure Count: %ld", challenge.previousFailureCount]]; // int
+    [self log:[NSString stringWithFormat:@"  Proposed Credential: %@", challenge.proposedCredential]];       // NSURLCredential
+    [self log:[NSString stringWithFormat:@"  Protection Space: %@", challenge.protectionSpace]];             // NSURLProtectionSpace
+    [self log:[NSString stringWithFormat:@"    protocol = %@", [[challenge protectionSpace] protocol]]];
+    [self log:[NSString stringWithFormat:@"    realm = %@", [[challenge protectionSpace] realm]]];
+    [self log:[NSString stringWithFormat:@"    authenticationMethod = %@", [[challenge protectionSpace] authenticationMethod]]];
+    [self log:[NSString stringWithFormat:@"  Sender: %@", challenge.sender]];                                // NSURLAuthenticationChallengeSender
 
     // get challenge information
     NSString *host = [challenge.protectionSpace host];
@@ -125,7 +132,7 @@
 
     // Handle server trust
     if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-        [ForgeLog d:@"Responding to authentication method: NSURLAuthenticationMethodServerTrust"];
+        [self log:@"Responding to authentication method: NSURLAuthenticationMethodServerTrust"];
         _basic_authorized = NO;
         [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
         return;
@@ -134,7 +141,7 @@
     // Handle unsupported authentication challenges
     if (![self isSupportedAuthenticationMethod:[[challenge protectionSpace] authenticationMethod]]) {
         NSString *message = [NSString stringWithFormat:@"Rejecting authentication method: %@", [[challenge protectionSpace] authenticationMethod]];
-        [ForgeLog d:message];
+        [self log:message];
         _basic_authorized = NO;
         [[challenge sender] rejectProtectionSpaceAndContinueWithChallenge:challenge];
         return;
@@ -142,7 +149,7 @@
 
     // Handle supported authentication challenges
     NSString *message = [NSString stringWithFormat:@"Handling supported authentication method: %@", [[challenge protectionSpace] authenticationMethod]];
-    [ForgeLog d:message];
+    [self log:message];
 
     // update state flags
     _basic_authorized = NO;
@@ -150,7 +157,7 @@
 
     // respond to initial challenge
     if ([challenge previousFailureCount] == 0) {
-        [ForgeLog d:@"Requesting username/password for basic auth"];
+        [self log:@"Requesting username/password for basic auth"];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
                                                         message:nil
                                                        delegate:nil
@@ -159,7 +166,7 @@
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
         [LoginDialogDelegate showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
-                [ForgeLog d:@"User cancelled username/password request for basic auth"];
+                [self log:@"User cancelled username/password request for basic auth"];
                 _basic_authorized_failed = YES;
                 [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
                 if (closeTabOnCancel == YES) {
@@ -168,7 +175,7 @@
                 return;
             }
 
-            [ForgeLog d:@"Sending username/password challenge response for basic auth"];
+            [self log:@"Sending username/password challenge response for basic auth"];
             NSString *username = [[alert textFieldAtIndex:0] text];
             NSString *password = [[alert textFieldAtIndex:1] text];
             [[challenge sender] useCredential:[NSURLCredential credentialWithUser:username
@@ -181,7 +188,7 @@
     }
 
     // user supplied invalid credentials
-    [ForgeLog d:@"Invalid username/password for basic auth"];
+    [self log:@"Invalid username/password for basic auth"];
     _basic_authorized_failed = YES;
     [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
 }
@@ -189,24 +196,15 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-    // TODO also see: http://stackoverflow.com/questions/26223494/
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     NSString *status = [NSHTTPURLResponse localizedStringForStatusCode:httpResponse.statusCode];
     NSString *responseString = [NSString stringWithFormat:@"%@", httpResponse];
 
-    [ForgeLog d:[NSString stringWithFormat:@"[4] Received callback: ConnectionDelegate::didReceiveResponse status: %@ authorized: %d embedded: %d failed: %d", status, _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
-    [ForgeLog d:[NSString stringWithFormat:@"    Response: %@", responseString]];
+    [self log:[NSString stringWithFormat:@"[4] Received callback: ConnectionDelegate::didReceiveResponse status: %@ authorized: %d embedded: %d failed: %d", status, _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
+    [self log:[NSString stringWithFormat:@"    Response: %@", responseString]];
 
     _basic_authorized = YES;
     _basic_connection = nil;
-
-    /*if ([httpResponse statusCode] == 200) {
-        _basic_authorized = YES;
-    } else {
-        _basic_authorized = NO;
-    }
-    //[_basic_connection cancel];
-    _basic_connection = nil;*/
 
     [webView loadRequest:_basic_request];
 }
@@ -214,12 +212,12 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    [ForgeLog d:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData authorized: %d embedded: %d failed: %d", _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
+    [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData authorized: %d embedded: %d failed: %d", _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
 
     if (_basic_authorized_failed == YES) {
         _basic_authorized_failed = NO;
         NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [ForgeLog d:[NSString stringWithFormat:@"Authorization failed: ConnectionDelegate::didReceiveData %@", html]];
+        [self log:[NSString stringWithFormat:@"Authorization failed: ConnectionDelegate::didReceiveData %@", html]];
         [webView loadHTMLString:html baseURL:nil];
         return;
     }

@@ -245,7 +245,6 @@ static ConnectionDelegate *connectionDelegate = nil;
     }
 
     // otherwise, delegate remaining processing for request
-    [ForgeLog d:@"shouldStartLoadWithRequest processing using custom auth"];
     if (connectionDelegate == nil) {
         connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView];
         if ([task.params objectForKey:@"basicAuthConfig"]) {
@@ -260,6 +259,9 @@ static ConnectionDelegate *connectionDelegate = nil;
             }
             if ([cfg objectForKey:@"useCredentialStorage"] != nil) {
                 connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"useCredentialStorage"] boolValue];
+            }
+            if ([cfg objectForKey:@"verboseLogging"] != nil) {
+                connectionDelegate->verboseLogging = [[cfg objectForKey:@"verboseLogging"] boolValue];
             }
         }
     }
