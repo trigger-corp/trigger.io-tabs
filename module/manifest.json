@@ -1,8 +1,8 @@
 {
-	"changes": "* Add support for BasicAuth challenges from sites opened in Tab.\n",
+	"changes": "* Add support for Basic Auth and NTLM challenges from sites opened in Tab.",
 	"description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
 	"min_platform_version": "v2.5.1",
 	"namespace": "tabs",
 	"platform_version": "v2.5.1",
-	"version": "2.15.10"
+	"version": "2.15"
 }
