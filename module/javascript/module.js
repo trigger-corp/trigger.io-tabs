@@ -35,10 +35,10 @@ var patternToReStr = function (str) {
 	} else {
 		re += host;
 	}
-	
+
 	// Path
 	re += path.replace(/\*/g, '.*');
-	
+
 	return "^"+re+"$";
 };
 
@@ -139,5 +139,4 @@ forge['tabs'] = {
 			});
 		}, error);
 	}
-
 };

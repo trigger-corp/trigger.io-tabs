@@ -1,6 +1,78 @@
-/*global forge, module, asyncTest, ok, start, askQuestion, equal */
+/* global forge, module, asyncTest, ok, start, askQuestion, equal */
+
 module("forge.tabs");
 
+asyncTest("Open tab with website", 1, function() {
+	forge.tabs.open("https://trigger.io", function () {
+		askQuestion("Did a tab/view just open in the foreground with the Trigger.io website?", {
+			Yes: function () {
+				ok(true, "Success");
+				start();
+			},
+			No: function () {
+				ok(false, "User claims failure");
+				start();
+			}
+		});
+	}, function (e) {
+		ok(false, "API call failure: "+e.message);
+		start();
+	});
+});
+
+asyncTest("Test HTTP Basic Auth Advanced", 1, function() {
+	forge.tabs.openWithOptions({
+		url: "http://docker.trigger.io/staffbase/A.html",
+		pattern: "http://docker.trigger.io/staffbase/D-close-tab.html?*",
+		basicAuth: true,
+		basicAuthConfig: {
+			titleText: "titleText %host%",
+			usernameHintText: "usernameHintText",
+			passwordHintText: "passwordHintText",
+			loginButtonText: "loginButtonText",
+			cancelButtonText: "cancelButtonText",
+			closeTabOnCancel: true
+		}
+	}, function (response) {
+		askQuestion("Did a tab/view just open in the foreground and respond with: " + JSON.stringify(response), {
+			Yes: function () {
+				ok(true, "Success");
+				start();
+			},
+			No: function () {
+				ok(false, "User claims failure");
+				start();
+			}
+		});
+	}, function (e) {
+		ok(false, "API call failure: "+e.message);
+		start();
+	});
+});
+
+asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
+	forge.tabs.openAdvanced({
+		url: "https://docker.trigger.io/staffbase/A.html",
+		pattern: "https://docker.trigger.io/staffbase/D-close-tab.html?*",
+		basicAuth: true
+	}, function (modal) {
+		modal.closed.addListener(function (response) {
+			askQuestion("Did a tab/view just open in the foreground with a basic auth prompt and respond with: " + JSON.stringify(response), {
+				Yes: function () {
+					ok(true, "Success");
+					start();
+				},
+				No: function () {
+					ok(false, "User claims failure");
+					start();
+				}
+			});
+		});
+	}, function (e) {
+		ok(false, "API call failure: "+e.message);
+		start();
+	});
+});
 
 asyncTest("Test Title Text", 1, function() {
 	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
@@ -364,23 +436,5 @@ asyncTest("Advanced tab", 1, function() {
 			ok(false, "API call failure: "+e.message);
 			start();
 		});
-	});
-});
-
-asyncTest("Open tab with website", 1, function() {
-	forge.tabs.open("https://trigger.io", function () {
-		askQuestion("Did a tab/view just open in the foreground with the Trigger.io website?", {
-			Yes: function () {
-				ok(true, "Success");
-				start();
-			},
-			No: function () {
-				ok(false, "User claims failure");
-				start();
-			}
-		});
-	}, function (e) {
-		ok(false, "API call failure: "+e.message);
-		start();
 	});
 });

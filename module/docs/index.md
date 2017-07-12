@@ -40,6 +40,8 @@ Optional:
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
+- ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
+- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
 
 **Example**:
 
@@ -81,6 +83,9 @@ Optional:
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
+- ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
+- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
+
 
 
 ### Modal Browser API

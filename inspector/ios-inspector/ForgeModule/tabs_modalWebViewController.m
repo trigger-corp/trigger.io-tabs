@@ -8,10 +8,14 @@
 
 #import "tabs_modalWebViewController.h"
 #import "tabs_Delegate.h"
+#import "tabs_ConnectionDelegate.h"
+#import "tabs_API.h"
 
 @implementation tabs_modalWebViewController
 @synthesize navigationItem;
 @synthesize title;
+
+static ConnectionDelegate *connectionDelegate = nil;
 
 
 - (void)didReceiveMemoryWarning
@@ -100,6 +104,10 @@
 	// Make sure the network indicator is turned off
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
+    // release our connection delegate so it can be garbage collected
+    [connectionDelegate releaseDelegate];
+    connectionDelegate = nil;
+
 	if (returnObj != nil) {
 		[[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", task.callid] withParam:returnObj];
 	}
@@ -175,10 +183,9 @@
 }
 
 - (BOOL)webView:(UIWebView *)myWebView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-	// Called when a URL is requested
-	
-	NSURL *thisurl = [request URL];
+    NSURL *thisurl = [request URL];
 
+    // handle forge:// URLs
 	if ([[thisurl scheme] isEqualToString:@"forge"]) {
 		if ([[thisurl absoluteString] isEqualToString:@"forge://go"]) {
 			// See if URL is whitelisted - only allow forge API access on trusted pages
@@ -217,27 +224,56 @@
 		[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
 		
 		return NO;
-	} else {
-		if (pattern != nil) {
-			NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
-			if ([regex numberOfMatchesInString:[thisurl absoluteString] options:0 range:NSMakeRange(0, [[thisurl absoluteString] length])] > 0) {
-				returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-										   [thisurl absoluteString],
-										   @"url",
-										   [NSNumber numberWithBool:NO],
-										   @"userCancelled",
-										   nil
-										   ];
-				
-				[[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-				[[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
-			
-				return NO;
-			}
-		}
-		return YES;
 	}
+
+    // check whitelist
+    if (pattern != nil) {
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
+        if ([regex numberOfMatchesInString:[thisurl absoluteString] options:0 range:NSMakeRange(0, [[thisurl absoluteString] length])] > 0) {
+            returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [thisurl absoluteString],
+                                       @"url",
+                                       [NSNumber numberWithBool:NO],
+                                       @"userCancelled",
+                                       nil];
+            
+            [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
+            [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+        
+            return NO;
+        }
+    }
+
+    // we're done if basic auth is not enabled
+    if (self.enableBasicAuth == NO) {
+        return YES;
+    }
+
+    // otherwise, delegate remaining processing for request
+    if (connectionDelegate == nil) {
+        connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView];
+        if ([task.params objectForKey:@"basicAuthConfig"]) {
+            NSDictionary *cfg = [task.params objectForKey:@"basicAuthConfig"];
+            connectionDelegate->i8n.title = [cfg objectForKey:@"titleText"] ?: connectionDelegate->i8n.title;
+            connectionDelegate->i8n.usernameHint = [cfg objectForKey:@"usernameHintText"] ?: connectionDelegate->i8n.usernameHint;
+            connectionDelegate->i8n.passwordHint = [cfg objectForKey:@"passwordHintText"] ?: connectionDelegate->i8n.passwordHint;
+            connectionDelegate->i8n.loginButton = [cfg objectForKey:@"loginButtonText"] ?: connectionDelegate->i8n.loginButton;
+            connectionDelegate->i8n.cancelButton = [cfg objectForKey:@"cancelButtonText"] ?: connectionDelegate->i8n.cancelButton;
+            if ([cfg objectForKey:@"closeTabOnCancel"] != nil) {
+                connectionDelegate->closeTabOnCancel = [[cfg objectForKey:@"closeTabOnCancel"] boolValue];
+            }
+            if ([cfg objectForKey:@"useCredentialStorage"] != nil) {
+                connectionDelegate->useCredentialStorage = [[cfg objectForKey:@"useCredentialStorage"] boolValue];
+            }
+            if ([cfg objectForKey:@"verboseLogging"] != nil) {
+                connectionDelegate->verboseLogging = [[cfg objectForKey:@"verboseLogging"] boolValue];
+            }
+        }
+    }
+
+    return [connectionDelegate handleRequest:request];
 }
+
 
 - (void)webViewDidStartLoad:(UIWebView *)_webView {
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
