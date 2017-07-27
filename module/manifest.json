@@ -1,8 +1,8 @@
 {
-	"changes": "* Add support for Basic Auth and NTLM challenges from sites opened in Tab.",
+	"changes": "* Added Basic Auth option `retryFailedLogin`\n* Fixed: iOS would enable Basic Auth handling even if `enableBasicAuth` was not set.\n* Fixed: Android i8n for Basic Auth",
 	"description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
-	"min_platform_version": "v2.5.1",
+	"min_platform_version": "v2.5.5",
 	"namespace": "tabs",
-	"platform_version": "v2.5.1",
-	"version": "2.15"
+	"platform_version": "v2.5.5",
+	"version": "2.16"
 }
