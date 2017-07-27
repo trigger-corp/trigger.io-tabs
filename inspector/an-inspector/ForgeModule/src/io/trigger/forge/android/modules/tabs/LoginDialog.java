@@ -15,19 +15,15 @@ import io.trigger.forge.android.core.ForgeLog;
 public class LoginDialog {
     private AlertDialog.Builder builder;
 
-    public class Text {
+    public static class Text {
         public String title = "Log in to %host%";
         public String usernameHint = "Login";
         public String passwordHint = "Password";
         public String loginButton = "Log In";
         public String cancelButton = "Cancel";
     };
-    public Text i8n = new Text();
-    public boolean closeTabOnCancel = false;
-    public boolean retryFailedLogin = false;
 
-    public LoginDialog(final Activity context, final ModalView modalInstance, final WebView webView, final HttpAuthHandler handler, final String host, final String realm) {
-
+    public LoginDialog(final Activity context, final ModalView modalInstance, final WebView webView, final HttpAuthHandler handler, final String host, final String realm, final Text i8n, final boolean closeTabOnCancel, final boolean retryFailedLogin) {
         LinearLayout layout = new LinearLayout(context);
         final EditText usernameInput = new EditText(context);
         final EditText passwordInput = new EditText(context);

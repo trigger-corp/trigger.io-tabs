@@ -278,18 +278,22 @@ public class ModalView {
         // prompt user for credentials
         task.performUI(new Runnable() {
             public void run() {
-                final LoginDialog dialog = new LoginDialog(ForgeApp.getActivity(), instance, webView, handler, host, realm);
+
+                LoginDialog.Text i8n = new LoginDialog.Text();
+                boolean closeTabOnCancel = false;
+                boolean retryFailedLogin = false;
                 if (task.params.has("basicAuthConfig")) {
                     JsonObject cfg = task.params.getAsJsonObject("basicAuthConfig");
-                    dialog.i8n.title = cfg.has("titleText") ? cfg.get("titleText").getAsString() : dialog.i8n.title;
-                    dialog.i8n.usernameHint = cfg.has("usernameHintText") ? cfg.get("usernameHintText").getAsString() : dialog.i8n.usernameHint;
-                    dialog.i8n.passwordHint = cfg.has("passwordHintText") ? cfg.get("passwordHintText").getAsString() : dialog.i8n.passwordHint;
-                    dialog.i8n.loginButton = cfg.has("loginButtonText") ? cfg.get("loginButtonText").getAsString() : dialog.i8n.loginButton;
-                    dialog.i8n.cancelButton = cfg.has("cancelButtonText") ? cfg.get("cancelButtonText").getAsString() : dialog.i8n.cancelButton;
-                    dialog.closeTabOnCancel = cfg.has("closeTabOnCancel") ? cfg.get("closeTabOnCancel").getAsBoolean() : false;
-                    dialog.retryFailedLogin = cfg.has("retryFailedLogin") ? cfg.get("retryFailedLogin").getAsBoolean() : false;
+                    i8n.title = cfg.has("titleText") ? cfg.get("titleText").getAsString() : i8n.title;
+                    i8n.passwordHint = cfg.has("passwordHintText") ? cfg.get("passwordHintText").getAsString() : i8n.passwordHint;
+                    i8n.usernameHint = cfg.has("usernameHintText") ? cfg.get("usernameHintText").getAsString() : i8n.usernameHint;
+                    i8n.loginButton = cfg.has("loginButtonText") ? cfg.get("loginButtonText").getAsString() : i8n.loginButton;
+                    i8n.cancelButton = cfg.has("cancelButtonText") ? cfg.get("cancelButtonText").getAsString() : i8n.cancelButton;
+                    closeTabOnCancel = cfg.has("closeTabOnCancel") ? cfg.get("closeTabOnCancel").getAsBoolean() : false;
+                    retryFailedLogin = cfg.has("retryFailedLogin") ? cfg.get("retryFailedLogin").getAsBoolean() : false;
                 }
 
+                final LoginDialog dialog = new LoginDialog(ForgeApp.getActivity(), instance, webView, handler, host, realm, i8n, closeTabOnCancel, retryFailedLogin);
                 dialog.show();
             }
         });

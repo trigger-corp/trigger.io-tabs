@@ -1,4 +1,4 @@
-/* global forge, module, asyncTest, ok, start, askQuestion, equal */
+/* global forge, module, asyncTest, ok, start, equal */
 
 module("forge.tabs");
 
