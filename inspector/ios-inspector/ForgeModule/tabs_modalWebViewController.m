@@ -240,7 +240,7 @@ static ConnectionDelegate *connectionDelegate = nil;
     }
 
     // we're done if basic auth is not enabled
-    if (self.enableBasicAuth == NO) {
+    if (self.enableBasicAuth == [NSNumber numberWithBool:NO]) {
         return YES;
     }
 
