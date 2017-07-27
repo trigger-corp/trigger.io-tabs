@@ -52,6 +52,7 @@ public class ModalView {
     final static int ID_BUTTON_LEFT = 11;
     final static int ID_BUTTON_RIGHT = 12;
 
+    public int previousFailureCount = 0;
     public boolean terminateBasicAuthHandling = false;
 
 
@@ -286,6 +287,7 @@ public class ModalView {
                     dialog.i8n.loginButton = cfg.has("loginButtonText") ? cfg.get("loginButtonText").getAsString() : dialog.i8n.loginButton;
                     dialog.i8n.cancelButton = cfg.has("cancelButtonText") ? cfg.get("cancelButtonText").getAsString() : dialog.i8n.cancelButton;
                     dialog.closeTabOnCancel = cfg.has("closeTabOnCancel") ? cfg.get("closeTabOnCancel").getAsBoolean() : false;
+                    dialog.retryFailedLogin = cfg.has("retryFailedLogin") ? cfg.get("retryFailedLogin").getAsBoolean() : false;
                 }
 
                 dialog.show();

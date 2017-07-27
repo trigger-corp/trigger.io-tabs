@@ -263,6 +263,9 @@ static ConnectionDelegate *connectionDelegate = nil;
             if ([cfg objectForKey:@"verboseLogging"] != nil) {
                 connectionDelegate->verboseLogging = [[cfg objectForKey:@"verboseLogging"] boolValue];
             }
+            if ([cfg objectForKey:@"retryFailedLogin"] != nil) {
+                connectionDelegate->retryFailedLogin = [[cfg objectForKey:@"retryFailedLogin"] boolValue];
+            }
         }
     }
 

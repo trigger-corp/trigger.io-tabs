@@ -24,7 +24,17 @@ asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
 	forge.tabs.openAdvanced({
 		url: "https://docker.trigger.io/staffbase/A.html",
 		pattern: "https://docker.trigger.io/staffbase/D-close-tab.html?*",
-		basicAuth: true
+		basicAuth: true,
+		basicAuthConfig: {
+			titleText: "titleText %host%",
+			usernameHintText: "usernameHintText",
+			passwordHintText: "passwordHintText",
+			loginButtonText: "loginButtonText",
+			cancelButtonText: "cancelButtonText",
+			closeTabOnCancel: true,
+			retryFailedLogin: true,
+			verboseLogging: true
+		}
 	}, function (modal) {
 		modal.closed.addListener(function (response) {
 			askQuestion("Did a tab/view just open in the foreground with a basic auth prompt and respond with: " + JSON.stringify(response), {
@@ -43,6 +53,7 @@ asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
 		start();
 	});
 });
+
 
 asyncTest("Test Title Text", 1, function() {
 	forge.tools.getURL("fixtures/tabs/close.html", function (url) {
