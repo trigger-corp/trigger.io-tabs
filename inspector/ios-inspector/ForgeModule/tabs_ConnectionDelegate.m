@@ -35,6 +35,7 @@
     closeTabOnCancel = NO;
     useCredentialStorage = YES;
     verboseLogging = NO;
+    retryFailedLogin =  NO;
     
     _basic_authorized = NO;
     _basic_authorized_failed = NO;
@@ -155,8 +156,15 @@
     _basic_authorized = NO;
     _basic_authorized_did_ask = YES;
 
+    // allow up to three retries if retryFailedLogin is set
+    int tries = 1;
+    if (retryFailedLogin) {
+        tries = 3;
+    }
+    [self log:[NSString stringWithFormat:@"Previous failure count is: %ld", [challenge previousFailureCount]]];
+
     // respond to initial challenge
-    if ([challenge previousFailureCount] == 0) {
+    if ([challenge previousFailureCount] < tries) {
         [self log:@"Requesting username/password for basic auth"];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
                                                         message:nil

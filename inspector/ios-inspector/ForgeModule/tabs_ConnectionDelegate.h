@@ -36,6 +36,7 @@
     bool closeTabOnCancel;
     bool useCredentialStorage;
     bool verboseLogging;
+    bool retryFailedLogin;
 }
 
 - (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView;

@@ -10,22 +10,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import io.trigger.forge.android.core.ForgeApp;
+import io.trigger.forge.android.core.ForgeLog;
 
 public class LoginDialog {
     private AlertDialog.Builder builder;
 
-    public class Text {
+    public static class Text {
         public String title = "Log in to %host%";
         public String usernameHint = "Login";
         public String passwordHint = "Password";
         public String loginButton = "Log In";
         public String cancelButton = "Cancel";
     };
-    public Text i8n = new Text();
-    public boolean closeTabOnCancel = false;
 
-    public LoginDialog(final Activity context, final ModalView modalInstance, final WebView webView, final HttpAuthHandler handler, final String host, final String realm) {
-
+    public LoginDialog(final Activity context, final ModalView modalInstance, final WebView webView, final HttpAuthHandler handler, final String host, final String realm, final Text i8n, final boolean closeTabOnCancel, final boolean retryFailedLogin) {
         LinearLayout layout = new LinearLayout(context);
         final EditText usernameInput = new EditText(context);
         final EditText passwordInput = new EditText(context);
@@ -50,7 +48,12 @@ public class LoginDialog {
                 if (handler != null) {
                     handler.proceed(username, password);
                 }
-                modalInstance.terminateBasicAuthHandling = true;
+                if (retryFailedLogin && modalInstance.previousFailureCount < 3) {
+                    modalInstance.previousFailureCount++; // try again
+                } else {
+                    modalInstance.previousFailureCount = 0;
+                    modalInstance.terminateBasicAuthHandling = true;
+                }
             }
         });
         builder.setNegativeButton(i8n.cancelButton, new DialogInterface.OnClickListener() {

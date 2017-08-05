@@ -1,8 +1,10 @@
+/* global forge, module, asyncTest, ok, start, equal */
+
 module("forge.tabs");
 
 asyncTest("openWithOptions - fail", 1, function() {
 	forge.tabs.openWithOptions({
-	
+
 	}, function () {
 		ok(false);
 		start();
@@ -14,7 +16,7 @@ asyncTest("openWithOptions - fail", 1, function() {
 
 asyncTest("openWithOptions - everything", 1, function() {
 	forge.tabs.openWithOptions({
-		url: "http://www.trigger.io",
+		url: "https://www.trigger.io",
 		pattern: "https://trigger.io/*",
 		tint: [40, 20, 50, 255],
 		buttonText: "Test",
