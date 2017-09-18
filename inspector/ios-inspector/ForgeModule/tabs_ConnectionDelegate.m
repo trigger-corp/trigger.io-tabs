@@ -12,6 +12,7 @@
 
 @implementation ConnectionDelegate
 
+
 - (void) log:(NSString*)message {
     if (verboseLogging) {
         [ForgeLog d:message];
@@ -37,10 +38,9 @@
     verboseLogging = NO;
     retryFailedLogin =  NO;
     
-    _basic_authorized = NO;
     _basic_authorized_failed = NO;
-    _basic_authorized_did_ask = NO;
-    _basic_authorized_embedded = NO;
+
+    authorizationCache = [[NSMutableDictionary alloc] init];
 
     return self;
 }
@@ -55,13 +55,11 @@
 {
     NSString *requestURL = [[request URL] absoluteString];
 
-    [self log:[NSString stringWithFormat:@"[1] Invocation: ConnectionDelegate::handleRequest v2.5.10 %@ authorized: %d asked: %d", requestURL, _basic_authorized, _basic_authorized_did_ask]];
+    [self log:[NSString stringWithFormat:@"[1] Invocation: ConnectionDelegate::handleRequest %@", requestURL]];
 
     // assume requests coming through while webview is loading are embedded content
     if (webView.isLoading) {
         [self log:@"Returning ConnectionDelegate::handleRequest YES - embedded content"];
-        _basic_authorized = YES;
-        _basic_authorized_embedded = YES;
         return YES;
     }
 
@@ -71,17 +69,19 @@
         return YES;
     }
 
-    // this request has not yet been checked for basic auth, check it
-    if (_basic_authorized == NO) {
-        _basic_request = request;
-        _basic_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-        [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
-        return NO;
+    // check if this URL has been authorized in the past
+    NSNumber *authorized = [authorizationCache objectForKey:requestURL];
+    bool _basic_authorized = NO;
+    if (authorized != nil) {
+        [self log:[NSString stringWithFormat:@"ConnectionDelegate::handleRequest authorizationCache: %@", authorized]];
+        _basic_authorized = [authorized boolValue];
     }
 
-    // sometimes preceding pages did not have auth so we cannot assume subsequent requests will also be authed
-    if (_basic_authorized_embedded == NO && _basic_authorized_did_ask == NO) {
-      _basic_authorized = NO; // reset basic auth for next request
+    // this request has not yet been checked for basic auth, check it
+    if (_basic_authorized == NO) {
+        [NSURLConnection connectionWithRequest:request delegate:self];
+        [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
+        return NO;
     }
 
     [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
@@ -110,7 +110,7 @@
 
 - (void) connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-    [self log:[NSString stringWithFormat:@"[3] Received callback: ConnectionDelegate::willSendRequestForAuthenticationChallenge %@ authorized: %d embedded: %d", [challenge.protectionSpace host], _basic_authorized, _basic_authorized_embedded]];
+    [self log:[NSString stringWithFormat:@"[3] Received callback: ConnectionDelegate::willSendRequestForAuthenticationChallenge %@", [challenge.protectionSpace host]]];
     [self log:[NSString stringWithFormat:@"  Error: %@", challenge.error]];                                  // NSError
     [self log:[NSString stringWithFormat:@"  Failure Response: %@", challenge.failureResponse]];             // NSURLResponse
     [self log:[NSString stringWithFormat:@"  Previous Failure Count: %ld", challenge.previousFailureCount]]; // int
@@ -134,7 +134,6 @@
     // Handle server trust
     if ([[[challenge protectionSpace] authenticationMethod] isEqualToString:NSURLAuthenticationMethodServerTrust]) {
         [self log:@"Responding to authentication method: NSURLAuthenticationMethodServerTrust"];
-        _basic_authorized = NO;
         [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
         return;
     }
@@ -143,7 +142,6 @@
     if (![self isSupportedAuthenticationMethod:[[challenge protectionSpace] authenticationMethod]]) {
         NSString *message = [NSString stringWithFormat:@"Rejecting authentication method: %@", [[challenge protectionSpace] authenticationMethod]];
         [self log:message];
-        _basic_authorized = NO;
         [[challenge sender] rejectProtectionSpaceAndContinueWithChallenge:challenge];
         return;
     }
@@ -151,10 +149,6 @@
     // Handle supported authentication challenges
     NSString *message = [NSString stringWithFormat:@"Handling supported authentication method: %@", [[challenge protectionSpace] authenticationMethod]];
     [self log:message];
-
-    // update state flags
-    _basic_authorized = NO;
-    _basic_authorized_did_ask = YES;
 
     // allow up to three retries if retryFailedLogin is set
     int tries = 1;
@@ -208,19 +202,21 @@
     NSString *status = [NSHTTPURLResponse localizedStringForStatusCode:httpResponse.statusCode];
     NSString *responseString = [NSString stringWithFormat:@"%@", httpResponse];
 
-    [self log:[NSString stringWithFormat:@"[4] Received callback: ConnectionDelegate::didReceiveResponse status: %@ authorized: %d embedded: %d failed: %d", status, _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
+    [self log:[NSString stringWithFormat:@"[4] Received callback: ConnectionDelegate::didReceiveResponse status: %@ failed: %d", status, _basic_authorized_failed]];
     [self log:[NSString stringWithFormat:@"    Response: %@", responseString]];
 
-    _basic_authorized = YES;
-    _basic_connection = nil;
+    NSString *url = [[[connection currentRequest] URL] absoluteString];
+    [authorizationCache setObject:[NSNumber numberWithBool:YES] forKey:url];
 
-    [webView loadRequest:_basic_request];
+    [webView loadRequest:[connection currentRequest]];
 }
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData authorized: %d embedded: %d failed: %d", _basic_authorized, _basic_authorized_embedded, _basic_authorized_failed]];
+    [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData failed: %d", _basic_authorized_failed]];
+
+    NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     if (_basic_authorized_failed == YES) {
         _basic_authorized_failed = NO;
@@ -231,6 +227,24 @@
     }
 }
 
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    [self log:[NSString stringWithFormat:@"[6] Received callback: ConnectionDelegate::didFailWithError: %@ failed: %d", error, _basic_authorized_failed]];
+}
+
+
+/*- (nullable NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(nullable NSURLResponse *)response
+{
+    [self log:[NSString stringWithFormat:@"[7] Received callback: ConnectionDelegate::willSendRequest connection: %@ request: %@ redirectResponse: %@ => failed: %d", connection, request, response, _basic_authorized_failed]];
+
+    return request;
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    [self log:[NSString stringWithFormat:@"[8] Received callback: ConnectionDelegate::connectionDidFinishLoading failed: %d", _basic_authorized_failed]];
+}*/
 
 @end
 

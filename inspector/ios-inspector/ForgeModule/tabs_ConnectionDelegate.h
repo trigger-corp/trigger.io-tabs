@@ -12,16 +12,11 @@
 
 // good overview: http://mikeabdullah.net/history-of-nsurlconnection-auth.html
 
-@interface ConnectionDelegate : NSObject <NSURLConnectionDelegate> {
+@interface ConnectionDelegate : NSObject <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
+    NSMutableDictionary<NSString*, NSNumber*> *authorizationCache;
+    bool _basic_authorized_failed;
+
     UIWebView *webView;
-
-    bool             _basic_authorized;
-    bool             _basic_authorized_failed;
-    bool             _basic_authorized_did_ask;
-    bool             _basic_authorized_embedded;
-    NSURLRequest    *_basic_request;
-    NSURLConnection *_basic_connection;
-
     tabs_modalWebViewController *modalInstance;
     ConnectionDelegate *me;
 

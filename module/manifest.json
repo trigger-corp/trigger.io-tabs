@@ -1,8 +1,8 @@
 {
-	"changes": "* Added method `setTitle` to modal browser (iOS only).",
-	"description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
-	"min_platform_version": "v2.5.5",
-	"namespace": "tabs",
-	"platform_version": "v2.5.5",
-	"version": "2.17"
+    "changes": "* Added method `setTitle` to modal browser (iOS only).",
+    "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
+    "min_platform_version": "v2.5.5",
+    "namespace": "tabs",
+    "platform_version": "v2.5.5",
+    "version": "2.17.1"
 }
