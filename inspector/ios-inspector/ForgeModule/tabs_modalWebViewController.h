@@ -45,6 +45,7 @@
 - (void)setButtonTintColor:(UIColor *)newTint;
 
 - (void)setTitle:(NSString *)newTitle;
+- (void)overwriteTitle:(ForgeTask*)newTask title:(NSString*)newTitle;
 - (void)setTitleTintColor:(UIColor *)newTint;
 - (void)setTintColor:(UIColor *)newTint;
 - (void)setTranslucent:(bool)newTranslucent;

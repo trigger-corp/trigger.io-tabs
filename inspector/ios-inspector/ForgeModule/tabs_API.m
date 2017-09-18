@@ -125,4 +125,8 @@ static NSMutableDictionary* tabs_modal_map;
     [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtons:task];
 }
 
++ (void)setTitle:(ForgeTask*)task modal:(NSString*)modal title:(NSString*)title {
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] overwriteTitle:task title:title];
+}
+
 @end

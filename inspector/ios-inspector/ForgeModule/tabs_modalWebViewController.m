@@ -137,6 +137,11 @@ static ConnectionDelegate *connectionDelegate = nil;
 - (void)setTitle:(NSString *)newTitle {
 	title = newTitle;
 }
+- (void)overwriteTitle:(ForgeTask*)newTask title:(NSString*)newTitle {
+    title = newTitle;
+    [navigationItem setTitle:title];
+    [newTask success:nil];
+}
 
 - (void)setBackLabel:(NSString *)newLabel {
 	backLabel = newLabel;

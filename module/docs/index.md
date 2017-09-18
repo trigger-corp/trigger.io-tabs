@@ -128,6 +128,13 @@ The first parameter is an object describing the button with the following proper
 !platforms: iOS, Android
 !param: error `function(content)` called with details of any error which may occur
 
+!method: modalBrowser.setTitle(title, success, error)
+!param: title `string` new title for the modal browser
+!param: success `function()` callback to be invoked when no errors occur
+!description: Change the title of the modal browser's topbar.
+!platforms: iOS
+!param: error `function(content)` called with details of any error which may occur
+
 ### Modal Browser Events
 
 Additionally, the following event listeners are supported:
