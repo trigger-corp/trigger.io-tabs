@@ -90,8 +90,15 @@ static ConnectionDelegate *connectionDelegate = nil;
 	if (buttonTint != nil && [backButton respondsToSelector:@selector(setTintColor:)]) {
 		[backButton setTintColor:buttonTint];
 	}
-	
-	int height = 24;
+
+    // TODO dirty dirty hack to tide us over until we've adapted to the iPhone-X way of doing things
+	int height;
+	if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
+        height = 24;
+    } else {
+        height = 44;
+    }
+
 	if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
 		height += [ForgeApp sharedApp].webviewTop;
 		navBar.frame = CGRectMake(navBar.frame.origin.x, navBar.frame.origin.y + [ForgeApp sharedApp].webviewTop, navBar.frame.size.width, navBar.frame.size.height);
