@@ -19,10 +19,11 @@
     }
 }
 
-- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView {
+- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView pattern:(NSString*)newPattern {
     if (self = [super init]) {
         modalInstance = newModalInstance;
         webView = newWebView;
+        pattern = newPattern;
         // "retain"
         me = self;
     }
@@ -208,6 +209,20 @@
     NSString *url = [[[connection currentRequest] URL] absoluteString];
     [authorizationCache setObject:[NSNumber numberWithBool:YES] forKey:url];
 
+    // check return pattern
+    NSString *responseURL = [[response URL] absoluteString];
+    if (pattern != nil) {
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
+        if ([regex numberOfMatchesInString:responseURL options:0 range:NSMakeRange(0, [responseURL length])] > 0) {
+            NSDictionary *returnObj = [NSDictionary dictionaryWithObjectsAndKeys:responseURL, @"url",
+                                                        [NSNumber numberWithBool:NO], @"userCancelled", nil];
+            [modalInstance setReturnObj:returnObj];
+            [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
+            [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+            return;
+        }
+    }
+
     [webView loadRequest:[connection currentRequest]];
 }
 
@@ -215,8 +230,6 @@
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData failed: %d", _basic_authorized_failed]];
-
-    NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
     if (_basic_authorized_failed == YES) {
         _basic_authorized_failed = NO;

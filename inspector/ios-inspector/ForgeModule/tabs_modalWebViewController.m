@@ -91,7 +91,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 		[backButton setTintColor:buttonTint];
 	}
 	
-	int height = 44;
+	int height = 24;
 	if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
 		height += [ForgeApp sharedApp].webviewTop;
 		navBar.frame = CGRectMake(navBar.frame.origin.x, navBar.frame.origin.y + [ForgeApp sharedApp].webviewTop, navBar.frame.size.width, navBar.frame.size.height);
@@ -151,6 +151,15 @@ static ConnectionDelegate *connectionDelegate = nil;
 - (void)setTask:(ForgeTask *)newTask {
 	task = newTask;
 }
+
+- (ForgeTask*)getTask {
+    return task;
+}
+
+- (void)setReturnObj:(NSDictionary *)newReturnObj {
+    returnObj = newReturnObj;
+}
+
 - (void)setPattern:(NSString *)newPattern {
 	pattern = newPattern;
 }
@@ -221,7 +230,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 		return NO;
 	}
 
-    // check whitelist
+    // check return pattern
     if (pattern != nil) {
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
         if ([regex numberOfMatchesInString:[thisurl absoluteString] options:0 range:NSMakeRange(0, [[thisurl absoluteString] length])] > 0) {
@@ -246,7 +255,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 
     // otherwise, delegate remaining processing for request
     if (connectionDelegate == nil) {
-        connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView];
+        connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView pattern:pattern];
         if ([task.params objectForKey:@"basicAuthConfig"]) {
             NSDictionary *cfg = [task.params objectForKey:@"basicAuthConfig"];
             connectionDelegate->i8n.title = [cfg objectForKey:@"titleText"] ?: connectionDelegate->i8n.title;

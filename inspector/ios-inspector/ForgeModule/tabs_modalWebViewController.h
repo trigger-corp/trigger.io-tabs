@@ -50,6 +50,8 @@
 - (void)setTranslucent:(bool)newTranslucent;
 - (void)setStatusBarStyle:(UIStatusBarStyle)newStatusBarStyle;
 - (void)setTask:(ForgeTask *)newTask;
+- (ForgeTask*)getTask;
+- (void)setReturnObj:(NSDictionary *)newReturnObj;
 - (void)setPattern:(NSString *)newPattern;
 - (void)cancel:(id)nothing;
 - (void)stringByEvaluatingJavaScriptFromString:(ForgeTask*)evalTask string:(NSString*)string;

@@ -15,6 +15,7 @@
 @interface ConnectionDelegate : NSObject <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
     NSMutableDictionary<NSString*, NSNumber*> *authorizationCache;
     bool _basic_authorized_failed;
+    NSString *pattern;
 
     UIWebView *webView;
     tabs_modalWebViewController *modalInstance;
@@ -34,7 +35,7 @@
     bool retryFailedLogin;
 }
 
-- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView;
+- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView*)newWebView pattern:(NSString*)newPattern;
 - (void) releaseDelegate;
 
 - (BOOL)handleRequest:(NSURLRequest *)request;
