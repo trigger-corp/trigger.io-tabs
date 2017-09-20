@@ -30,7 +30,7 @@
 		B3127A1716AD9F660027B9B8 /* tabs_API.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tabs_API.h; sourceTree = "<group>"; };
 		B3127A1816AD9F660027B9B8 /* tabs_API.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tabs_API.m; sourceTree = "<group>"; };
 		B3127A1916AD9F660027B9B8 /* tabs_modalWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tabs_modalWebViewController.h; sourceTree = "<group>"; };
-		B3127A1A16AD9F660027B9B8 /* tabs_modalWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tabs_modalWebViewController.m; sourceTree = "<group>"; };
+		B3127A1A16AD9F660027B9B8 /* tabs_modalWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tabs_modalWebViewController.m; sourceTree = "<group>"; usesTabs = 0; };
 		B3127A1B16AD9F660027B9B8 /* tabs_modalWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = tabs_modalWebViewController.xib; sourceTree = "<group>"; };
 		B31B6D4E15C13D5200854074 /* libForgeModule.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libForgeModule.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B31B6D5115C13D5200854074 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };

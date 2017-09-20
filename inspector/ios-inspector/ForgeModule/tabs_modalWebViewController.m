@@ -91,14 +91,14 @@ static ConnectionDelegate *connectionDelegate = nil;
 		[backButton setTintColor:buttonTint];
 	}
 
-    // TODO dirty dirty hack to tide us over until we've adapted to the iPhone-X way of doing things
-	int height;
-	if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"11.0")) {
-        height = 24;
-    } else {
-        height = 44;
+    // TODO dirty dirty hacks to tide us over until we've adapted to the iPhone-X way of doing things
+    if (@available(iOS 11.0, *)) {
+        // don't add a safe area to the view for now
+        // later we'll figure out how to square it all with iPhone-X
+        [webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
 
+    int height = 44;
 	if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
 		height += [ForgeApp sharedApp].webviewTop;
 		navBar.frame = CGRectMake(navBar.frame.origin.x, navBar.frame.origin.y + [ForgeApp sharedApp].webviewTop, navBar.frame.size.width, navBar.frame.size.height);
