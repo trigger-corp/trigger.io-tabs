@@ -20,10 +20,12 @@
     return self;
 }
 
+
 - (void) clicked {
     NSString *eventName = [NSString stringWithFormat:@"tabs.buttonPressed.%@", callId];
     [[ForgeApp sharedApp] event:eventName withParam:[NSNull null]];
 }
+
 
 - (void) releaseDelegate {
     me = nil;

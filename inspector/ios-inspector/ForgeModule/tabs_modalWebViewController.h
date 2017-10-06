@@ -28,6 +28,12 @@
     bool translucent;
     UIStatusBarStyle statusBarStyle;
     UIStatusBarStyle savedStatusBarStyle;
+
+    UIView *blurView;
+    UIVisualEffectView *blurViewVisualEffect;
+    NSLayoutConstraint *blurViewBottomConstraint;
+
+    NSLayoutConstraint *navBarTopConstraint;
     
 	NSDictionary *returnObj;
 }
