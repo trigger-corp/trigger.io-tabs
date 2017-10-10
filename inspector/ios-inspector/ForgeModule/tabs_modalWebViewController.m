@@ -77,14 +77,6 @@ static ConnectionDelegate *connectionDelegate = nil;
     }
     [navigationItem setTitle:title];
 
-    navBar.translucent = translucent;
-
-    if (tint != nil && [navBar respondsToSelector:@selector(setBarTintColor:)]) {
-        [navBar setBarTintColor:tint];
-    } else if (tint != nil && [navBar respondsToSelector:@selector(setTintColor:)]) {
-        [navBar setTintColor:tint];
-    }
-
     if (titleTint != nil && [navBar respondsToSelector:@selector(setTitleTextAttributes:)]) {
         [navBar setTitleTextAttributes:@{ NSForegroundColorAttributeName:titleTint }];
     }
@@ -124,6 +116,10 @@ static ConnectionDelegate *connectionDelegate = nil;
     [webView.scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(insetHeight, 0, 0, 0)];
 
     [self createStatusBarVisualEffect:webView];
+
+    if (tint != nil) {
+        blurView.backgroundColor = tint;
+    }
 }
 
 
@@ -131,7 +127,6 @@ static ConnectionDelegate *connectionDelegate = nil;
     // remove existing status bar blur effect
     [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc]init] forBarMetrics:UIBarMetricsDefault];
     [[UINavigationBar appearance] setShadowImage:[[UIImage alloc]init]];
-    //navigationBar.translucent = YES;
 
     // create a replacement blur effect that covers both the status bar and navigation bar
     blurView = [[UIView alloc] init];
@@ -274,11 +269,6 @@ static ConnectionDelegate *connectionDelegate = nil;
 
 - (void)setTintColor:(UIColor *)newTint {
     tint = newTint;
-}
-
-
-- (void)setTranslucent:(bool)newTranslucent {
-    translucent = newTranslucent;
 }
 
 

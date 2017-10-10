@@ -31,7 +31,6 @@ Optional:
 -  ``tint``: Color to tint the top bar of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
--  ``translucent``: Turn off the top bar translucency effect (iOS Only)
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
@@ -45,13 +44,13 @@ Optional:
 
 **Example**:
 
-	forge.tabs.openWithOptions({
-	  url: 'http://my.server.com/login/',
-	  pattern: 'http://my.server.com/loggedin/*',
-	  title: 'Login Page'
-	}, function (data) {
-	  forge.logging.log(data.url);
-	});
+    forge.tabs.openWithOptions({
+      url: 'http://my.server.com/login/',
+      pattern: 'http://my.server.com/loggedin/*',
+      title: 'Login Page'
+    }, function (data) {
+      forge.logging.log(data.url);
+    });
 
 !method: forge.tabs.openAdvanced(options, success, error)
 !platforms: iOS, Android
@@ -74,7 +73,6 @@ Optional:
 -  ``tint``: Color to tint the top bar of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
--  ``translucent``: Turn off the top bar translucency effect (iOS Only)
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
@@ -140,16 +138,16 @@ Additionally, the following event listeners are supported:
 
 ### Example:
 
-	forge.tabs.openAdvanced({
-	  url: 'http://my.server.com/page/',
-	}, function (modal) {
-	  modal.loadFinished.addListener(function () {
-		modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
-	  });
-	  modal.closed.addListener(function () {
-		alert("Modal closed!");
-	  }
-	});
+    forge.tabs.openAdvanced({
+      url: 'http://my.server.com/page/',
+    }, function (modal) {
+      modal.loadFinished.addListener(function () {
+        modal.executeJS("window.document.body.innerHTML = 'Hello Forge user!';");
+      });
+      modal.closed.addListener(function () {
+        alert("Modal closed!");
+      }
+    });
 
 
 ## Notes
@@ -162,15 +160,15 @@ One workaround for this issue is to force Crosswalk to use SurfaceView instead o
 
 Therefore, if you are using the `forge.tabs` module with a `crosswalk` build you will need to set the value of the "Enable Animatable Xwalk View" property to `true` in your `src/config.json` file:
 
-	"crosswalk": {
-		"enable_animatable_xwalk_view": true
-	}
+    "crosswalk": {
+        "enable_animatable_xwalk_view": true
+    }
 
 If you are experiencing flickering when opening the on-screen keyboard you can use the second workaround for this issue which is to set the "Window Soft Input Mode" property to `"adjustPan"` in your `src/config.json` file:
 
-	"android" {
-		"windowSoftInputMode": "adjustPan"
-	}
+    "android" {
+        "windowSoftInputMode": "adjustPan"
+    }
 
 This workaround will resolve the flickering, albeit at the cost of the WebView no longer scrolling up when the on-screen keyboard is opened.
 

@@ -401,7 +401,6 @@ asyncTest("Tab with options", 1, function() {
             buttonTint: [0, 75, 0, 255],
             title: "Hello",
             buttonText: "Leave",
-            translucent: true,
             statusBarStyle: "light_content"
         }, function () {
             askQuestion("Did a tab open and describe itself correctly?", {

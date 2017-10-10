@@ -222,7 +222,7 @@
             return;
         }
     }
-tabs_modalWebViewController
+
     [webView loadRequest:[connection currentRequest]];
 }
 

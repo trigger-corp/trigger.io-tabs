@@ -25,7 +25,6 @@
 	NSString *pattern;
 	UIColor *tint;
 	UIColor *titleTint;
-    bool translucent;
     UIStatusBarStyle statusBarStyle;
     UIStatusBarStyle savedStatusBarStyle;
 
@@ -52,7 +51,6 @@
 - (void)setTitle:(NSString *)newTitle;
 - (void)setTitleTintColor:(UIColor *)newTint;
 - (void)setTintColor:(UIColor *)newTint;
-- (void)setTranslucent:(bool)newTranslucent;
 - (void)setStatusBarStyle:(UIStatusBarStyle)newStatusBarStyle;
 - (void)setTask:(ForgeTask *)newTask;
 - (ForgeTask*)getTask;
