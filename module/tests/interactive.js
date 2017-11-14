@@ -43,7 +43,9 @@ asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
             closeTabOnCancel: true,
             retryFailedLogin: true,
             verboseLogging: true
-        }
+        },
+        opaqueTopBar: true,
+        tint: [255, 255, 255, 255]
     }, function (modal) {
         modal.closed.addListener(function (response) {
             askQuestion("Did a tab/view just open in the foreground with a basic auth prompt and respond with: " + JSON.stringify(response), {

@@ -31,6 +31,7 @@ Optional:
 -  ``tint``: Color to tint the top bar of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
+-  ``opaqueTopBar``: Set to `true` to turn off the top bar translucency effect (iOS Only)
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].

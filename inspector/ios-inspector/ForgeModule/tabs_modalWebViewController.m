@@ -120,6 +120,13 @@ static ConnectionDelegate *connectionDelegate = nil;
     if (tint != nil) {
         blurView.backgroundColor = tint;
     }
+
+    blurViewVisualEffect.hidden = opaqueTopBar;
+}
+
+
+- (void)setOpaqueTopBar:(bool)newOpaqueTopBar {
+    opaqueTopBar = newOpaqueTopBar;
 }
 
 

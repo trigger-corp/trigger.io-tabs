@@ -66,6 +66,12 @@ static NSMutableDictionary* tabs_modal_map;
                                                       alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
     }
 
+    if ([task.params objectForKey:@"opaqueTopBar"] != nil) {
+        [modalView setOpaqueTopBar:[[task.params objectForKey:@"opaqueTopBar"] boolValue]];
+    } else {
+        [modalView setOpaqueTopBar:false];
+    }
+
     if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
         ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
         [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
