@@ -1,8 +1,8 @@
 {
-    "changes": "* New iOS option: `opaqueTopBar`",
+    "changes": "* New iOS options: `statusBarStyle`, `scalePagesToFit`, `navigationToolbar`.\nNew iOS method: `modal.setTitle`",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
     "min_platform_version": "v2.6.2",
     "namespace": "tabs",
     "platform_version": "v2.6.2",
-    "version": "2.19"
+    "version": "2.19.1"
 }

@@ -12,6 +12,7 @@ The ``forge.tabs`` namespace allows you to open a browser tab.
 !platforms: iOS, Android
 !param: error `function(content)` called with details of any error which may occur
 
+
 !method: forge.tabs.openWithOptions(options, success, error)
 !param: options `object` object containing url and optional properties
 !param: success `function(object)` callback to be invoked when no errors occur
@@ -35,11 +36,14 @@ Optional:
 -  ``titleTint``: Color to tint the top bar title of the modal view. An array of
    four integers in the range [0,255] that make up the RGBA color. For
    example, opaque red is [255, 0, 0, 255].
+-  ``statusBarStyle``: Set status bar style. Either ``"default"`` or ``"light_content"`` (iOS Only)
 -  ``buttonText``: Text to show in the button to close the modal view.
 -  ``buttonIcon``: Icon to show in the button to close the modal view,
    if ``buttonIcon`` is specified ``buttonText`` will be ignored.
 -  ``buttonTint``: Color to tint the button of the top bar in the modal
    view.
+- ``scalePagesToFit``: Set to `true` to scale pages to fit to view. (iOS only)
+- ``navigationToolbar``: Set to `true` to enable a navigation toolbar with forward, backword, stop, reload and share buttons. (iOS only)
 - ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
 - ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
 
@@ -53,38 +57,15 @@ Optional:
       forge.logging.log(data.url);
     });
 
+
 !method: forge.tabs.openAdvanced(options, success, error)
 !platforms: iOS, Android
-!param: options `object` object containing url and optional properties
+!param: options `object` object containing url and optional properties. Same as `forge.tabs.openWithOptions`.
 !param: success `function(modalBrowserObject)` callback to be invoked when no errors occur
 !param: error `function(content)` called with details of any error which may occu
 !description: As ``openWithOptions`` but immediately returns a modalBrowserObject which can be used to listen to events in the modal browser and execute javascript in the page.
 
 > ::Warning:: This API method should only be used if absolutely required, executing JavaScript code on external pages in the modal view can cause issues if not used carefully.
-
-Required:
-
--  ``url``: Required URL to open
-
-Optional:
-
--  ``pattern``: Pattern to close the modal view, see
-   [modal views](/docs/current/recipes/integrations/modal.html) for more detail on usage.
--  ``title``: Title of the modal view.
--  ``tint``: Color to tint the top bar of the modal view. An array of
-   four integers in the range [0,255] that make up the RGBA color. For
-   example, opaque red is [255, 0, 0, 255].
--  ``titleTint``: Color to tint the top bar title of the modal view. An array of
-   four integers in the range [0,255] that make up the RGBA color. For
-   example, opaque red is [255, 0, 0, 255].
--  ``buttonText``: Text to show in the button to close the modal view.
--  ``buttonIcon``: Icon to show in the button to close the modal view,
-   if ``buttonIcon`` is specified ``buttonText`` will be ignored.
--  ``buttonTint``: Color to tint the button of the top bar in the modal
-   view.
-- ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
-- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
-
 
 
 ### Modal Browser API
@@ -126,6 +107,14 @@ The first parameter is an object describing the button with the following proper
 !param: success `function()` callback to be invoked when no errors occur
 !platforms: iOS, Android
 !param: error `function(content)` called with details of any error which may occur
+
+!method: modalBrowser.setTitle(title, success, error)
+!param: title `string` new title for the modal browser
+!param: success `function()` callback to be invoked when no errors occur
+!description: Change the title of the modal browser's topbar.
+!platforms: iOS
+!param: error `function(content)` called with details of any error which may occur
+
 
 ### Modal Browser Events
 

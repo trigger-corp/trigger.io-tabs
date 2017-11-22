@@ -79,6 +79,28 @@ static NSMutableDictionary* tabs_modal_map;
         [modalView setStatusBarStyle:UIStatusBarStyleDefault];
     }
 
+    // status bar options
+    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
+        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
+            [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
+    } else {
+        [modalView setStatusBarStyle:UIStatusBarStyleDefault];
+    }
+
+    // scaling options
+    if ([task.params objectForKey:@"scalePagesToFit"] != nil) {
+        modalView.scalePagesToFit = [NSNumber numberWithBool:[[task.params objectForKey:@"scalePagesToFit"] boolValue]];
+    } else {
+        modalView.scalePagesToFit = [NSNumber numberWithBool:NO];
+    }
+
+    // navigation toolbar options
+    if ([task.params objectForKey:@"navigationToolbar"] != nil) {
+        modalView.enableNavigationToolbar = [NSNumber numberWithBool:[[task.params objectForKey:@"navigationToolbar"] boolValue]];
+    } else {
+        modalView.enableNavigationToolbar = [NSNumber numberWithBool:NO];
+    }
+
     // basic auth options
     if ([task.params objectForKey:@"basicAuth"] != nil) {
         modalView.enableBasicAuth = [NSNumber numberWithBool:[[task.params objectForKey:@"basicAuth"] boolValue]];
@@ -142,7 +164,12 @@ static NSMutableDictionary* tabs_modal_map;
 
 
 + (void)removeButtons:(ForgeTask*)task modal:(NSString*)modal {
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtons:task];
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtonsWithTask:task];
+}
+
+
++ (void)setTitle:(ForgeTask*)task modal:(NSString*)modal title:(NSString*)title {
+    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] setTitleWithTask:task title:title];
 }
 
 @end

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface tabs_Delegate : UIViewController <UINavigationControllerDelegate, UINavigationBarDelegate> {
+@interface tabs_Delegate : UIViewController <UINavigationControllerDelegate, UINavigationBarDelegate, UITabBarDelegate> {
     NSString *callId;
     tabs_Delegate *me;
 }

@@ -8,39 +8,44 @@
 
 #import <UIKit/UIKit.h>
 
+#import "tabs_NavigationToolbar.h"
+
 @interface tabs_modalWebViewController : UIViewController <UIWebViewDelegate, UIBarPositioningDelegate> {
-	IBOutlet UIWebView *webView;
-	IBOutlet UIBarButtonItem *backButton;
-	IBOutlet UINavigationBar *navBar;
-	NSURL *url;
-	UIViewController *rootView;
+    UIViewController *rootView;
 
-	NSString *backLabel;
-    NSString *backImage;
-    UIColor *buttonTint;
-
-	NSString *title;
-	UINavigationItem *navigationItem;
-	ForgeTask *task;
-	NSString *pattern;
-	UIColor *tint;
-	UIColor *titleTint;
-    bool opaqueTopBar;
     UIStatusBarStyle statusBarStyle;
     UIStatusBarStyle savedStatusBarStyle;
+
+    IBOutlet UINavigationBar *navigationBar;
+    UINavigationItem *navigationItem;
+    bool opaqueTopBar;
+    UIColor *tint;
+    UIColor *titleTint;
+    NSString *title;
 
     UIView *blurView;
     UIVisualEffectView *blurViewVisualEffect;
     NSLayoutConstraint *blurViewBottomConstraint;
-
     NSLayoutConstraint *navBarTopConstraint;
-    
+
+    IBOutlet UIBarButtonItem *backButton;
+    NSString *backLabel;
+    NSString *backImage;
+    UIColor *buttonTint;
+
+    tabs_NavigationToolbar *navigationToolbar;
+
+	NSURL *url;
+	ForgeTask *task;
+	NSString *pattern;
 	NSDictionary *returnObj;
 }
 
-@property (nonatomic, strong) IBOutlet NSNumber* enableBasicAuth;
-
-@property (nonatomic, strong) IBOutlet UINavigationItem *navigationItem;
+@property (strong, nonatomic) IBOutlet UIWebView* webView;
+@property (strong, nonatomic) IBOutlet NSNumber* scalePagesToFit;
+@property (strong, nonatomic) IBOutlet NSNumber* enableNavigationToolbar;
+@property (strong, nonatomic) IBOutlet NSNumber* enableBasicAuth;
+@property (strong, nonatomic) IBOutlet UINavigationItem *navigationItem;
 
 - (void)setUrl:(NSURL*)newUrl;
 - (void)setRootView:(UIViewController*)newRootView;
@@ -52,8 +57,11 @@
 - (void)setTitle:(NSString *)newTitle;
 - (void)setTitleTintColor:(UIColor *)newTint;
 - (void)setTintColor:(UIColor *)newTint;
+
 - (void)setOpaqueTopBar:(bool)newTranslucent;
 - (void)setStatusBarStyle:(UIStatusBarStyle)newStatusBarStyle;
+- (void)setNavigationToolbarHidden:(BOOL)hidden;
+
 - (void)setTask:(ForgeTask *)newTask;
 - (ForgeTask*)getTask;
 - (void)setReturnObj:(NSDictionary *)newReturnObj;
@@ -63,7 +71,8 @@
 - (void)close;
 
 - (void)addButtonWithTask:(ForgeTask*)newTask text:(NSString*)newText icon:(NSString*)newIcon position:(NSString*)newPosition style:(NSString*)newStyle tint:(UIColor*)newTint;
-- (void)removeButtons:(ForgeTask*)newTask;
+- (void)removeButtonsWithTask:(ForgeTask*)newTask;
+- (void)setTitleWithTask:(ForgeTask*)newTask title:(NSString*)title;
 
 @end
 

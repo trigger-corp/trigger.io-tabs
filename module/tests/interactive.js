@@ -85,13 +85,40 @@ asyncTest("Open tab with website", 1, function() {
 });
 
 
+asyncTest("Open tab with website & navigation toolbar", 1, function() {
+    forge.tabs.openWithOptions({
+        url: "https://trigger.io",
+        scalePagesToFit: true,
+        navigationToolbar: true,
+        statusBarStyle: "light_content"
+    }, function () {
+        askQuestion("Did a tab/view just open in the foreground with the Trigger.io website and a navigation toolbar?", {
+            Yes: function () {
+                ok(true, "Success");
+                start();
+            },
+            No: function () {
+                ok(false, "User claims failure");
+                start();
+            }
+        });
+    }, function (e) {
+        ok(false, "API call failure: "+e.message);
+        start();
+    });
+});
+
+
 asyncTest("Test Title Text", 1, function() {
     forge.tools.getURL("fixtures/tabs/close.html", function (url) {
         forge.tabs.openAdvanced({
             url: url,
-            title: "Title Text",
+            title: "Set Title Failed",
             buttonText: "button"
         }, function (modal) {
+            if (forge.is.ios()) {
+                modal.setTitle("Title Text");
+            }
             modal.closed.addListener(function () {
                 askQuestion("Did a tab/view just open with one button labelled \"button\" and a title set to \"Title Text\"?", {
                     Yes: function () {

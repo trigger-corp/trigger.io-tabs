@@ -16,6 +16,9 @@
 @synthesize title;
 
 static ConnectionDelegate *connectionDelegate = nil;
+static NSMutableArray* toolBarItems = nil;
+static UIBarButtonItem *stop = nil;
+static UIBarButtonItem *reload = nil;
 
 - (void)didReceiveMemoryWarning
 {
@@ -62,7 +65,7 @@ static ConnectionDelegate *connectionDelegate = nil;
     if (url == nil) {
         url = [NSURL URLWithString:@"about:blank"];
     }
-    [webView loadRequest:[NSURLRequest requestWithURL:url]];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
 
     if (backImage != nil) {
         [[[ForgeFile alloc] initWithObject:backImage] data:^(NSData *data) {
@@ -75,10 +78,10 @@ static ConnectionDelegate *connectionDelegate = nil;
     } else {
         [backButton setTitle:backLabel];
     }
-    [navigationItem setTitle:title];
+    [navigationItem setTitle:self.title];
 
-    if (titleTint != nil && [navBar respondsToSelector:@selector(setTitleTextAttributes:)]) {
-        [navBar setTitleTextAttributes:@{ NSForegroundColorAttributeName:titleTint }];
+    if (titleTint != nil && [navigationBar respondsToSelector:@selector(setTitleTextAttributes:)]) {
+        [navigationBar setTitleTextAttributes:@{ NSForegroundColorAttributeName:titleTint }];
     }
     
     if (buttonTint != nil && [backButton respondsToSelector:@selector(setTintColor:)]) {
@@ -87,7 +90,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 
     // Workaround for buggy auto layout implementation on iOS < 11
     if (@available(iOS 11.0, *)) {
-        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navBar
+        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navigationBar
                                                            attribute:NSLayoutAttributeTop
                                                            relatedBy:NSLayoutRelationEqual
                                                               toItem:self.view.safeAreaLayoutGuide
@@ -95,7 +98,7 @@ static ConnectionDelegate *connectionDelegate = nil;
                                                           multiplier:1.0f
                                                             constant:0.0f];
     } else {
-        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navBar
+        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navigationBar
                                                            attribute:NSLayoutAttributeTop
                                                            relatedBy:NSLayoutRelationEqual
                                                               toItem:self.topLayoutGuide
@@ -105,23 +108,41 @@ static ConnectionDelegate *connectionDelegate = nil;
     }
     navBarTopConstraint.active = YES;
 
-    // Disable automatic content inset adjustment
+    // Because safeAreas don't help squat if they're broken on iOS 11 and not supported on iOS 10
     if (@available(iOS 11.0, *)) {
-        [webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
+        [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
 
-    // Set content insets
+    // Set content inset for navigationBar
     CGFloat insetHeight = ForgeConstant.statusBarHeightDynamic + ForgeConstant.navigationBarHeightStatic;
-    [webView.scrollView setContentInset:UIEdgeInsetsMake(insetHeight, 0, 0, 0)];
-    [webView.scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(insetHeight, 0, 0, 0)];
+    [self setTopInset:insetHeight];
 
-    [self createStatusBarVisualEffect:webView];
-
+    // Blurview
+    [self createStatusBarVisualEffect:self.webView];
     if (tint != nil) {
         blurView.backgroundColor = tint;
     }
-
     blurViewVisualEffect.hidden = opaqueTopBar;
+
+    // Page scaling
+    if (self.scalePagesToFit == [NSNumber numberWithBool:YES]) {
+        self.webView.scalesPageToFit = YES;
+    }
+
+    // Navigation toolbar
+    navigationToolbar = [[tabs_NavigationToolbar alloc] initForWebViewController:self];
+    if (self.enableNavigationToolbar == [NSNumber numberWithBool:YES]) {
+        [self setNavigationToolbarHidden:NO];
+    } else {
+        [self setNavigationToolbarHidden:YES];
+    }
+    [self.view insertSubview:navigationToolbar aboveSubview:self.webView];
+    [self layoutNavigationToolbar];
+}
+
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return statusBarStyle;
 }
 
 
@@ -148,7 +169,7 @@ static ConnectionDelegate *connectionDelegate = nil;
     blurViewBottomConstraint = [NSLayoutConstraint constraintWithItem:blurView
                                                             attribute:NSLayoutAttributeBottom
                                                             relatedBy:NSLayoutRelationEqual
-                                                               toItem:navBar
+                                                               toItem:navigationBar
                                                             attribute:NSLayoutAttributeBottom
                                                            multiplier:1.0f
                                                              constant:0.0f];
@@ -172,8 +193,28 @@ static ConnectionDelegate *connectionDelegate = nil;
 }
 
 
+- (void)layoutNavigationToolbar {
+    navigationToolbar.translatesAutoresizingMaskIntoConstraints = NO;
+    [navigationToolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [navigationToolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    if (@available(iOS 11.0, *)) {
+        [navigationToolbar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+    } else {
+        [navigationToolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    }
+}
+
+
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
+            [self setNavigationToolbarHidden:YES];
+        } else {
+            [self setNavigationToolbarHidden:NO];
+        }
+    }
 
     // refresh content insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
@@ -181,12 +222,25 @@ static ConnectionDelegate *connectionDelegate = nil;
         if (@available(iOS 11.0, *)) {
             insets = self.view.safeAreaInsets; // currently this only matters for the iPhone-X
         }
-        NSLog(@"SIDE INSETS: %f -> %f", insets.left, insets.right);
-        CGFloat insetHeight = ForgeConstant.statusBarHeightDynamic + ForgeConstant.navigationBarHeightStatic;
-        [webView.scrollView setContentInset:UIEdgeInsetsMake(insetHeight, 0, 0, 0)];
-        [webView.scrollView setScrollIndicatorInsets:UIEdgeInsetsMake(insetHeight, 0, 0, 0)];
-        webView.frame = CGRectMake(insets.left, webView.frame.origin.y, ForgeConstant.screenWidth - (insets.left + insets.right), webView.frame.size.height);
+        [self setLeftInset:insets.left];
+        [self setRightInset:insets.right];
     }];
+}
+
+
+- (void)setNavigationToolbarHidden:(BOOL)hidden
+{
+    [navigationToolbar setHidden:hidden];
+    UIEdgeInsets safeAreaInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    if (@available(iOS 11.0, *)) {
+        safeAreaInsets = UIApplication.sharedApplication.keyWindow.safeAreaInsets;
+    }
+    if (hidden == YES) {
+        [self setBottomInset:safeAreaInsets.bottom];
+    } else {
+        CGSize size = navigationToolbar.intrinsicContentSize;
+        [self setBottomInset:safeAreaInsets.bottom + size.height];
+    }
 }
 
 
@@ -205,7 +259,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 
 
 - (void)stringByEvaluatingJavaScriptFromString:(ForgeTask*)evalTask string:(NSString*)string {
-    [evalTask success:[webView stringByEvaluatingJavaScriptFromString:string]];
+    [evalTask success:[self.webView stringByEvaluatingJavaScriptFromString:string]];
 }
 
 
@@ -364,7 +418,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 
     // otherwise, delegate remaining processing for request
     if (connectionDelegate == nil) {
-        connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:webView pattern:pattern];
+        connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:self.webView pattern:pattern];
         if ([task.params objectForKey:@"basicAuthConfig"]) {
             NSDictionary *cfg = [task.params objectForKey:@"basicAuthConfig"];
             connectionDelegate->i8n.title = [cfg objectForKey:@"titleText"] ?: connectionDelegate->i8n.title;
@@ -391,21 +445,36 @@ static ConnectionDelegate *connectionDelegate = nil;
 }
 
 
-- (void)webViewDidStartLoad:(UIWebView *)_webView {
+- (void)webViewDidStartLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadStarted", task.callid] withParam:@{@"url": webView.request.URL.absoluteString}];
+    if (navigationToolbar != nil) {
+        [navigationToolbar webViewDidStartLoad:webView];
+    }
+    if (self.title == nil || [self.title isEqualToString:@""]) {
+        [navigationItem setTitle:@""];
+    }
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadStarted", task.callid] withParam:@{@"url": self.webView.request.URL.absoluteString}];
 }
 
 
-- (void)webViewDidFinishLoad:(UIWebView *)_webView {
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadFinished", task.callid] withParam:@{@"url": webView.request.URL.absoluteString}];
+    if (navigationToolbar != nil) {
+        [navigationToolbar webViewDidFinishLoad:webView];
+    }
+    if (self.title == nil || [self.title isEqualToString:@""]) {
+        NSString *documentTitle = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+        [navigationItem setTitle:documentTitle];
+    }
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadFinished", task.callid] withParam:@{@"url": self.webView.request.URL.absoluteString}];
 }
 
 
-- (void)webView:(UIWebView *)myWebView didFailLoadWithError:(NSError *)error {
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-
+    if (navigationToolbar != nil) {
+        [navigationToolbar webView:webView didFailLoadWithError:error];
+    }
     if (error.code == -1009) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading"
                                                         message:@"No Internet connection available."
@@ -415,7 +484,7 @@ static ConnectionDelegate *connectionDelegate = nil;
         [alert show];
     }
     [ForgeLog w:[NSString stringWithFormat:@"Modal webview error: %@", error]];
-    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", task.callid] withParam:@{@"url": webView.request.URL.absoluteString, @"description": error.description}];
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", task.callid] withParam:@{@"url": self.webView.request.URL.absoluteString, @"description": error.description}];
 }
 
 
@@ -426,7 +495,7 @@ static ConnectionDelegate *connectionDelegate = nil;
 
 -(void)close {
     returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                 webView.request.URL.absoluteString,
+                 self.webView.request.URL.absoluteString,
                  @"url",
                  [NSNumber numberWithBool:NO],
                  @"userCancelled",
@@ -477,7 +546,7 @@ static ConnectionDelegate *connectionDelegate = nil;
     [buttonItem setAction:@selector(clicked)];
     
 
-    UINavigationItem *navItem = ((UINavigationItem*)[navBar.items objectAtIndex:0]);
+    UINavigationItem *navItem = ((UINavigationItem*)[navigationBar.items objectAtIndex:0]);
     if (newPosition != nil && [newPosition isEqualToString:@"right"]) {
         [navItem setRightBarButtonItem:buttonItem];
     } else {
@@ -488,8 +557,8 @@ static ConnectionDelegate *connectionDelegate = nil;
 }
 
 
--(void)removeButtons:(ForgeTask*)newTask {
-    UINavigationItem *navItem = ((UINavigationItem*)[navBar.items objectAtIndex:0]);
+-(void)removeButtonsWithTask:(ForgeTask*)newTask {
+    UINavigationItem *navItem = ((UINavigationItem*)[navigationBar.items objectAtIndex:0]);
 
     if (navItem.leftBarButtonItem.target != nil) {
         [((tabs_Delegate*)navItem.leftBarButtonItem.target) releaseDelegate];
@@ -503,6 +572,48 @@ static ConnectionDelegate *connectionDelegate = nil;
 
 
     [newTask success:nil];
+}
+
+
+- (void)setTitleWithTask:(ForgeTask*)newTask title:(NSString*)newTitle {
+    self.title = newTitle;
+    [navigationItem setTitle:title];
+    [newTask success:nil];
+}
+
+
+- (void) setTopInset:(CGFloat) topInset {
+    UIEdgeInsets scrollInset  = self.webView.scrollView.scrollIndicatorInsets;
+    UIEdgeInsets contentInset = self.webView.scrollView.contentInset;
+    scrollInset = UIEdgeInsetsMake(topInset, scrollInset.left, scrollInset.bottom, scrollInset.right);
+    contentInset = UIEdgeInsetsMake(topInset, contentInset.left, contentInset.bottom, contentInset.right);
+    self.webView.scrollView.scrollIndicatorInsets = scrollInset;
+    self.webView.scrollView.contentInset = contentInset;
+}
+
+
+- (void) setBottomInset:(CGFloat) bottomInset {
+    UIEdgeInsets scrollInset  = self.webView.scrollView.scrollIndicatorInsets;
+    UIEdgeInsets contentInset = self.webView.scrollView.contentInset;
+    scrollInset = UIEdgeInsetsMake(scrollInset.top, scrollInset.left, bottomInset, scrollInset.right);
+    contentInset = UIEdgeInsetsMake(contentInset.top, contentInset.left, bottomInset, contentInset.right);
+    self.webView.scrollView.scrollIndicatorInsets = scrollInset;
+    self.webView.scrollView.contentInset = contentInset;
+}
+
+- (void) setLeftInset:(CGFloat) leftInset {
+    self.webView.frame = CGRectMake(leftInset,
+                                    self.webView.frame.origin.y,
+                                    ForgeConstant.screenWidth - leftInset,
+                                    self.webView.frame.size.height);
+}
+
+
+- (void) setRightInset:(CGFloat) rightInset {
+    self.webView.frame = CGRectMake(self.webView.frame.origin.x,
+                                    self.webView.frame.origin.y,
+                                    self.webView.frame.size.width - rightInset,
+                                    self.webView.frame.size.height);
 }
 
 @end
