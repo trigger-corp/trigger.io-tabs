@@ -127,7 +127,7 @@
             self.popoverController = [[UIPopoverController alloc] initWithContentViewController:vc];
         }
         self.popoverController.delegate = self;
-        [self.popoverController presentPopoverFromBarButtonItem:[self.items lastObject]
+        [self.popoverController presentPopoverFromBarButtonItem:self.items[4]
                                        permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
     }
 }
