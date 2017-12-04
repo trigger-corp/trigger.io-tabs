@@ -46,15 +46,11 @@
     UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                                                                   target:self
                                                                                   action:@selector(action:)];
-    UIBarButtonItem *space60 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
-                                                                            target:nil
-                                                                            action:nil];
-    space60.width = 60.0f;
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                            target:nil
                                                                            action:nil];
 
-    [self setItems:@[self.backButton, space60, self.forwardButton, space, actionButton, space, self.stopButton]];
+    [self setItems:@[self.backButton, space , self.forwardButton, space, actionButton, space, self.stopButton]];
 
 
     tabs_SafariActivity *safari = [[tabs_SafariActivity alloc] init];

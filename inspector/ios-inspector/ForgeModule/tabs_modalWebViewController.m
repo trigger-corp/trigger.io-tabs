@@ -62,6 +62,7 @@ static UIBarButtonItem *reload = nil;
 
     [backButton setAction:@selector(cancel:)];
 
+    // Start URL loading
     if (url == nil) {
         url = [NSURL URLWithString:@"about:blank"];
     }
