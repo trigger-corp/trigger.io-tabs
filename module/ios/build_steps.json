@@ -1,0 +1,10 @@
+[
+    {
+        "do": {
+            "set_in_info_plist": {
+                "key": "LSApplicationQueriesSchemes",
+                "value": ["googlechrome", "googlechromes"]
+            }
+        }
+    }
+]
