@@ -60,6 +60,9 @@ static UIBarButtonItem *reload = nil;
 {
     [super viewDidLoad];
 
+    self.webView.opaque = NO;
+    self.webView.backgroundColor = [UIColor clearColor];
+
     [backButton setAction:@selector(cancel:)];
 
     // Start URL loading
