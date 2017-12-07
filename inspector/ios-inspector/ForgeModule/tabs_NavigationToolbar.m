@@ -17,6 +17,7 @@
 {
     self = [super init];
     if (self) {
+        _hasStartedLoading = NO;
         self.webViewController = webViewController;
         [self createToolbar];
     }
@@ -43,14 +44,15 @@
                                                          target:self.webViewController.webView
                                                          action:@selector(goForward)];
     self.forwardButton.enabled = NO;
-    UIBarButtonItem *actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                                                                                  target:self
-                                                                                  action:@selector(action:)];
+    self.actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                                                      target:self
+                                                                      action:@selector(action:)];
+    self.actionButton.enabled = NO;
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                            target:nil
                                                                            action:nil];
 
-    [self setItems:@[self.backButton, space , self.forwardButton, space, actionButton, space, self.stopButton]];
+    [self setItems:@[self.backButton, space , self.forwardButton, space, self.actionButton, space, self.stopButton]];
 
 
     tabs_SafariActivity *safari = [[tabs_SafariActivity alloc] init];
@@ -113,9 +115,13 @@
         return;
     }
 
+    NSURL *url = self.webViewController.webView.request.URL;
+    if (_hasStartedLoading == NO || url == nil || [[url absoluteString] isEqualToString:@""]){
+        return;
+    }
+
     UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.webViewController.webView.request.URL]
                                                                      applicationActivities:self.applicationActivities];
-
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         [self.webViewController presentViewController:vc animated:YES completion:NULL];
     } else {
@@ -130,6 +136,8 @@
 
 - (void)toggleState
 {
+    NSURL *url = self.webViewController.webView.request.URL;
+    self.actionButton.enabled = _hasStartedLoading && url != nil && ![[url absoluteString] isEqualToString:@""];
     self.backButton.enabled = self.webViewController.webView.canGoBack;
     self.forwardButton.enabled = self.webViewController.webView.canGoForward;
     NSMutableArray *toolbarItems = [self.items mutableCopy];
@@ -146,6 +154,7 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    _hasStartedLoading = YES;
     [self toggleState];
 }
 

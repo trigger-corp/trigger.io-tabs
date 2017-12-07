@@ -37,11 +37,18 @@
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]]) {
             url = activityItem;
+        } else {
+            url = nil;
         }
     }
 }
 
 - (void)performActivity {
+    if (url == nil) {
+        NSLog(@"No active URL for tabs_SafariActivity");
+        return;
+    }
+
     BOOL completed = [[UIApplication sharedApplication] openURL:url];
     [self activityDidFinish:completed];
 }
@@ -82,11 +89,18 @@
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]]) {
             url = activityItem;
+        } else {
+            url = nil;
         }
     }
 }
 
 - (void)performActivity {
+    if (url == nil) {
+        NSLog(@"No active URL for tabs_ChromeActivity");
+        return;
+    }
+
     NSURL *chromeURL = url;
     NSString *scheme = url.scheme;
 

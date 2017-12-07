@@ -10,7 +10,9 @@
 
 @class tabs_modalWebViewController;
 
-@interface tabs_NavigationToolbar : UIToolbar <UIPopoverControllerDelegate>
+@interface tabs_NavigationToolbar : UIToolbar <UIPopoverControllerDelegate> {
+    bool _hasStartedLoading;
+}
 
 @property (strong, nonatomic) tabs_modalWebViewController *webViewController;
 
@@ -18,6 +20,7 @@
 @property (strong, nonatomic) UIBarButtonItem *reloadButton;
 @property (strong, nonatomic) UIBarButtonItem *backButton;
 @property (strong, nonatomic) UIBarButtonItem *forwardButton;
+@property (strong, nonatomic) UIBarButtonItem *actionButton;
 
 @property (strong, nonatomic) UIPopoverController *popoverController;
 @property (strong, nonatomic) NSArray *applicationActivities;
