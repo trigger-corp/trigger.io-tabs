@@ -45,6 +45,7 @@
 @property (strong, nonatomic) IBOutlet NSNumber* scalePagesToFit;
 @property (strong, nonatomic) IBOutlet NSNumber* enableNavigationToolbar;
 @property (strong, nonatomic) IBOutlet NSNumber* enableBasicAuth;
+@property (strong, nonatomic) IBOutlet NSNumber* enableInsecureBasicAuth;
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationItem;
 
 - (void)setUrl:(NSURL*)newUrl;

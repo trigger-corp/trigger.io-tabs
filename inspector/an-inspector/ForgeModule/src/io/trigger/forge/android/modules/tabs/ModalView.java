@@ -266,6 +266,18 @@ public class ModalView {
             return true;
         }
 
+        // check if we're on HTTPS and not set to be insecure for testing purposes
+        String url = webView.getUrl();
+        boolean insecure = false;
+        if (task.params.has("basicAuthConfig")) {
+            JsonObject cfg = task.params.getAsJsonObject("basicAuthConfig");
+            insecure = cfg.has("insecure") ? cfg.get("insecure").getAsBoolean() : false;
+        }
+        if (!url.startsWith("https:") && !insecure) {
+            ForgeLog.w("Basic Auth is only supported for sites served over https");
+            return true;
+        }
+
         // try existing credentials
         String [] storedCredentials = webView.getHttpAuthUsernamePassword(host, realm);
         if (handler.useHttpAuthUsernamePassword() && storedCredentials != null && storedCredentials.length >= 2) {

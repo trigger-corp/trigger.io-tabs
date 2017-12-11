@@ -45,6 +45,34 @@ asyncTest("Open tab with website & navigation toolbar", 1, function() {
 });
 
 
+asyncTest("Test HTTP browsing with Basic Auth enabled", 1, function() {
+    forge.tabs.openAdvanced({
+        url: "http://example.org",
+        basicAuth: true,
+        basicAuthConfig: {
+            retryFailedLogin: true,
+            verboseLogging: true
+        }
+    }, function (modal) {
+        modal.closed.addListener(function () {
+            askQuestion("Did a tab/view of http://example.org just open in the foreground ?", {
+                Yes: function () {
+                    ok(true, "Success");
+                    start();
+                },
+                No: function () {
+                    ok(false, "User claims failure");
+                    start();
+                }
+            });
+        });
+    }, function (e) {
+        ok(false, "API call failure: "+e.message);
+        start();
+    });
+});
+
+
 asyncTest("Test HTTPS Basic Auth Advanced", 1, function() {
     forge.tabs.openAdvanced({
         url: "https://docker.trigger.io/staffbase/A.html",

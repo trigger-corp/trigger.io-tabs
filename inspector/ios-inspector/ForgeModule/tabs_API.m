@@ -108,6 +108,13 @@ static NSMutableDictionary* tabs_modal_map;
         modalView.enableBasicAuth = [NSNumber numberWithBool:NO];
     }
 
+    NSDictionary *basicAuthConfig = [task.params objectForKey:@"basicAuthConfig"];
+    if (basicAuthConfig != nil && [basicAuthConfig objectForKey:@"insecure"] != nil) {
+        modalView.enableInsecureBasicAuth = [NSNumber numberWithBool:[[basicAuthConfig objectForKey:@"insecure"] boolValue]];
+    } else {
+        modalView.enableInsecureBasicAuth = [NSNumber numberWithBool:NO];;
+    }
+
     [modalView setTask:task];
 
     [[[ForgeApp sharedApp] viewController] presentViewController:modalView animated:YES completion:nil];

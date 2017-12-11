@@ -420,6 +420,12 @@ static UIBarButtonItem *reload = nil;
         return YES;
     }
 
+    // we're done if this is not a HTTPS site and we're not set to be insecure for testing purposes
+    if (![[thisurl scheme] isEqualToString:@"https"] && self.enableInsecureBasicAuth == [NSNumber numberWithBool:NO]) {
+        [ForgeLog w:@"Basic Auth is only supported for sites served over https"];
+        return YES;
+    }
+
     // otherwise, delegate remaining processing for request
     if (connectionDelegate == nil) {
         connectionDelegate = [[ConnectionDelegate alloc] initWithModalView:self webView:self.webView pattern:pattern];
