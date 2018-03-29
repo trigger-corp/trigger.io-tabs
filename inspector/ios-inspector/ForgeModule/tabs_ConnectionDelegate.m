@@ -15,7 +15,7 @@
 
 - (void) log:(NSString*)message {
     if (verboseLogging) {
-        [ForgeLog d:message];
+        [ForgeLog d:[NSString stringWithFormat:@"[ConnectionDelegate] %@", message]];
     }
 }
 
@@ -39,6 +39,7 @@
     verboseLogging = NO;
     retryFailedLogin =  NO;
     
+    _in_basic_auth_flow = NO;
     _basic_authorized_failed = NO;
 
     authorizationCache = [[NSMutableDictionary alloc] init];
@@ -77,16 +78,15 @@
         [self log:[NSString stringWithFormat:@"ConnectionDelegate::handleRequest authorizationCache: %@", authorized]];
         _basic_authorized = [authorized boolValue];
     }
-
-    // this request has not yet been checked for basic auth, check it
-    if (_basic_authorized == NO) {
-        [NSURLConnection connectionWithRequest:request delegate:self];
-        [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
-        return NO;
+    
+    if (_basic_authorized == YES) {
+        [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
+        return YES;
     }
 
-    [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
-
+    
+    [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
+    [NSURLConnection connectionWithRequest:request delegate:self];
     return YES;
 }
 
@@ -102,9 +102,12 @@
 {
     if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodHTTPBasic]) {
         return YES;
-    } else if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodNTLM]) {
+    }
+    
+    if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodNTLM]) {
         return YES;
     }
+    
     return NO;
 }
 
@@ -122,6 +125,8 @@
     [self log:[NSString stringWithFormat:@"    authenticationMethod = %@", [[challenge protectionSpace] authenticationMethod]]];
     [self log:[NSString stringWithFormat:@"  Sender: %@", challenge.sender]];                                // NSURLAuthenticationChallengeSender
 
+    _in_basic_auth_flow = NO;
+    
     // get challenge information
     NSString *host = [challenge.protectionSpace host];
     NSString *status = @"";
@@ -158,8 +163,17 @@
     }
     [self log:[NSString stringWithFormat:@"Previous failure count is: %ld", [challenge previousFailureCount]]];
 
-    // respond to initial challenge
-    if ([challenge previousFailureCount] < tries) {
+    // stop if user supplied invalid credentials and hit max retries
+    if ([challenge previousFailureCount] >= tries) {
+        [self log:@"Invalid username/password for basic auth"];
+        _basic_authorized_failed = YES;
+        [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+        return;
+    }
+    
+    // open login dialog in ui thread
+    _in_basic_auth_flow = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self log:@"Requesting username/password for basic auth"];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
                                                         message:nil
@@ -177,7 +191,7 @@
                 }
                 return;
             }
-
+            
             [self log:@"Sending username/password challenge response for basic auth"];
             NSString *username = [[alert textFieldAtIndex:0] text];
             NSString *password = [[alert textFieldAtIndex:1] text];
@@ -186,19 +200,17 @@
                                                                       persistence:NSURLCredentialPersistenceForSession]
                    forAuthenticationChallenge:challenge];
         }];
-
-        return;
-    }
-
-    // user supplied invalid credentials
-    [self log:@"Invalid username/password for basic auth"];
-    _basic_authorized_failed = YES;
-    [[challenge sender] continueWithoutCredentialForAuthenticationChallenge:challenge];
+    });
 }
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
+    // stop if already closed
+    if (me == nil) {
+        return;
+    }
+
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     NSString *status = [NSHTTPURLResponse localizedStringForStatusCode:httpResponse.statusCode];
     NSString *responseString = [NSString stringWithFormat:@"%@", httpResponse];
@@ -222,8 +234,9 @@
             return;
         }
     }
-
-    [webView loadRequest:[connection currentRequest]];
+    
+    // remember the current url until response body is loaded
+    currentUrl = [NSURL URLWithString:responseURL];
 }
 
 
@@ -231,12 +244,14 @@
 {
     [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData failed: %d", _basic_authorized_failed]];
 
-    if (_basic_authorized_failed == YES) {
-        _basic_authorized_failed = NO;
-        NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [self log:[NSString stringWithFormat:@"Authorization failed: ConnectionDelegate::didReceiveData %@", html]];
-        [webView loadHTMLString:html baseURL:nil];
-        return;
+    NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    _basic_authorized_failed = NO;
+    
+    // The webview won't load the page content automatically when in basicAuth flow.
+    // It does however in all other cases.
+    if (_in_basic_auth_flow == YES) {
+        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body after basicAuthFlow: %@", html]];
+        [webView loadHTMLString:html baseURL:currentUrl];
     }
 }
 

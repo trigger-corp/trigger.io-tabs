@@ -14,8 +14,10 @@
 
 @interface ConnectionDelegate : NSObject <NSURLConnectionDelegate, NSURLConnectionDataDelegate> {
     NSMutableDictionary<NSString*, NSNumber*> *authorizationCache;
+    bool _in_basic_auth_flow;
     bool _basic_authorized_failed;
     NSString *pattern;
+    NSURL *currentUrl;
 
     UIWebView *webView;
     tabs_modalWebViewController *modalInstance;
