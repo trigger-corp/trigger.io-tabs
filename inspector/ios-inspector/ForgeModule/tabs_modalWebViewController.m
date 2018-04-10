@@ -493,6 +493,14 @@ static UIBarButtonItem *reload = nil;
                                               otherButtonTitles:nil];
         [alert show];
     }
+    if (error.code == 102) {
+        NSString *URLString = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
+        NSURL *failedRequestURL = [NSURL URLWithString:URLString];
+        // Determine if we want the system to handle it.
+        if ([[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+            [[UIApplication sharedApplication]openURL:failedRequestURL];
+        }
+    }
     [ForgeLog w:[NSString stringWithFormat:@"Modal webview error: %@", error]];
     [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", task.callid] withParam:@{@"url": self.webView.request.URL.absoluteString, @"description": error.description}];
 }

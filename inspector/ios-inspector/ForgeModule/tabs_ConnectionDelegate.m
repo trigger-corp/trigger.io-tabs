@@ -1,5 +1,5 @@
 //
-//  tabs_LoginDialogDelegate.m
+//  tabs_ConnectionDelegate.m
 //  ForgeModule
 //
 //  Created by Antoine van Gelder on 2017/03/16.
@@ -212,6 +212,7 @@
     }
 
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+    
     NSString *status = [NSHTTPURLResponse localizedStringForStatusCode:httpResponse.statusCode];
     NSString *responseString = [NSString stringWithFormat:@"%@", httpResponse];
 
@@ -237,6 +238,7 @@
     
     // remember the current url until response body is loaded
     currentUrl = [NSURL URLWithString:responseURL];
+    
 }
 
 
