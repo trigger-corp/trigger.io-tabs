@@ -11,6 +11,7 @@ import io.trigger.forge.android.core.ForgeWebView;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,11 +25,28 @@ import com.google.gson.JsonElement;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
+import org.xwalk.core.XWalkWebResourceRequest;
+import org.xwalk.core.XWalkWebResourceResponse;
 import org.xwalk.core.internal.XWalkSettingsInternal;
 
 public class WebViewProxy {
 	ForgeWebView webView = null;
 	ModalView parentView = null;
+
+	private void openURIAsIntent(Uri uri) {
+		// Some other URI scheme, let the phone handle it if
+		// possible
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
+		List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+		if (list.size() > 0) {
+			// Intent exists, invoke it.
+			ForgeLog.i("Allowing another Android app to handle URL: " + uri.toString());
+			ForgeApp.getActivity().startActivity(intent);
+		} else {
+			ForgeLog.w("Attempted to open a URL which could not be handled: " + uri.toString());
+		}
+	}
 
 	protected final ForgeWebView getWebView() {
 		return webView;
@@ -100,6 +118,21 @@ public class WebViewProxy {
 			}
 
 			@Override
+			public void onReceivedResponseHeaders(XWalkView view, XWalkWebResourceRequest request, XWalkWebResourceResponse response) {
+				Map<String, String> responseHeaders = response.getResponseHeaders();
+				if (responseHeaders.containsKey("content-disposition")) {
+					String contentDisposition = responseHeaders.get("content-disposition");
+					if (contentDisposition.contains("inline")) {
+						Uri requestURI = request.getUrl();
+						// Don't load the URL in web view for downloadable files.
+						forgeWebView.stopLoading();
+						ForgeLog.i("Received a file download response. Opening URL externally ");
+						openURIAsIntent(requestURI);
+					}
+				}
+			}
+
+			@Override
 			public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
 				if (parentView.shouldOverrideUrlLoading(url)) {
 					return true;
@@ -144,19 +177,11 @@ public class WebViewProxy {
 				} else {
 					// Some other URI scheme, let the phone handle it if
 					// possible
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-					final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
-					List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-					if (list.size() > 0) {
-						// Intent exists, invoke it.
-						ForgeLog.i("Allowing another Android app to handle URL: " + url);
-						ForgeApp.getActivity().startActivity(intent);
-					} else {
-						ForgeLog.w("Attempted to open a URL which could not be handled: " + url);
-					}
+					openURIAsIntent(Uri.parse(url));
 					return true;
 				}
 			}
+
 		});
 
 		// Add JS Bridge for whitelisted remote URLs
