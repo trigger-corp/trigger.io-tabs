@@ -36,6 +36,7 @@ public class WebViewProxy {
 	private void openURIAsIntent(Uri uri) {
 		// Some other URI scheme, let the phone handle it if
 		// possible
+		ForgeLog.i("Trying to open URI as intent: " + uri.toString());
 		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 		final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
 		List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
