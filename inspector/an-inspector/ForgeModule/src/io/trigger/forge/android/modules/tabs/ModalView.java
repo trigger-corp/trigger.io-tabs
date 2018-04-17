@@ -1,8 +1,12 @@
 package io.trigger.forge.android.modules.tabs;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -24,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
@@ -34,6 +39,22 @@ import io.trigger.forge.android.core.ForgeWebView;
 import io.trigger.forge.android.util.BitmapUtil;
 
 public class ModalView {
+    public static void openURIAsIntent(Uri uri) {
+        // Some other URI scheme, let the phone handle it if
+        // possible
+        ForgeLog.i("Trying to open URI as intent: " + uri.toString());
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (list.size() > 0) {
+            // Intent exists, invoke it.
+            ForgeLog.i("Allowing another Android app to handle URL: " + uri.toString());
+            ForgeApp.getActivity().startActivity(intent);
+        } else {
+            ForgeLog.w("Attempted to open a URL which could not be handled: " + uri.toString());
+        }
+    }
+
     // Reference to the last created modal view (for back button, etc)
     static ModalView instance = null;
 
@@ -200,6 +221,13 @@ public class ModalView {
 
 
     // - WebViewProxy callbacks --------------------------------------------------------------------
+
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+        // Don't load the URL in web view for downloadable files.
+        webViewProxy.getWebView().stopLoading();
+        ForgeLog.i("Received a file download response. Opening URL externally ");
+        openURIAsIntent(Uri.parse(url));
+    }
 
     public void onProgressChanged(int newProgress) {
         progressBar.setProgress(newProgress);
