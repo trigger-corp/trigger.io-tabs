@@ -11,15 +11,11 @@ import io.trigger.forge.android.core.ForgeWebView;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
-
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.webkit.DownloadListener;
 import android.webkit.HttpAuthHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -42,6 +38,13 @@ public class WebViewProxy {
 		final ForgeWebView forgeWebView = new ForgeWebView(activity);
 		// Save static reference
 		webView = forgeWebView;
+
+		forgeWebView.setDownloadListener(new DownloadListener() {
+			@Override
+			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+				parentView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
+			}
+		});
 
 		// Configure ForgeWebView
 		WebSettings webSettings = forgeWebView.getSettingsInternal();
@@ -126,16 +129,7 @@ public class WebViewProxy {
 				} else {
 					// Some other URI scheme, let the phone handle it if
 					// possible
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-					final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
-					List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-					if (list.size() > 0) {
-						// Intent exists, invoke it.
-						ForgeLog.i("Allowing another Android app to handle URL: " + url);
-						ForgeApp.getActivity().startActivity(intent);
-					} else {
-						ForgeLog.w("Attempted to open a URL which could not be handled: " + url);
-					}
+					parentView.openURIAsIntent(Uri.parse(url));
 					return true;
 				}
 			}
