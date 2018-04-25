@@ -21,6 +21,7 @@ import android.webkit.ValueCallback;
 
 import com.google.gson.JsonElement;
 
+import org.xwalk.core.XWalkDownloadListener;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
@@ -43,6 +44,13 @@ public class WebViewProxy {
 		// Create webview
 		final ForgeWebView forgeWebView = new ForgeWebView(activity, null);
 		this.webView = forgeWebView;
+
+		forgeWebView.setDownloadListener(new XWalkDownloadListener(webView.getContext()) {
+			@Override
+			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+				parentView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
+			}
+		});
 
 		// Configure ForgeWebView
 		XWalkSettingsInternal webSettings = forgeWebView.getSettingsInternal();
@@ -144,19 +152,11 @@ public class WebViewProxy {
 				} else {
 					// Some other URI scheme, let the phone handle it if
 					// possible
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-					final PackageManager packageManager = ForgeApp.getActivity().getPackageManager();
-					List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-					if (list.size() > 0) {
-						// Intent exists, invoke it.
-						ForgeLog.i("Allowing another Android app to handle URL: " + url);
-						ForgeApp.getActivity().startActivity(intent);
-					} else {
-						ForgeLog.w("Attempted to open a URL which could not be handled: " + url);
-					}
+					parentView.openURIAsIntent(Uri.parse(url));
 					return true;
 				}
 			}
+
 		});
 
 		// Add JS Bridge for whitelisted remote URLs

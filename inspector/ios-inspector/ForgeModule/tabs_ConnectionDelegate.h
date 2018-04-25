@@ -1,5 +1,5 @@
 //
-//  tabs_LoginDialogDelegate.h
+//  tabs_ConnectionDelegate.h
 //  ForgeModule
 //
 //  Created by Antoine van Gelder on 2017/03/16.
