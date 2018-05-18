@@ -67,6 +67,7 @@
 - (ForgeTask*)getTask;
 - (void)setReturnObj:(NSDictionary *)newReturnObj;
 - (void)setPattern:(NSString *)newPattern;
+- (BOOL)matchesPattern:(NSURL *)urlToCheck;
 - (void)cancel:(id)nothing;
 - (void)stringByEvaluatingJavaScriptFromString:(ForgeTask*)evalTask string:(NSString*)string;
 - (void)close;
