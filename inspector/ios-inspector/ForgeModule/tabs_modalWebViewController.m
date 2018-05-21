@@ -326,6 +326,18 @@ static UIBarButtonItem *reload = nil;
     pattern = newPattern;
 }
 
+- (BOOL)matchesPattern:(NSURL *)urlToCheck {
+    if (pattern == nil) {
+        return NO;
+    }
+
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:nil];
+    NSString *urlStr = [urlToCheck absoluteString];
+
+    return [regex numberOfMatchesInString:urlStr options:0 range:NSMakeRange(0, [urlStr length])] > 0;
+}
 
 - (void)setTitleTintColor:(UIColor *)newTint {
     titleTint = newTint;
@@ -351,7 +363,6 @@ static UIBarButtonItem *reload = nil;
     // Return YES for supported orientations
     return YES;
 }
-
 
 - (BOOL)webView:(UIWebView *)myWebView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *thisurl = [request URL];
@@ -398,21 +409,22 @@ static UIBarButtonItem *reload = nil;
     }
 
     // check return pattern
-    if (pattern != nil) {
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:nil];
-        if ([regex numberOfMatchesInString:[thisurl absoluteString] options:0 range:NSMakeRange(0, [[thisurl absoluteString] length])] > 0) {
-            returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
-                         [thisurl absoluteString],
-                         @"url",
-                         [NSNumber numberWithBool:NO],
-                         @"userCancelled",
-                         nil];
-            
-            [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-            [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+    if ([self matchesPattern:thisurl]) {
+        [ForgeLog w:[NSString stringWithFormat:@"Encountered url matching pattern, closing the tab now: %@", thisurl]];
+        returnObj = [NSDictionary dictionaryWithObjectsAndKeys:
+                [thisurl absoluteString],
+                @"url",
+                [NSNumber numberWithBool:NO],
+                @"userCancelled",
+                        nil];
 
-            return NO;
-        }
+        [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES
+                                                                  completion:nil];
+        [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:)
+                                                    withObject:[NSNumber numberWithBool:YES]
+                                                    afterDelay:0.5f];
+
+        return NO;
     }
 
     // we're done if basic auth is not enabled
@@ -494,10 +506,12 @@ static UIBarButtonItem *reload = nil;
         [alert show];
     }
     if (error.code == 102) {
-        NSString *URLString = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
-        NSURL *failedRequestURL = [NSURL URLWithString:URLString];
+        NSString *urlStr = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
+        NSURL *failedRequestURL = [NSURL URLWithString:urlStr];
+
         // Determine if we want the system to handle it.
-        if ([[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+        if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+            [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", urlStr]];
             [[UIApplication sharedApplication]openURL:failedRequestURL];
         }
     }
