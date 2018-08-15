@@ -5,6 +5,7 @@ import io.trigger.forge.android.core.ForgeEventListener;
 import io.trigger.forge.android.core.ForgeLog;
 import io.trigger.forge.android.core.ForgeWebView;
 
+import android.content.res.Configuration;
 import android.view.KeyEvent;
 
 public class EventListener extends ForgeEventListener {
@@ -24,4 +25,9 @@ public class EventListener extends ForgeEventListener {
 		}
 		return null;
 	}
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+	    ModalView.instance.updateContentInsets();
+    }
 }

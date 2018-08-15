@@ -1,8 +1,8 @@
 {
-    "changes": "* Fixed: Tabs would open an external URL when it should have closed automatically.",
+    "changes": "* Only use this version with the v2.7 betas\n* Android P support.",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
-    "min_platform_version": "v2.6.7",
+    "min_platform_version": "v2.7.1beta-1",
     "namespace": "tabs",
-    "platform_version": "v2.6.7",
-    "version": "2.22"
+    "platform_version": "v2.7.1beta-1",
+    "version": "2.23"
 }
