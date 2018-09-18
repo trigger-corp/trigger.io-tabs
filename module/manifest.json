@@ -1,8 +1,8 @@
 {
-    "changes": "* Only use this version with the v2.7 betas\n* Android P support.",
+    "changes": "* Android P support.",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
-    "min_platform_version": "v2.7.1beta-1",
+    "min_platform_version": "v2.7.1",
     "namespace": "tabs",
-    "platform_version": "v2.7.1beta-1",
+    "platform_version": "v2.7.1",
     "version": "2.23"
 }
