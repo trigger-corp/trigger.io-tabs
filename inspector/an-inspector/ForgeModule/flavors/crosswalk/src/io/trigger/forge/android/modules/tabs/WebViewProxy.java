@@ -42,6 +42,7 @@ public class WebViewProxy {
 	}
 
 	private void onFileUploadSelect(ValueCallback<Uri> v) {
+		ForgeLog.i("Got File Upload!");
 		this.parentView.onFileUpload(v);
 	}
 
@@ -58,6 +59,7 @@ public class WebViewProxy {
 			}
 		});
 
+		ForgeLog.i("Setting WebChrome Client for upload");
 		forgeWebView.setWebChromeClient(new XWalkWebChromeClient() {
 			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
 				onFileUploadSelect(uploadMsg);
