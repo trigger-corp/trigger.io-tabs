@@ -1,5 +1,6 @@
 package io.trigger.forge.android.modules.tabs;
 
+import android.webkit.WebChromeClient;
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeJSBridge;
@@ -26,6 +27,7 @@ import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.internal.XWalkSettingsInternal;
+import org.xwalk.core.internal.XWalkWebChromeClient;
 
 public class WebViewProxy {
 	ForgeWebView webView = null;
@@ -39,6 +41,10 @@ public class WebViewProxy {
 		this.parentView = parentView;
 	}
 
+	private void onFileUploadSelect(ValueCallback<Uri> v) {
+		this.parentView.onFileUpload(v);
+	}
+
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 
 		// Create webview
@@ -49,6 +55,20 @@ public class WebViewProxy {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
 				parentView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
+			}
+		});
+
+		forgeWebView.setWebChromeClient(new XWalkWebChromeClient() {
+			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
+				onFileUploadSelect(uploadMsg);
+			}
+			// For Android 3.0+
+			public void openFileChooser( ValueCallback uploadMsg, String acceptType ) {
+				onFileUploadSelect(uploadMsg);
+			}
+			//For Android 4.1
+			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
+				onFileUploadSelect(uploadMsg);
 			}
 		});
 

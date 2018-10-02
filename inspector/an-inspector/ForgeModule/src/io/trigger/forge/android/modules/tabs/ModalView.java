@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -227,6 +228,16 @@ public class ModalView {
         webViewProxy.getWebView().stopLoading();
         ForgeLog.i("Received a file download response. Opening URL externally ");
         openURIAsIntent(Uri.parse(url));
+    }
+
+    public void onFileUpload(ValueCallback<Uri> uploadMsg) {
+        int FILE_CHOOSER_RESULT_CODE=1;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
     }
 
     public void onProgressChanged(int newProgress) {
