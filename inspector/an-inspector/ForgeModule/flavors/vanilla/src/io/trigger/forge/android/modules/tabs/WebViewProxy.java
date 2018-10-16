@@ -71,7 +71,7 @@ public class WebViewProxy {
 					WebView webView,
 					ValueCallback<Uri[]> uploadMsg,
 					WebChromeClient.FileChooserParams fileChooserParams) {
-				parentView.onFilesUpload(uploadMsg);
+				parentView.onFilesUpload(uploadMsg, fileChooserParams);
 				super.onShowFileChooser(webView, uploadMsg, fileChooserParams);
 				return true;
 			}

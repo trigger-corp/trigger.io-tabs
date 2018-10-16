@@ -1,5 +1,6 @@
 package io.trigger.forge.android.modules.tabs;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -17,12 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.HttpAuthHandler;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.os.Build;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,12 +34,7 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.util.List;
 
-import io.trigger.forge.android.core.ForgeActivity;
-import io.trigger.forge.android.core.ForgeApp;
-import io.trigger.forge.android.core.ForgeFile;
-import io.trigger.forge.android.core.ForgeLog;
-import io.trigger.forge.android.core.ForgeTask;
-import io.trigger.forge.android.core.ForgeWebView;
+import io.trigger.forge.android.core.*;
 import io.trigger.forge.android.util.BitmapUtil;
 
 public class ModalView {
@@ -56,6 +54,7 @@ public class ModalView {
         }
     }
 
+    private ValueCallback<Uri> vc = null;
     // Reference to the last created modal view (for back button, etc)
     static ModalView instance = null;
 
@@ -74,6 +73,8 @@ public class ModalView {
     final static int ID_BUTTON_LEFT = 11;
     final static int ID_BUTTON_RIGHT = 12;
 
+    final static int FILE_CHOOSER_RESULT_CODE = 90;
+
     public int previousFailureCount = 0;
     public boolean terminateBasicAuthHandling = false;
 
@@ -85,11 +86,16 @@ public class ModalView {
         return webViewProxy.getWebView();
     }
 
-
     // - LIFECYCLE ---------------------------------------------------------------------------------
 
     public ModalView() {
         instance = this;
+    }
+
+    public void onFileUploadSelected(Uri selectedFileURI) {
+        if (this.vc != null) {
+            this.vc.onReceiveValue(selectedFileURI);
+        }
     }
 
     public void closeModal(final ForgeActivity currentActivity, final String url, boolean cancelled) {
@@ -232,8 +238,8 @@ public class ModalView {
     }
 
     public void onFileUpload(ValueCallback<Uri> uploadMsg) {
+        this.vc = uploadMsg;
         ForgeLog.i("Received a file upload event. Opening native File Browser");
-        int FILE_CHOOSER_RESULT_CODE = 1;
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
         i.setType("*/*");
@@ -241,12 +247,17 @@ public class ModalView {
                 Intent.createChooser(i, "File Browser"),
                 FILE_CHOOSER_RESULT_CODE);
     }
-    public void onFilesUpload(ValueCallback<Uri[]> uploadMsg) {
+    public void onFilesUpload(ValueCallback<Uri[]> uploadMsg, WebChromeClient.FileChooserParams params) {
         ForgeLog.i("Received a file upload event. Opening native File Browser");
-        int FILE_CHOOSER_RESULT_CODE = 1;
+
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("*/*");
+        if (Build.VERSION.SDK_INT >= 21) {
+            i.putExtra(Intent.EXTRA_MIME_TYPES, params.getAcceptTypes());
+        } else {
+            // Don't set type for older Android version(Not supported.)
+            i.setType("*/*");
+        }
         ForgeApp.getActivity().startActivityForResult(
                 Intent.createChooser(i, "File Browser"),
                 FILE_CHOOSER_RESULT_CODE);

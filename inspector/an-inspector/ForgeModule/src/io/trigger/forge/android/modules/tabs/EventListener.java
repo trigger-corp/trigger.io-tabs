@@ -1,11 +1,15 @@
 package io.trigger.forge.android.modules.tabs;
 
+import android.content.Intent;
+import android.net.Uri;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeEventListener;
 import io.trigger.forge.android.core.ForgeLog;
 import io.trigger.forge.android.core.ForgeWebView;
 
 import android.view.KeyEvent;
+
+import static android.app.Activity.RESULT_OK;
 
 public class EventListener extends ForgeEventListener {
 	@Override
@@ -23,5 +27,15 @@ public class EventListener extends ForgeEventListener {
 			}
 		}
 		return null;
+	}
+	@Override
+	public void onActivityResult(int RequestCode, int resultCode, Intent intent) {
+		if (RequestCode == ModalView.FILE_CHOOSER_RESULT_CODE) {
+			ForgeLog.i("Got file upload intent result.");
+			final ModalView modalView = ModalView.instance;
+			Uri result = intent == null || resultCode != RESULT_OK ? null
+					: intent.getData();
+			modalView.onFileUploadSelected(result);
+		}
 	}
 }
