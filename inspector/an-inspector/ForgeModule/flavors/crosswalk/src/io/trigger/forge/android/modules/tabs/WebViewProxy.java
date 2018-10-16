@@ -1,6 +1,8 @@
 package io.trigger.forge.android.modules.tabs;
 
+import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeJSBridge;
@@ -11,11 +13,7 @@ import io.trigger.forge.android.core.ForgeWebView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -41,11 +39,6 @@ public class WebViewProxy {
 		this.parentView = parentView;
 	}
 
-	private void onFileUploadSelect(ValueCallback<Uri> v) {
-		ForgeLog.i("Got File Upload!");
-		this.parentView.onFileUpload(v);
-	}
-
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 
 		// Create webview
@@ -58,21 +51,6 @@ public class WebViewProxy {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
 				parentView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
-			}
-		});
-
-		ForgeLog.i("Setting WebChrome Client for upload");
-		forgeWebView.setWebChromeClient(new XWalkWebChromeClient() {
-			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-				onFileUploadSelect(uploadMsg);
-			}
-			// For Android 3.0+
-			public void openFileChooser( ValueCallback uploadMsg, String acceptType ) {
-				onFileUploadSelect(uploadMsg);
-			}
-			//For Android 4.1
-			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
-				onFileUploadSelect(uploadMsg);
 			}
 		});
 
@@ -110,6 +88,11 @@ public class WebViewProxy {
 			public void onPageLoadStopped(XWalkView view, String url, LoadStatus status) {
 				super.onPageLoadStopped(view, url, status);
 				parentView.onLoadFinished(url);
+			}
+			@Override
+			public void openFileChooser(XWalkView view, ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+				super.openFileChooser(view, uploadMsg, acceptType, capture);
+				parentView.onFileUpload(uploadMsg);
 			}
 		});
 

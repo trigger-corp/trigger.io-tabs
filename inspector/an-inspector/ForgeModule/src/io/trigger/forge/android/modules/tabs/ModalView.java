@@ -232,7 +232,18 @@ public class ModalView {
     }
 
     public void onFileUpload(ValueCallback<Uri> uploadMsg) {
-        int FILE_CHOOSER_RESULT_CODE=1;
+        ForgeLog.i("Received a file upload event. Opening native File Browser");
+        int FILE_CHOOSER_RESULT_CODE = 1;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
+    }
+    public void onFilesUpload(ValueCallback<Uri[]> uploadMsg) {
+        ForgeLog.i("Received a file upload event. Opening native File Browser");
+        int FILE_CHOOSER_RESULT_CODE = 1;
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
         i.setType("*/*");

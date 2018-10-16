@@ -33,10 +33,6 @@ public class WebViewProxy {
 		this.parentView = parentView;
 	}
 
-	private void onFileUploadSelect(ValueCallback<Uri> v) {
-		this.parentView.onFileUpload(v);
-	}
-
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 		// Create webview
 		final ForgeWebView forgeWebView = new ForgeWebView(activity);
@@ -47,20 +43,6 @@ public class WebViewProxy {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
 				parentView.onDownloadStart(url, userAgent, contentDisposition, mimetype, contentLength);
-			}
-		});
-
-		forgeWebView.setWebChromeClient(new WebChromeClient() {
-			public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-				onFileUploadSelect(uploadMsg);
-			}
-			// For Android 3.0+
-			public void openFileChooser( ValueCallback uploadMsg, String acceptType ) {
-				onFileUploadSelect(uploadMsg);
-			}
-			//For Android 4.1
-			public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
-				onFileUploadSelect(uploadMsg);
 			}
 		});
 
@@ -83,6 +65,15 @@ public class WebViewProxy {
 			public void onProgressChanged(WebView view, int newProgress) {
 				parentView.onProgressChanged(newProgress);
 				super.onProgressChanged(view, newProgress);
+			}
+			@Override
+			public boolean onShowFileChooser(
+					WebView webView,
+					ValueCallback<Uri[]> uploadMsg,
+					WebChromeClient.FileChooserParams fileChooserParams) {
+				parentView.onFilesUpload(uploadMsg);
+				super.onShowFileChooser(webView, uploadMsg, fileChooserParams);
+				return true;
 			}
 		});
 
