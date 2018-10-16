@@ -237,12 +237,20 @@ public class ModalView {
         openURIAsIntent(Uri.parse(url));
     }
 
-    public void onFileUpload(ValueCallback<Uri> uploadMsg) {
+    public void onFileUpload(ValueCallback<Uri> uploadMsg, String mimeType) {
         this.vc = uploadMsg;
         ForgeLog.i("Received a file upload event. Opening native File Browser");
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("*/*");
+        String fileChooserMimeType = mimeType == null ? "*/*" : mimeType;
+        if (fileChooserMimeType.contains(",")) {
+            if (Build.VERSION.SDK_INT >= 21) {
+                String[] mimeTypes = fileChooserMimeType.split(",");
+                i.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+            }
+            // We ignore input types here because older Android version doesn't support multiple MIME Types
+            i.setType("*/*");
+        }
         ForgeApp.getActivity().startActivityForResult(
                 Intent.createChooser(i, "File Browser"),
                 FILE_CHOOSER_RESULT_CODE);

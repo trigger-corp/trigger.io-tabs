@@ -92,7 +92,7 @@ public class WebViewProxy {
 			@Override
 			public void openFileChooser(XWalkView view, ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
 				super.openFileChooser(view, uploadMsg, acceptType, capture);
-				parentView.onFileUpload(uploadMsg);
+				parentView.onFileUpload(uploadMsg, acceptType);
 			}
 		});
 
