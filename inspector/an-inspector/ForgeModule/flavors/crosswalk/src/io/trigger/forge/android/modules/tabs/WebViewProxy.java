@@ -49,9 +49,11 @@ public class WebViewProxy {
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 
 		// Create webview
+		ForgeLog.i("Creating WebView");
 		final ForgeWebView forgeWebView = new ForgeWebView(activity, null);
 		this.webView = forgeWebView;
 
+		ForgeLog.i("Setting Download Listener");
 		forgeWebView.setDownloadListener(new XWalkDownloadListener(webView.getContext()) {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {

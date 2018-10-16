@@ -206,6 +206,7 @@ public class ModalView {
                 view.addView(topbar);
 
                 // add webview
+                ForgeLog.i("Adding WebView Proxy");
                 webViewProxy = new WebViewProxy(instance);
                 final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
