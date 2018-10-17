@@ -99,6 +99,7 @@ public class ModalView {
         ForgeLog.i("Handling File upload value callbacks");
         if (vc != null) {
             vc.onReceiveValue(selectedFileURI);
+            vc = null;
         }
         if (vcs != null) {
             // Input type=file only support selecting 1 file
@@ -107,7 +108,7 @@ public class ModalView {
                 vcs.onReceiveValue(uris);
             }
             vcs.onReceiveValue(null);
-
+            vcs = null;
         }
     }
 
@@ -115,9 +116,6 @@ public class ModalView {
         if (view == null) {
             return;
         }
-        // Clear file upload valueCallbacks
-        onFileUploadSelected(null);
-
         final JsonObject result = new JsonObject();
         result.addProperty("url", url);
         result.addProperty("userCancelled", cancelled);
