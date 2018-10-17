@@ -109,6 +109,8 @@ public class ModalView {
         if (view == null) {
             return;
         }
+        // Clear file upload valueCallbacks
+        onFileUploadSelected(null);
 
         final JsonObject result = new JsonObject();
         result.addProperty("url", url);
@@ -255,9 +257,9 @@ public class ModalView {
                 String[] mimeTypes = fileChooserMimeType.split(",");
                 i.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
             }
-            // We ignore input types here because older Android version doesn't support multiple MIME Types
-            i.setType("*/*");
         }
+        // We ignore input types here because older Android version doesn't support multiple MIME Types
+        i.setType("*/*");
         ForgeApp.getActivity().startActivityForResult(
                 Intent.createChooser(i, "File Browser"),
                 FILE_CHOOSER_RESULT_CODE);
