@@ -1,8 +1,5 @@
 package io.trigger.forge.android.modules.tabs;
 
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 import io.trigger.forge.android.core.ForgeActivity;
 import io.trigger.forge.android.core.ForgeApp;
 import io.trigger.forge.android.core.ForgeJSBridge;
@@ -25,7 +22,6 @@ import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.internal.XWalkSettingsInternal;
-import org.xwalk.core.internal.XWalkWebChromeClient;
 
 public class WebViewProxy {
 	ForgeWebView webView = null;
