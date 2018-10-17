@@ -94,13 +94,13 @@ public class ModalView {
     }
 
     public void onFileUploadSelected(Uri selectedFileURI) {
+        ForgeLog.i("Handling File upload value callbacks");
         if (vc != null) {
             vc.onReceiveValue(selectedFileURI);
         }
         if (vcs != null) {
-            // We don't allow miltiple file uploads for now
+            // Input type=file only support selecting 1 file
             Uri[] uris = new Uri[]{selectedFileURI};
-
             vcs.onReceiveValue(uris);
         }
     }
@@ -248,7 +248,7 @@ public class ModalView {
 
     public void onFileUpload(ValueCallback<Uri> uploadMsg, String mimeType) {
         vc = uploadMsg;
-        ForgeLog.i("Received a file upload event. Opening native File Browser");
+        ForgeLog.i("Received a file upload event. Opening native File Browser with mime type:" + mimeType);
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
         String fileChooserMimeType = mimeType == null ? "*/*" : mimeType;
