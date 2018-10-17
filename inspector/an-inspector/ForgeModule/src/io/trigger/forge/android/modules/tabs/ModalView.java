@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -32,6 +33,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import io.trigger.forge.android.core.*;
@@ -100,8 +102,12 @@ public class ModalView {
         }
         if (vcs != null) {
             // Input type=file only support selecting 1 file
-            Uri[] uris = new Uri[]{selectedFileURI};
-            vcs.onReceiveValue(uris);
+            if (selectedFileURI != null) {
+                Uri[] uris = new Uri[]{selectedFileURI};
+                vcs.onReceiveValue(uris);
+            }
+            vcs.onReceiveValue(null);
+
         }
     }
 
@@ -269,8 +275,12 @@ public class ModalView {
         vcs = uploadMsg;
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        if (Build.VERSION.SDK_INT >= 21 && params.getAcceptTypes().length != 0)  {
-            i.putExtra(Intent.EXTRA_MIME_TYPES, params.getAcceptTypes());
+        if (Build.VERSION.SDK_INT >= 21)  {
+            String[] acceptTypes = params.getAcceptTypes();
+            boolean shouldPutExtra = acceptTypes.length != 0 && acceptTypes[0] != "";
+            if (shouldPutExtra) {
+                i.putExtra(Intent.EXTRA_MIME_TYPES, params.getAcceptTypes());
+            }
         }
         // Don't set type for older Android version(Not supported.)
         i.setType("*/*");
