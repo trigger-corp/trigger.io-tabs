@@ -265,11 +265,11 @@ public class ModalView {
                 FILE_CHOOSER_RESULT_CODE);
     }
     public void onFilesUpload(ValueCallback<Uri[]> uploadMsg, WebChromeClient.FileChooserParams params) {
-        ForgeLog.i("Received a file upload event. Opening native File Browser");
+        ForgeLog.i("Received a file upload event. Opening native File Browser with MIME Types:");
         vcs = uploadMsg;
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21 && params.getAcceptTypes().length != 0)  {
             i.putExtra(Intent.EXTRA_MIME_TYPES, params.getAcceptTypes());
         }
         // Don't set type for older Android version(Not supported.)
