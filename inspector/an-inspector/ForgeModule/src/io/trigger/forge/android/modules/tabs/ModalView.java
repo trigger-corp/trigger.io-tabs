@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -15,10 +16,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.HttpAuthHandler;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
+import android.webkit.*;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -30,12 +28,46 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.trigger.forge.android.core.*;
 import io.trigger.forge.android.util.BitmapUtil;
 
 public class ModalView {
+    private String[] normaliseMimeTypes(String mimeTypes) {
+        if (mimeTypes == null) {
+            return new String[] {"*/*"};
+        }
+        String[] mimeTypesArray = null;
+        if (mimeTypes.contains(",")) {
+            mimeTypesArray = mimeTypes.split(",");
+        } else {
+            mimeTypesArray = new String[] {mimeTypes};
+        }
+        final List<String> computedMimeTypes = new ArrayList<>();
+        final MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
+        // Get mime type for file extension
+        for (int i=0; i < mimeTypesArray.length; ++i) {
+            final String mimeType = mimeTypesArray[i];
+            if (mimeType.startsWith(".")) {
+                final String fileExtensionMime = mimeMap.getMimeTypeFromExtension(mimeType.substring(1));
+                if (fileExtensionMime != null) {
+                    ForgeLog.d("Adding mime type to list:" + fileExtensionMime);
+                    computedMimeTypes.add(fileExtensionMime);
+                    ForgeLog.d("Added mime type to list:" + fileExtensionMime);
+                } else {
+                    ForgeLog.d("Unable to find MIME Type for file extension:" + mimeType);
+                }
+            } else if (mimeMap.hasMimeType(mimeType)) {
+                computedMimeTypes.add(mimeType);
+            }
+        }
+        if (computedMimeTypes.size() == 0) {
+            return new String[] {};
+        }
+        return computedMimeTypes.toArray(new String[computedMimeTypes.size()]);
+    }
     public static void openURIAsIntent(Uri uri) {
         // Some other URI scheme, let the phone handle it if
         // possible
@@ -249,16 +281,13 @@ public class ModalView {
     public void onFileUpload(ValueCallback<Uri> uploadMsg, String mimeType) {
         vc = uploadMsg;
         ForgeLog.i("Received a file upload event. Opening native File Browser with mime type:" + mimeType);
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        String fileChooserMimeType = mimeType == null ? "*/*" : mimeType;
-        if (fileChooserMimeType.contains(",")) {
-            if (Build.VERSION.SDK_INT >= 21) {
-                String[] mimeTypes = fileChooserMimeType.split(",");
-                i.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-            }
+        final String[] computedMimeTypes = normaliseMimeTypes(mimeType);
+        if (Build.VERSION.SDK_INT >= 21) {
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+
         }
-        // We ignore input types here because older Android version doesn't support multiple MIME Types
         i.setType("*/*");
         ForgeApp.getActivity().startActivityForResult(
                 Intent.createChooser(i, "File Browser"),
@@ -271,12 +300,10 @@ public class ModalView {
         i.addCategory(Intent.CATEGORY_OPENABLE);
         if (Build.VERSION.SDK_INT >= 21)  {
             String[] acceptTypes = params.getAcceptTypes();
-            boolean shouldPutExtra = acceptTypes.length != 0 && acceptTypes[0] != "";
-            if (shouldPutExtra) {
-                i.putExtra(Intent.EXTRA_MIME_TYPES, params.getAcceptTypes());
-            }
+            final String[] computedMimeTypes = normaliseMimeTypes(TextUtils.join(",", acceptTypes));
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+            // Older Android SDK doesn't have a way to specify file type filters
         }
-        // Don't set type for older Android version(Not supported.)
         i.setType("*/*");
         ForgeApp.getActivity().startActivityForResult(
                 Intent.createChooser(i, "File Browser"),
