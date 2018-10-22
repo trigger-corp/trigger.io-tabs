@@ -39,12 +39,7 @@ public class ModalView {
         if (mimeTypes == null) {
             return new String[] {"*/*"};
         }
-        String[] mimeTypesArray = null;
-        if (mimeTypes.contains(",")) {
-            mimeTypesArray = mimeTypes.split(",");
-        } else {
-            mimeTypesArray = new String[] {mimeTypes};
-        }
+        final String[] mimeTypesArray = mimeTypes.split(",");
         final List<String> computedMimeTypes = new ArrayList<>();
         final MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
         // Get mime type for file extension
@@ -53,21 +48,19 @@ public class ModalView {
             if (mimeType.startsWith(".")) {
                 final String fileExtensionMime = mimeMap.getMimeTypeFromExtension(mimeType.substring(1));
                 if (fileExtensionMime != null) {
-                    ForgeLog.d("Adding mime type to list:" + fileExtensionMime);
                     computedMimeTypes.add(fileExtensionMime);
-                    ForgeLog.d("Added mime type to list:" + fileExtensionMime);
-                } else {
-                    ForgeLog.d("Unable to find MIME Type for file extension:" + mimeType);
                 }
             } else if (mimeMap.hasMimeType(mimeType)) {
                 computedMimeTypes.add(mimeType);
             }
         }
         if (computedMimeTypes.size() == 0) {
-            return new String[] {};
+            // We show all file types if the mime types are not supported so user has a choice to select a file
+            return new String[] {"*/*"};
         }
         return computedMimeTypes.toArray(new String[computedMimeTypes.size()]);
     }
+
     public static void openURIAsIntent(Uri uri) {
         // Some other URI scheme, let the phone handle it if
         // possible
