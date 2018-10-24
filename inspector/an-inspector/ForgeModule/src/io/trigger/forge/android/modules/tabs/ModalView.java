@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -15,8 +16,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.HttpAuthHandler;
-import android.webkit.WebView;
+import android.webkit.*;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -28,17 +28,39 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import io.trigger.forge.android.core.ForgeActivity;
-import io.trigger.forge.android.core.ForgeApp;
-import io.trigger.forge.android.core.ForgeFile;
-import io.trigger.forge.android.core.ForgeLog;
-import io.trigger.forge.android.core.ForgeTask;
-import io.trigger.forge.android.core.ForgeWebView;
+import io.trigger.forge.android.core.*;
 import io.trigger.forge.android.util.BitmapUtil;
 
 public class ModalView {
+    private String[] normaliseMimeTypes(String mimeTypes) {
+        if (mimeTypes == null) {
+            return new String[] {"*/*"};
+        }
+        final String[] mimeTypesArray = mimeTypes.split(",");
+        final List<String> computedMimeTypes = new ArrayList<>();
+        final MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
+        // Get mime type for file extension
+        for (int i=0; i < mimeTypesArray.length; ++i) {
+            final String mimeType = mimeTypesArray[i];
+            if (mimeType.startsWith(".")) {
+                final String fileExtensionMime = mimeMap.getMimeTypeFromExtension(mimeType.substring(1));
+                if (fileExtensionMime != null) {
+                    computedMimeTypes.add(fileExtensionMime);
+                }
+            } else if (mimeMap.hasMimeType(mimeType)) {
+                computedMimeTypes.add(mimeType);
+            }
+        }
+        if (computedMimeTypes.size() == 0) {
+            // We show all file types if the mime types are not supported so user has a choice to select a file
+            return new String[] {"*/*"};
+        }
+        return computedMimeTypes.toArray(new String[computedMimeTypes.size()]);
+    }
+
     public static void openURIAsIntent(Uri uri) {
         // Some other URI scheme, let the phone handle it if
         // possible
@@ -55,6 +77,8 @@ public class ModalView {
         }
     }
 
+    private ValueCallback<Uri> vc = null;
+    private ValueCallback<Uri[]> vcs = null;
     // Reference to the last created modal view (for back button, etc)
     static ModalView instance = null;
 
@@ -73,6 +97,8 @@ public class ModalView {
     final static int ID_BUTTON_LEFT = 11;
     final static int ID_BUTTON_RIGHT = 12;
 
+    final static int FILE_CHOOSER_RESULT_CODE = 90;
+
     public int previousFailureCount = 0;
     public boolean terminateBasicAuthHandling = false;
 
@@ -84,18 +110,33 @@ public class ModalView {
         return webViewProxy.getWebView();
     }
 
-
     // - LIFECYCLE ---------------------------------------------------------------------------------
 
     public ModalView() {
         instance = this;
     }
 
+    public void onFileUploadSelected(Uri selectedFileURI) {
+        ForgeLog.i("Handling File upload value callbacks");
+        if (vc != null) {
+            vc.onReceiveValue(selectedFileURI);
+            vc = null;
+        }
+        if (vcs != null) {
+            // Input type=file only support selecting 1 file
+            if (selectedFileURI != null) {
+                Uri[] uris = new Uri[]{selectedFileURI};
+                vcs.onReceiveValue(uris);
+            }
+            vcs.onReceiveValue(null);
+            vcs = null;
+        }
+    }
+
     public void closeModal(final ForgeActivity currentActivity, final String url, boolean cancelled) {
         if (view == null) {
             return;
         }
-
         final JsonObject result = new JsonObject();
         result.addProperty("url", url);
         result.addProperty("userCancelled", cancelled);
@@ -205,6 +246,7 @@ public class ModalView {
                 view.addView(topbar);
 
                 // add webview
+                ForgeLog.i("Adding WebView Proxy");
                 webViewProxy = new WebViewProxy(instance);
                 final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
@@ -227,6 +269,38 @@ public class ModalView {
         webViewProxy.getWebView().stopLoading();
         ForgeLog.i("Received a file download response. Opening URL externally ");
         openURIAsIntent(Uri.parse(url));
+    }
+
+    public void onFileUpload(ValueCallback<Uri> uploadMsg, String mimeType) {
+        vc = uploadMsg;
+        ForgeLog.i("Received a file upload event. Opening native File Browser with mime type:" + mimeType);
+        final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        final String[] computedMimeTypes = normaliseMimeTypes(mimeType);
+        if (Build.VERSION.SDK_INT >= 21) {
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+
+        }
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
+    }
+    public void onFilesUpload(ValueCallback<Uri[]> uploadMsg, WebChromeClient.FileChooserParams params) {
+        ForgeLog.i("Received a file upload event. Opening native File Browser with MIME Types:");
+        vcs = uploadMsg;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        if (Build.VERSION.SDK_INT >= 21)  {
+            String[] acceptTypes = params.getAcceptTypes();
+            final String[] computedMimeTypes = normaliseMimeTypes(TextUtils.join(",", acceptTypes));
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+            // Older Android SDK doesn't have a way to specify file type filters
+        }
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
     }
 
     public void onProgressChanged(int newProgress) {
