@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -251,6 +253,9 @@ public class ModalView {
                 final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
                 webView.loadUrl(url);
+
+                // update content insets
+                updateContentInsets();
 
                 // Add to the view group and switch
                 ForgeApp.getActivity().addModalView(view);
@@ -537,7 +542,9 @@ public class ModalView {
         return button;
     }
 
+
     // - UI API's ----------------------------------------------------------------------------------
+
     public void addButton(final ForgeTask task, final JsonObject params) {
         task.performUI(new Runnable() {
             public void run() {
@@ -606,6 +613,7 @@ public class ModalView {
         });
     }
 
+
     public void removeButtons(final ForgeTask task) {
         task.performUI(new Runnable() {
             public void run() {
@@ -627,5 +635,14 @@ public class ModalView {
         });
     }
 
+
+    public void updateContentInsets() {
+        Rect safeAreaInsets = new Rect();
+        ForgeViewController.getSafeAreaInsets().round(safeAreaInsets);
+
+        view.setPadding(safeAreaInsets.left, safeAreaInsets.top, safeAreaInsets.right, safeAreaInsets.bottom);
+
+        getWebView().forceLayout();
+    }
 
 }

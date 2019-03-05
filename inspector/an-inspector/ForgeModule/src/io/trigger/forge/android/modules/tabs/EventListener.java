@@ -7,6 +7,7 @@ import io.trigger.forge.android.core.ForgeEventListener;
 import io.trigger.forge.android.core.ForgeLog;
 import io.trigger.forge.android.core.ForgeWebView;
 
+import android.content.res.Configuration;
 import android.view.KeyEvent;
 
 import static android.app.Activity.RESULT_OK;
@@ -38,4 +39,9 @@ public class EventListener extends ForgeEventListener {
 			modalView.onFileUploadSelected(result);
 		}
 	}
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+	    ModalView.instance.updateContentInsets();
+    }
 }

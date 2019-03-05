@@ -2,8 +2,26 @@
 
 module("forge.tabs");
 
+asyncTest("Open tab with file picker for upload", 1, function() {
+    forge.tabs.open("https://req-playground.scthi.tech/upload", function () {
+        askQuestion("Have you been able to pick files and upload them?", {
+            Yes: function () {
+                ok(true, "Success");
+                start();
+            },
+            No: function () {
+                ok(false, "User claims failure");
+                start();
+            }
+        });
+    }, function (e) {
+        ok(false, "API call failure: "+e.message);
+        start();
+    });
+});
+
 asyncTest("Open tab with downloads", 1, function() {
-    forge.tabs.open("https://req-playground-ahghagcnmb.now.sh/downloads", function () {
+    forge.tabs.open("https://req-playground.scthi.tech/downloads", function () {
         askQuestion("Have you been able to open the files listed on the download page?", {
             Yes: function () {
                 ok(true, "Success");
@@ -65,7 +83,7 @@ asyncTest("Open tab with website & navigation toolbar", 1, function() {
 
 asyncTest("Test HTTP browsing with Basic Auth enabled", 1, function() {
     forge.tabs.openAdvanced({
-        url: "http://example.org",
+        url: "https://example.org",
         basicAuth: true,
         basicAuthConfig: {
             retryFailedLogin: true,
@@ -73,7 +91,7 @@ asyncTest("Test HTTP browsing with Basic Auth enabled", 1, function() {
         }
     }, function (modal) {
         modal.closed.addListener(function () {
-            askQuestion("Did a tab/view of http://example.org just open in the foreground ?", {
+            askQuestion("Did a tab/view of https://example.org just open in the foreground ?", {
                 Yes: function () {
                     ok(true, "Success");
                     start();

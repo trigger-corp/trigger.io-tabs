@@ -1,17 +1,21 @@
 {
-	"modules": {
-	},
-	"this_module": {
-		"config": {}
-	},
-	"core": {
-		"general": {
-			"trusted_urls": [ "<all_urls>",
-							  "http://*/*",
-							  "https://*/*" ]
-		},
-		"android": {
-			"remote_debugging": true
-		}
-	}
+    "modules": {
+    },
+    "this_module": {
+        "config": {}
+    },
+    "core": {
+        "general": {
+            "trusted_urls": [ "<all_urls>",
+                              "http://*/*",
+                              "https://*/*" ]
+        },
+        "android": {
+            "remote_debugging": true,
+            "adjust_content_insets": "never"
+        },
+        "ios": {
+            "adjust_content_insets": "never"
+        }
+    }
 }
