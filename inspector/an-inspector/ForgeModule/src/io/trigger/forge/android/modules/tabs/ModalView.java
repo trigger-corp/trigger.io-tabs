@@ -254,7 +254,6 @@ public class ModalView {
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
                 webView.loadUrl(url);
 
-                // update content insets
                 updateContentInsets();
 
                 // Add to the view group and switch
