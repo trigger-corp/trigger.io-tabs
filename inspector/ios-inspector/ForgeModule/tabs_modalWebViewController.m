@@ -27,6 +27,13 @@ static UIBarButtonItem *reload = nil;
 }
 
 
+// workaround for WKWebView breaking ForgeConstant.statusBarHeightDynamic
+- (CGFloat)statusBarHeightDynamic {
+    CGFloat statusBarHeight = UIApplication.sharedApplication.statusBarFrame.size.height;
+    NSLog(@"tabs_modalWebViewController::statusBarHeight is 0.0, 20.0 or 44.0 => %f pixels high", statusBarHeight);
+    return statusBarHeight; // 20.0f, 44.0f on iPhone-X
+}
+
 #pragma mark - View lifecycle
 
 - (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
@@ -108,7 +115,7 @@ static UIBarButtonItem *reload = nil;
                                                               toItem:self.topLayoutGuide
                                                            attribute:NSLayoutAttributeTop
                                                           multiplier:1.0f
-                                                            constant:ForgeConstant.statusBarHeightDynamic];
+                                                            constant:[self statusBarHeightDynamic]];
     }
     navBarTopConstraint.active = YES;
 
@@ -118,7 +125,7 @@ static UIBarButtonItem *reload = nil;
     }
 
     // Set content inset for navigationBar
-    CGFloat insetHeight = ForgeConstant.statusBarHeightDynamic + ForgeConstant.navigationBarHeightStatic;
+    CGFloat insetHeight = [self statusBarHeightDynamic] + ForgeConstant.navigationBarHeightStatic;
     [self setTopInset:insetHeight];
 
     // Blurview
