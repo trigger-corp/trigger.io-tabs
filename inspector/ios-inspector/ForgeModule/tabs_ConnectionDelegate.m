@@ -245,9 +245,15 @@
     NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     _basic_authorized_failed = NO;
     
-    // The webview won't load the page content automatically.
-    [self log:[NSString stringWithFormat:@"[6] Received callback: Load body after basicAuthFlow: %@", html]];
-    [webView loadHTMLString:html baseURL:currentUrl];
+    // Determine if we want the system to handle it.
+    if (html == nil && [[UIApplication sharedApplication]canOpenURL:currentUrl]) {
+        [ForgeLog w:[NSString stringWithFormat:@"[6] Received callback: No html, open url by external app: %@", currentUrl]];
+        [[UIApplication sharedApplication]openURL:currentUrl];
+    } else {
+        // The webview won't load the page content automatically.
+        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body: %@", html]];
+        [webView loadHTMLString:html baseURL:currentUrl];
+    }
 }
 
 
