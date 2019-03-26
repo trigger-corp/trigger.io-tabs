@@ -18,6 +18,7 @@
     bool _basic_authorized_failed;
     NSString *pattern;
     NSURL *currentUrl;
+    NSMutableData *receivedData;
 
     UIWebView *webView;
     tabs_modalWebViewController *modalInstance;

@@ -86,6 +86,7 @@
     
     [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
     [NSURLConnection connectionWithRequest:request delegate:self];
+    receivedData = [NSMutableData data];
     return NO;
 }
 
@@ -242,8 +243,19 @@
 {
     [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData failed: %d", _basic_authorized_failed]];
 
-    NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    [receivedData appendData:data];
     _basic_authorized_failed = NO;
+}
+
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    [self log:[NSString stringWithFormat:@"[6] Received callback: ConnectionDelegate::didFailWithError: %@ failed: %d", error, _basic_authorized_failed]];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    NSString *html = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
     
     // Determine if we want the system to handle it.
     if (html == nil && [[UIApplication sharedApplication]canOpenURL:currentUrl]) {
@@ -254,12 +266,7 @@
         [self log:[NSString stringWithFormat:@"[6] Received callback: Load body: %@", html]];
         [webView loadHTMLString:html baseURL:currentUrl];
     }
-}
 
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    [self log:[NSString stringWithFormat:@"[6] Received callback: ConnectionDelegate::didFailWithError: %@ failed: %d", error, _basic_authorized_failed]];
 }
 
 @end
