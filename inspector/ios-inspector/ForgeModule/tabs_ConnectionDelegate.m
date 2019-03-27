@@ -39,7 +39,6 @@
     verboseLogging = NO;
     retryFailedLogin =  NO;
     
-    _in_basic_auth_flow = NO;
     _basic_authorized_failed = NO;
 
     authorizationCache = [[NSMutableDictionary alloc] init];
@@ -87,7 +86,8 @@
     
     [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
     [NSURLConnection connectionWithRequest:request delegate:self];
-    return YES;
+    receivedData = [NSMutableData data];
+    return NO;
 }
 
 
@@ -125,8 +125,6 @@
     [self log:[NSString stringWithFormat:@"    authenticationMethod = %@", [[challenge protectionSpace] authenticationMethod]]];
     [self log:[NSString stringWithFormat:@"  Sender: %@", challenge.sender]];                                // NSURLAuthenticationChallengeSender
 
-    _in_basic_auth_flow = NO;
-    
     // get challenge information
     NSString *host = [challenge.protectionSpace host];
     NSString *status = @"";
@@ -172,7 +170,6 @@
     }
     
     // open login dialog in ui thread
-    _in_basic_auth_flow = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self log:@"Requesting username/password for basic auth"];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[i8n.title stringByReplacingOccurrencesOfString:@"%host%" withString:host]
@@ -246,15 +243,8 @@
 {
     [self log:[NSString stringWithFormat:@"[5] Received callback: ConnectionDelegate::didReceiveData failed: %d", _basic_authorized_failed]];
 
-    NSString *html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    [receivedData appendData:data];
     _basic_authorized_failed = NO;
-    
-    // The webview won't load the page content automatically when in basicAuth flow.
-    // It does however in all other cases.
-    if (_in_basic_auth_flow == YES) {
-        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body after basicAuthFlow: %@", html]];
-        [webView loadHTMLString:html baseURL:currentUrl];
-    }
 }
 
 
@@ -263,18 +253,21 @@
     [self log:[NSString stringWithFormat:@"[6] Received callback: ConnectionDelegate::didFailWithError: %@ failed: %d", error, _basic_authorized_failed]];
 }
 
-
-/*- (nullable NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(nullable NSURLResponse *)response
-{
-    [self log:[NSString stringWithFormat:@"[7] Received callback: ConnectionDelegate::willSendRequest connection: %@ request: %@ redirectResponse: %@ => failed: %d", connection, request, response, _basic_authorized_failed]];
-
-    return request;
-}
-
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [self log:[NSString stringWithFormat:@"[8] Received callback: ConnectionDelegate::connectionDidFinishLoading failed: %d", _basic_authorized_failed]];
-}*/
+    NSString *html = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+    
+    // Determine if we want the system to handle it.
+    if (html == nil && [[UIApplication sharedApplication]canOpenURL:currentUrl]) {
+        [ForgeLog w:[NSString stringWithFormat:@"[6] Received callback: No html, open url by external app: %@", currentUrl]];
+        [[UIApplication sharedApplication]openURL:currentUrl];
+    } else {
+        // The webview won't load the page content automatically.
+        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body: %@", html]];
+        [webView loadHTMLString:html baseURL:currentUrl];
+    }
+
+}
 
 @end
 
