@@ -5,12 +5,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.content.res.TypedArrayUtils;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -456,13 +454,23 @@ public class ModalView {
             titleColor = Color.argb(titleTint.get(3).getAsInt(), titleTint.get(0).getAsInt(), titleTint.get(1).getAsInt(), titleTint.get(2).getAsInt());
         }
         titleView.setTextColor(titleColor);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
-        titleView.setGravity(Gravity.LEFT);
+        titleView.setGravity(Gravity.CENTER_VERTICAL);
         titleView.setSingleLine();
         titleView.setEllipsize(TextUtils.TruncateAt.END);
-
+        applyDefaultTextLayout(metrics, titleView);
         return titleView;
     }
+
+    /**
+     * Sets default setting for {@link TextView#setPadding(int, int, int, int)}
+     * and {@link TextView#setTextSize(int, float)}.
+     */
+    private void applyDefaultTextLayout(final DisplayMetrics metrics, final TextView textView) {
+        final int buttonMargin = Math.round(metrics.density * 4);
+        textView.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 18);
+    }
+
     private LinearLayout createButton(DisplayMetrics metrics, String buttonText, JsonElement buttonIcon, JsonArray buttonTint) throws IOException {
         return this.createButton(metrics, buttonText, buttonIcon, buttonTint, null);
     }
@@ -508,7 +516,7 @@ public class ModalView {
         button.setOrientation(LinearLayout.VERTICAL);
         button.setGravity(Gravity.CENTER);
 
-        final int buttonMargin = Math.round(metrics.density * 4);
+
         if (buttonIcon != null) {
             ImageView image = new ImageView(ForgeApp.getActivity());
             image.setScaleType(ImageView.ScaleType.CENTER);
@@ -522,6 +530,7 @@ public class ModalView {
             }
             icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), buttonFile.fd().createInputStream(), 0, 32, buttonColor);
             image.setImageDrawable(icon);
+            final int buttonMargin = Math.round(metrics.density * 4);
             image.setPadding(buttonMargin, 0, buttonMargin, 0);
             button.addView(image);
         } else {
@@ -532,9 +541,8 @@ public class ModalView {
                 text.setText("Close");
             }
             text.setTextColor(buttonColor);
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 18);
             text.setGravity(Gravity.CENTER);
-            text.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
+            applyDefaultTextLayout(metrics, text);
             button.addView(text);
         }
 
