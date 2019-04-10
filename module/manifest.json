@@ -1,8 +1,8 @@
 {
-	"changes": "Unified text layouts (size and margin) for top bar.",
+	"changes": "Bugfix: Open supported type likes pdfs inline instead of safari.",
 	"description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
 	"min_platform_version": "v2.7.6",
 	"namespace": "tabs",
 	"platform_version": "v2.7.6",
-	"version": "2.32.14"
+	"version": "2.32.15"
 }
