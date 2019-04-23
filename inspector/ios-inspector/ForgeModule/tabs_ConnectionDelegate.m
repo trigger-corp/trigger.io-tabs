@@ -82,12 +82,20 @@
         [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
         return YES;
     }
-
     
-    [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
+    NSURL* mainDocumentURL = [request mainDocumentURL];
+    if (mainDocumentURL == nil || ![requestURL isEqualToString: [mainDocumentURL absoluteString]]) {
+        [self log:[NSString stringWithFormat:@"Returning ConnectionDelegate::handleRequest YES - not mainDocumentURL=%@", mainDocumentURL]];
+        return YES;
+    }
+    
+    
+    [self log:[NSString stringWithFormat:@"Returning ConnectionDelegate::handleRequest NO - not authorized mainDocumentURL=%@", [request mainDocumentURL]]];
     [NSURLConnection connectionWithRequest:request delegate:self];
     receivedData = [NSMutableData data];
     return NO;
+    
+//    return YES;
 }
 
 
@@ -255,7 +263,11 @@
     NSString *textEncodingName = [httpResponse textEncodingName];
     NSString *mimeType = [httpResponse MIMEType];
     
-    [self log:[NSString stringWithFormat:@"[6] Received callback: Load body of mimeType %@ and textEncodingName %@", mimeType, textEncodingName]];
+    if (textEncodingName == nil) {
+        textEncodingName = @"utf-8";
+    }
+    
+    [self log:[NSString stringWithFormat:@"[6] Received callback: Load body data of mimeType %@ and textEncodingName %@", mimeType, textEncodingName]];
     [webView loadData:receivedData MIMEType: mimeType textEncodingName: textEncodingName baseURL:currentUrl];
 }
 
