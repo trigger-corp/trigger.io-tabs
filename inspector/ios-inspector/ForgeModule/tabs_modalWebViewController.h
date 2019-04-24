@@ -36,6 +36,7 @@
     tabs_NavigationToolbar *navigationToolbar;
 
 	NSURL *url;
+    NSString *retryUrl;
 	ForgeTask *task;
 	NSString *pattern;
 	NSDictionary *returnObj;

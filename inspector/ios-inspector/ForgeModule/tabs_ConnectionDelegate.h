@@ -18,7 +18,7 @@
     bool _basic_authorized_failed;
     NSString *pattern;
 
-    NSHTTPURLResponse* httpResponse;
+    NSHTTPURLResponse *httpResponse;
     NSMutableData *receivedData;
 
     UIWebView *webView;
