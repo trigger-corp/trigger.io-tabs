@@ -82,12 +82,20 @@
         [self log:@"Returning ConnectionDelegate::handleRequest YES - we are authorized"];
         return YES;
     }
-
     
-    [self log:@"Returning ConnectionDelegate::handleRequest NO - not authorized"];
+    NSURL* mainDocumentURL = [request mainDocumentURL];
+    if (mainDocumentURL == nil || ![requestURL isEqualToString: [mainDocumentURL absoluteString]]) {
+        [self log:[NSString stringWithFormat:@"Returning ConnectionDelegate::handleRequest YES - not mainDocumentURL=%@", mainDocumentURL]];
+        return YES;
+    }
+    
+    
+    [self log:[NSString stringWithFormat:@"Returning ConnectionDelegate::handleRequest NO - not authorized mainDocumentURL=%@", [request mainDocumentURL]]];
     [NSURLConnection connectionWithRequest:request delegate:self];
     receivedData = [NSMutableData data];
     return NO;
+    
+//    return YES;
 }
 
 
@@ -208,7 +216,7 @@
         return;
     }
 
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+    httpResponse = (NSHTTPURLResponse*)response;
     
     NSString *status = [NSHTTPURLResponse localizedStringForStatusCode:httpResponse.statusCode];
     NSString *responseString = [NSString stringWithFormat:@"%@", httpResponse];
@@ -232,10 +240,6 @@
             return;
         }
     }
-    
-    // remember the current url until response body is loaded
-    currentUrl = [NSURL URLWithString:responseURL];
-    
 }
 
 
@@ -255,18 +259,16 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    NSString *html = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+    NSURL *currentUrl = [httpResponse URL];
+    NSString *textEncodingName = [httpResponse textEncodingName];
+    NSString *mimeType = [httpResponse MIMEType];
     
-    // Determine if we want the system to handle it.
-    if (html == nil && [[UIApplication sharedApplication]canOpenURL:currentUrl]) {
-        [ForgeLog w:[NSString stringWithFormat:@"[6] Received callback: No html, open url by external app: %@", currentUrl]];
-        [[UIApplication sharedApplication]openURL:currentUrl];
-    } else {
-        // The webview won't load the page content automatically.
-        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body: %@", html]];
-        [webView loadHTMLString:html baseURL:currentUrl];
+    if (textEncodingName == nil) {
+        textEncodingName = @"utf-8";
     }
-
+    
+    [self log:[NSString stringWithFormat:@"[6] Received callback: Load body data of mimeType %@ and textEncodingName %@", mimeType, textEncodingName]];
+    [webView loadData:receivedData MIMEType: mimeType textEncodingName: textEncodingName baseURL:currentUrl];
 }
 
 @end

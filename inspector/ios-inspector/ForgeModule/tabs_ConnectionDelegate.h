@@ -17,7 +17,8 @@
     bool _in_basic_auth_flow;
     bool _basic_authorized_failed;
     NSString *pattern;
-    NSURL *currentUrl;
+
+    NSHTTPURLResponse *httpResponse;
     NSMutableData *receivedData;
 
     UIWebView *webView;

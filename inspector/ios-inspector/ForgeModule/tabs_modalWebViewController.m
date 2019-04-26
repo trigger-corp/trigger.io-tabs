@@ -512,14 +512,23 @@ static UIBarButtonItem *reload = nil;
                                               otherButtonTitles:nil];
         [alert show];
     }
-    if (error.code == 102) {
+    if (error.code == 102) { // loading interupted
         NSString *urlStr = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
         NSURL *failedRequestURL = [NSURL URLWithString:urlStr];
 
-        // Determine if we want the system to handle it.
-        if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
-            [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", urlStr]];
-            [[UIApplication sharedApplication]openURL:failedRequestURL];
+        // If we haven't done yet, we retry to load the failed url
+        // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
+        if (![urlStr isEqualToString:retryUrl]) {
+            retryUrl = urlStr;
+            [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", urlStr]];
+            [self.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
+        }
+        
+        // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
+        // Example: ics, vcf -> Calendar
+        else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+           [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", urlStr]];
+           [[UIApplication sharedApplication]openURL:failedRequestURL];
         }
     }
     [ForgeLog w:[NSString stringWithFormat:@"Modal webview error: %@", error]];
