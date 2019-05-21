@@ -267,8 +267,18 @@
         textEncodingName = @"utf-8";
     }
     
-    [self log:[NSString stringWithFormat:@"[6] Received callback: Load body data of mimeType %@ and textEncodingName %@", mimeType, textEncodingName]];
-    [webView loadData:receivedData MIMEType: mimeType textEncodingName: textEncodingName baseURL:currentUrl];
+    
+    // [webView canGoBack] doesn't work with [webView loadData], so we create another request here
+    // in case the navigation toolbar is enabled.
+    // Otherwise we proceed with loading the received data.
+    if ([modalInstance enableNavigationToolbar] == [NSNumber numberWithBool:YES]) {
+        [self log:[NSString stringWithFormat:@"[6] Received callback: Load request %@", currentUrl]];
+        NSURLRequest *request = [NSURLRequest requestWithURL:currentUrl];
+        [webView loadRequest:request];
+    } else {
+        [self log:[NSString stringWithFormat:@"[6] Received callback: Load body data of mimeType %@ and textEncodingName %@", mimeType, textEncodingName]];
+        [webView loadData:receivedData MIMEType: mimeType textEncodingName: textEncodingName baseURL:currentUrl];
+    }
 }
 
 @end
