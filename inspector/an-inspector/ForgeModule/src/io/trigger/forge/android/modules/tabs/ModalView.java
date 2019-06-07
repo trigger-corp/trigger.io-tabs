@@ -439,21 +439,14 @@ public class ModalView {
         topbar.setPadding(margin, 0, margin, 0);
 
         
-        // We have to handle all click events here
+        // We have to handle/prevent all click events here
         // to prevent them from being delegated to underlying layers
         // (RE-554: https://mitarbeiterapp.atlassian.net/browse/RE-554).
-        topbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // we do nothing, just "ignore"
-                ForgeLog.i("Handle onClick().");
-            }
-        });
-
         topbar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                ForgeLog.i("Handle onTouch().");
+                ForgeLog.i("Handle onTouch() => will be ignored to " +
+                        "prevent click events on underlying layers.");
                 return true;
             }
         });
