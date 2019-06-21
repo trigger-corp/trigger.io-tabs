@@ -33,15 +33,25 @@ public class EventListener extends ForgeEventListener {
 	public void onActivityResult(int RequestCode, int resultCode, Intent intent) {
 		if (RequestCode == ModalView.FILE_CHOOSER_RESULT_CODE) {
 			ForgeLog.i("Got file upload intent result.");
-			final ModalView modalView = ModalView.instance;
 			Uri result = intent == null || resultCode != RESULT_OK ? null
 					: intent.getData();
-			modalView.onFileUploadSelected(result);
+
+			if (ModalView.instance == null) {
+				ForgeLog.i("onActivityResult: ModalView.instance is null (already closed)");
+				return;
+			}
+
+			ModalView.instance.onFileUploadSelected(result);
 		}
 	}
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-	    ModalView.instance.updateContentInsets();
+		if (ModalView.instance == null) {
+			ForgeLog.i("onConfigurationChanged: ModalView.instance is null (already closed)");
+			return;
+		}
+
+		ModalView.instance.updateContentInsets();
     }
 }

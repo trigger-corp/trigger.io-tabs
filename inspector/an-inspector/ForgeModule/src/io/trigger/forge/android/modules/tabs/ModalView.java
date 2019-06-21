@@ -363,10 +363,12 @@ public class ModalView {
         if (!task.params.has("basicAuth")) {
             ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 1");
             return true;
-        } else if (task.params.get("basicAuth").getAsBoolean() == false) {
+        }
+        if (!task.params.get("basicAuth").getAsBoolean()) {
             ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 2");
             return true;
-        } else if (instance.terminateBasicAuthHandling == true) {
+        }
+        if (terminateBasicAuthHandling) {
             return true;
         }
 
