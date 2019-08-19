@@ -12,10 +12,7 @@
         },
         "android": {
             "remote_debugging": true,
-            "adjust_content_insets": "never"
-        },
-        "ios": {
-            "adjust_content_insets": "never"
+            "viewport_fit": "cover"
         }
     }
 }
