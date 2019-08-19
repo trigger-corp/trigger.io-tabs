@@ -10,11 +10,7 @@ import io.trigger.forge.android.core.ForgeWebView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -42,9 +38,11 @@ public class WebViewProxy {
 	public ForgeWebView register(final ForgeActivity activity, final String url) {
 
 		// Create webview
+		ForgeLog.i("Creating WebView");
 		final ForgeWebView forgeWebView = new ForgeWebView(activity, null);
 		this.webView = forgeWebView;
 
+		ForgeLog.i("Setting Download Listener");
 		forgeWebView.setDownloadListener(new XWalkDownloadListener(webView.getContext()) {
 			@Override
 			public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
@@ -86,6 +84,11 @@ public class WebViewProxy {
 			public void onPageLoadStopped(XWalkView view, String url, LoadStatus status) {
 				super.onPageLoadStopped(view, url, status);
 				parentView.onLoadFinished(url);
+			}
+			@Override
+			public void openFileChooser(XWalkView view, ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+				super.openFileChooser(view, uploadMsg, acceptType, capture);
+				parentView.onFileUpload(uploadMsg, acceptType);
 			}
 		});
 

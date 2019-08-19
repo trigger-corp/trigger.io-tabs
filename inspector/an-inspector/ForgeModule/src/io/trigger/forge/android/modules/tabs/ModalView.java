@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -17,8 +16,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.HttpAuthHandler;
-import android.webkit.WebView;
+import android.webkit.*;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -30,18 +28,39 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import io.trigger.forge.android.core.ForgeActivity;
-import io.trigger.forge.android.core.ForgeApp;
-import io.trigger.forge.android.core.ForgeFile;
-import io.trigger.forge.android.core.ForgeLog;
-import io.trigger.forge.android.core.ForgeTask;
-import io.trigger.forge.android.core.ForgeViewController;
-import io.trigger.forge.android.core.ForgeWebView;
+import io.trigger.forge.android.core.*;
 import io.trigger.forge.android.util.BitmapUtil;
 
 public class ModalView {
+    private String[] normaliseMimeTypes(String mimeTypes) {
+        if (mimeTypes == null) {
+            return new String[] {"*/*"};
+        }
+        final String[] mimeTypesArray = mimeTypes.split(",");
+        final List<String> computedMimeTypes = new ArrayList<>();
+        final MimeTypeMap mimeMap = MimeTypeMap.getSingleton();
+        // Get mime type for file extension
+        for (int i=0; i < mimeTypesArray.length; ++i) {
+            final String mimeType = mimeTypesArray[i];
+            if (mimeType.startsWith(".")) {
+                final String fileExtensionMime = mimeMap.getMimeTypeFromExtension(mimeType.substring(1));
+                if (fileExtensionMime != null) {
+                    computedMimeTypes.add(fileExtensionMime);
+                }
+            } else if (mimeMap.hasMimeType(mimeType)) {
+                computedMimeTypes.add(mimeType);
+            }
+        }
+        if (computedMimeTypes.size() == 0) {
+            // We show all file types if the mime types are not supported so user has a choice to select a file
+            return new String[] {"*/*"};
+        }
+        return computedMimeTypes.toArray(new String[computedMimeTypes.size()]);
+    }
+
     public static void openURIAsIntent(Uri uri) {
         // Some other URI scheme, let the phone handle it if
         // possible
@@ -58,6 +77,8 @@ public class ModalView {
         }
     }
 
+    private ValueCallback<Uri> vc = null;
+    private ValueCallback<Uri[]> vcs = null;
     // Reference to the last created modal view (for back button, etc)
     static ModalView instance = null;
 
@@ -76,6 +97,8 @@ public class ModalView {
     final static int ID_BUTTON_LEFT = 11;
     final static int ID_BUTTON_RIGHT = 12;
 
+    final static int FILE_CHOOSER_RESULT_CODE = 90;
+
     public int previousFailureCount = 0;
     public boolean terminateBasicAuthHandling = false;
 
@@ -87,18 +110,33 @@ public class ModalView {
         return webViewProxy.getWebView();
     }
 
-
     // - LIFECYCLE ---------------------------------------------------------------------------------
 
     public ModalView() {
         instance = this;
     }
 
+    public void onFileUploadSelected(Uri selectedFileURI) {
+        ForgeLog.i("Handling File upload value callbacks");
+        if (vc != null) {
+            vc.onReceiveValue(selectedFileURI);
+            vc = null;
+        }
+        if (vcs != null) {
+            // Input type=file only support selecting 1 file
+            if (selectedFileURI != null) {
+                Uri[] uris = new Uri[]{selectedFileURI};
+                vcs.onReceiveValue(uris);
+            }
+            vcs.onReceiveValue(null);
+            vcs = null;
+        }
+    }
+
     public void closeModal(final ForgeActivity currentActivity, final String url, boolean cancelled) {
         if (view == null) {
             return;
         }
-
         final JsonObject result = new JsonObject();
         result.addProperty("url", url);
         result.addProperty("userCancelled", cancelled);
@@ -208,12 +246,12 @@ public class ModalView {
                 view.addView(topbar);
 
                 // add webview
+                ForgeLog.i("Adding WebView Proxy");
                 webViewProxy = new WebViewProxy(instance);
                 final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
                 webView.loadUrl(url);
 
-                // update content insets
                 updateContentInsets();
 
                 // Add to the view group and switch
@@ -233,6 +271,38 @@ public class ModalView {
         webViewProxy.getWebView().stopLoading();
         ForgeLog.i("Received a file download response. Opening URL externally ");
         openURIAsIntent(Uri.parse(url));
+    }
+
+    public void onFileUpload(ValueCallback<Uri> uploadMsg, String mimeType) {
+        vc = uploadMsg;
+        ForgeLog.i("Received a file upload event. Opening native File Browser with mime type:" + mimeType);
+        final Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        final String[] computedMimeTypes = normaliseMimeTypes(mimeType);
+        if (Build.VERSION.SDK_INT >= 21) {
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+
+        }
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
+    }
+    public void onFilesUpload(ValueCallback<Uri[]> uploadMsg, WebChromeClient.FileChooserParams params) {
+        ForgeLog.i("Received a file upload event. Opening native File Browser with MIME Types:");
+        vcs = uploadMsg;
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        if (Build.VERSION.SDK_INT >= 21)  {
+            String[] acceptTypes = params.getAcceptTypes();
+            final String[] computedMimeTypes = normaliseMimeTypes(TextUtils.join(",", acceptTypes));
+            i.putExtra(Intent.EXTRA_MIME_TYPES, computedMimeTypes);
+            // Older Android SDK doesn't have a way to specify file type filters
+        }
+        i.setType("*/*");
+        ForgeApp.getActivity().startActivityForResult(
+                Intent.createChooser(i, "File Browser"),
+                FILE_CHOOSER_RESULT_CODE);
     }
 
     public void onProgressChanged(int newProgress) {
@@ -293,10 +363,12 @@ public class ModalView {
         if (!task.params.has("basicAuth")) {
             ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 1");
             return true;
-        } else if (task.params.get("basicAuth").getAsBoolean() == false) {
+        }
+        if (!task.params.get("basicAuth").getAsBoolean()) {
             ForgeLog.i("ModalView::onReceivedHttpAuthRequest basicAuth disabled 2");
             return true;
-        } else if (instance.terminateBasicAuthHandling == true) {
+        }
+        if (terminateBasicAuthHandling) {
             return true;
         }
 
@@ -368,6 +440,19 @@ public class ModalView {
         topbar.setBackgroundDrawable(bgColor);
         topbar.setPadding(margin, 0, margin, 0);
 
+        
+        // We have to handle/prevent all click events here
+        // to prevent them from being delegated to underlying layers
+        // (RE-554: https://mitarbeiterapp.atlassian.net/browse/RE-554).
+        topbar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                ForgeLog.i("Handle onTouch() => will be ignored to " +
+                        "prevent click events on underlying layers.");
+                return true;
+            }
+        });
+
         return topbar;
     }
 
@@ -384,13 +469,23 @@ public class ModalView {
             titleColor = Color.argb(titleTint.get(3).getAsInt(), titleTint.get(0).getAsInt(), titleTint.get(1).getAsInt(), titleTint.get(2).getAsInt());
         }
         titleView.setTextColor(titleColor);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 24);
-        titleView.setGravity(Gravity.LEFT);
+        titleView.setGravity(Gravity.CENTER_VERTICAL);
         titleView.setSingleLine();
         titleView.setEllipsize(TextUtils.TruncateAt.END);
-
+        applyDefaultTextLayout(metrics, titleView);
         return titleView;
     }
+
+    /**
+     * Sets default setting for {@link TextView#setPadding(int, int, int, int)}
+     * and {@link TextView#setTextSize(int, float)}.
+     */
+    private void applyDefaultTextLayout(final DisplayMetrics metrics, final TextView textView) {
+        final int buttonMargin = Math.round(metrics.density * 4);
+        textView.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 18);
+    }
+
     private LinearLayout createButton(DisplayMetrics metrics, String buttonText, JsonElement buttonIcon, JsonArray buttonTint) throws IOException {
         return this.createButton(metrics, buttonText, buttonIcon, buttonTint, null);
     }
@@ -436,7 +531,7 @@ public class ModalView {
         button.setOrientation(LinearLayout.VERTICAL);
         button.setGravity(Gravity.CENTER);
 
-        final int buttonMargin = Math.round(metrics.density * 4);
+
         if (buttonIcon != null) {
             ImageView image = new ImageView(ForgeApp.getActivity());
             image.setScaleType(ImageView.ScaleType.CENTER);
@@ -450,6 +545,7 @@ public class ModalView {
             }
             icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), buttonFile.fd().createInputStream(), 0, 32, buttonColor);
             image.setImageDrawable(icon);
+            final int buttonMargin = Math.round(metrics.density * 4);
             image.setPadding(buttonMargin, 0, buttonMargin, 0);
             button.addView(image);
         } else {
@@ -460,9 +556,8 @@ public class ModalView {
                 text.setText("Close");
             }
             text.setTextColor(buttonColor);
-            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, metrics.density * 18);
             text.setGravity(Gravity.CENTER);
-            text.setPadding(buttonMargin * 2, buttonMargin, buttonMargin * 2, buttonMargin);
+            applyDefaultTextLayout(metrics, text);
             button.addView(text);
         }
 

@@ -66,6 +66,15 @@ public class WebViewProxy {
 				parentView.onProgressChanged(newProgress);
 				super.onProgressChanged(view, newProgress);
 			}
+			@Override
+			public boolean onShowFileChooser(
+					WebView webView,
+					ValueCallback<Uri[]> uploadMsg,
+					WebChromeClient.FileChooserParams fileChooserParams) {
+				parentView.onFilesUpload(uploadMsg, fileChooserParams);
+				super.onShowFileChooser(webView, uploadMsg, fileChooserParams);
+				return true;
+			}
 		});
 
 		forgeWebView.setWebViewClient(new WebViewClient() {
