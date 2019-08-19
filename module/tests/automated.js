@@ -58,21 +58,19 @@ asyncTest("Advanced tab", 2, function() {
 });
 
 asyncTest("Advanced tab - error", 1, function() {
-    forge.tools.getURL("fixtures/tabs/not_a_file.html", function (url) {
-        forge.tabs.openAdvanced({
-            url: url
-        }, function (modal) {
-            modal.loadError.addListener(function () {
-                modal.close();
-                ok(true, "Success");
-            });
-            modal.closed.addListener(function () {
-                start();
-            });
-        }, function (e) {
-            ok(false, "API call failure: "+e.message);
+    forge.tabs.openAdvanced({
+        url: "https://does.not.exist/foo/index.html"
+    }, function (modal) {
+        modal.loadError.addListener(function () {
+            modal.close();
+            ok(true, "Success");
+        });
+        modal.closed.addListener(function () {
             start();
         });
+    }, function (e) {
+        ok(false, "API call failure: "+e.message);
+        start();
     });
 });
 
