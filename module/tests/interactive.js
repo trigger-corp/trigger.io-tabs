@@ -2,6 +2,24 @@
 
 module("forge.tabs");
 
+asyncTest("Open tab with remote site", 1, function() {
+    forge.tabs.open("https://news.ycombinator.com", function () {
+        askQuestion("Did a tab/view just open in the foreground with the Hacker News website?", {
+            Yes: function () {
+                ok(true, "Success");
+                start();
+            },
+            No: function () {
+                ok(false, "User claims failure");
+                start();
+            }
+        });
+    }, function (e) {
+        ok(false, "API call failure: "+e.message);
+        start();
+    });
+});
+
 asyncTest("Open tab with file picker for upload", 1, function() {
     forge.tabs.open("https://req-playground.scthi.tech/upload", function () {
         askQuestion("Have you been able to pick files and upload them?", {
