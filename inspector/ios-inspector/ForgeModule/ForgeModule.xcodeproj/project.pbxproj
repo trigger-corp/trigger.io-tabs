@@ -9,13 +9,14 @@
 /* Begin PBXBuildFile section */
 		710A44901FC471FD00C77999 /* tabs_NavigationToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */; };
 		710A44941FC563D100C77999 /* tabs_Activities.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A44931FC563D100C77999 /* tabs_Activities.m */; };
-		710EBE1E230E7DE200401FB7 /* tabs_WKWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 710EBE1D230E7DD400401FB7 /* tabs_WKWebViewController.xib */; };
 		710EBE21230E804600401FB7 /* tabs_WKWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */; };
+		711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */; };
 		7130F946230EB58800A4F65B /* tabs_WKWebViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7130F945230EB58800A4F65B /* tabs_WKWebViewDelegate.m */; };
 		714F6AC01E7BD9E0001618FF /* tabs_ConnectionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 714F6ABF1E7BD9E0001618FF /* tabs_ConnectionDelegate.m */; };
 		71B1A76123101E3A0028BF77 /* tabs_LoginDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */; };
 		71B378361F8769E8000DD4EB /* tabs_UIWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B378351F8769E8000DD4EB /* tabs_UIWebViewController.xib */; };
 		71CC15C61C995DC40032A613 /* tabs_Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 71CC15C51C995DC40032A613 /* tabs_Delegate.m */; };
+		71D9A93C2313C0E100F77E13 /* tabs_WKWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 710EBE1D230E7DD400401FB7 /* tabs_WKWebViewController.xib */; };
 		B3127A1C16AD9F660027B9B8 /* tabs_API.m in Sources */ = {isa = PBXBuildFile; fileRef = B3127A1816AD9F660027B9B8 /* tabs_API.m */; };
 		B3127A1D16AD9F660027B9B8 /* tabs_UIWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B3127A1A16AD9F660027B9B8 /* tabs_UIWebViewController.m */; };
 		B31B6D5215C13D5200854074 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B31B6D5115C13D5200854074 /* Foundation.framework */; };
@@ -35,6 +36,8 @@
 		710EBE1D230E7DD400401FB7 /* tabs_WKWebViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tabs_WKWebViewController.xib; sourceTree = "<group>"; };
 		710EBE1F230E804600401FB7 /* tabs_WKWebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_WKWebViewController.h; sourceTree = "<group>"; };
 		710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_WKWebViewController.m; sourceTree = "<group>"; };
+		711D4DDC2313FBFE0013C59A /* tabs_EventListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_EventListener.h; sourceTree = "<group>"; };
+		711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_EventListener.m; sourceTree = "<group>"; };
 		7130F944230EB58800A4F65B /* tabs_WKWebViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_WKWebViewDelegate.h; sourceTree = "<group>"; };
 		7130F945230EB58800A4F65B /* tabs_WKWebViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_WKWebViewDelegate.m; sourceTree = "<group>"; };
 		714F6ABE1E7BD9E0001618FF /* tabs_ConnectionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tabs_ConnectionDelegate.h; sourceTree = "<group>"; };
@@ -109,22 +112,32 @@
 			name = UIWebView;
 			sourceTree = "<group>";
 		};
+		714072332313BF9F00AE7879 /* UI Elements */ = {
+			isa = PBXGroup;
+			children = (
+				710A44921FC563D100C77999 /* tabs_Activities.h */,
+				710A44931FC563D100C77999 /* tabs_Activities.m */,
+				71B1A75F23101E3A0028BF77 /* tabs_LoginDialog.h */,
+				71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */,
+				710A448E1FC471FD00C77999 /* tabs_NavigationToolbar.h */,
+				710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */,
+			);
+			name = "UI Elements";
+			sourceTree = "<group>";
+		};
 		B31B6D4315C13D5200854074 = {
 			isa = PBXGroup;
 			children = (
-				71B1A75F23101E3A0028BF77 /* tabs_LoginDialog.h */,
-				71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */,
 				719331791F28D2EB009919E5 /* placeholder.plist */,
 				7130F940230EB4F000A4F65B /* UIWebView */,
 				7130F93F230EB4E800A4F65B /* WKWebView */,
-				710A44921FC563D100C77999 /* tabs_Activities.h */,
-				710A44931FC563D100C77999 /* tabs_Activities.m */,
+				714072332313BF9F00AE7879 /* UI Elements */,
 				B3127A1716AD9F660027B9B8 /* tabs_API.h */,
 				B3127A1816AD9F660027B9B8 /* tabs_API.m */,
+				711D4DDC2313FBFE0013C59A /* tabs_EventListener.h */,
+				711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */,
 				71CC15C71C995E620032A613 /* tabs_Delegate.h */,
 				71CC15C51C995DC40032A613 /* tabs_Delegate.m */,
-				710A448E1FC471FD00C77999 /* tabs_NavigationToolbar.h */,
-				710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */,
 				B31B6D5015C13D5200854074 /* Frameworks */,
 				B31B6D4F15C13D5200854074 /* Products */,
 			);
@@ -223,7 +236,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				71B378361F8769E8000DD4EB /* tabs_UIWebViewController.xib in Resources */,
-				710EBE1E230E7DE200401FB7 /* tabs_WKWebViewController.xib in Resources */,
+				71D9A93C2313C0E100F77E13 /* tabs_WKWebViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +253,7 @@
 				B3127A1D16AD9F660027B9B8 /* tabs_UIWebViewController.m in Sources */,
 				714F6AC01E7BD9E0001618FF /* tabs_ConnectionDelegate.m in Sources */,
 				710A44941FC563D100C77999 /* tabs_Activities.m in Sources */,
+				711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */,
 				7130F946230EB58800A4F65B /* tabs_WKWebViewDelegate.m in Sources */,
 				710A44901FC471FD00C77999 /* tabs_NavigationToolbar.m in Sources */,
 				71B1A76123101E3A0028BF77 /* tabs_LoginDialog.m in Sources */,

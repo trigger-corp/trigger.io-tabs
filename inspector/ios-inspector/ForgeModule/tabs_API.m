@@ -34,6 +34,9 @@ static NSMutableDictionary* tabs_viewControllers;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        //[ForgeApp.sharedApp.viewController addChildViewController:viewController];
+        //[ForgeApp.sharedApp.appDelegate.window addSubview:viewController.view];
+        //[ForgeApp.sharedApp.appDelegate.window bringSubviewToFront:viewController.view];
         [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:nil];
     });
     [task success:task.callid];
