@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "tabs_modalWebViewController.h"
+#import "tabs_UIWebViewController.h"
 
 // good overview: http://mikeabdullah.net/history-of-nsurlconnection-auth.html
 
@@ -22,7 +22,7 @@
     NSMutableData *receivedData;
 
     UIWebView *webView;
-    tabs_modalWebViewController *modalInstance;
+    tabs_UIWebViewController *modalInstance;
     ConnectionDelegate *me;
 
 @public
@@ -39,7 +39,7 @@
     bool retryFailedLogin;
 }
 
-- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView*)newWebView pattern:(NSString*)newPattern;
+- (ConnectionDelegate*) initWithModalView:(tabs_UIWebViewController*)newModalInstance webView:(UIWebView*)newWebView pattern:(NSString*)newPattern;
 - (void) releaseDelegate;
 
 - (BOOL)handleRequest:(NSURLRequest *)request;
@@ -47,11 +47,3 @@
 @end
 
 
-@interface LoginDialogDelegate : NSObject<UIAlertViewDelegate>
-
-typedef void (^AlertViewCompletionBlock)(NSInteger buttonIndex);
-@property (strong,nonatomic) AlertViewCompletionBlock callback;
-
-+ (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback;
-
-@end

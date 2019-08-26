@@ -6,12 +6,14 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "tabs_modalWebViewController.h"
-#import "tabs_Delegate.h"
+#import "tabs_UIWebViewController.h"
 #import "tabs_ConnectionDelegate.h"
+
+#import "tabs_Delegate.h"
 #import "tabs_API.h"
 
-@implementation tabs_modalWebViewController
+
+@implementation tabs_UIWebViewController
 @synthesize navigationItem;
 @synthesize title;
 
@@ -27,25 +29,9 @@ static UIBarButtonItem *reload = nil;
 }
 
 
-// workaround for WKWebView breaking ForgeConstant.statusBarHeightDynamic
-- (CGFloat)statusBarHeightDynamic {
-    CGFloat statusBarHeight = UIApplication.sharedApplication.statusBarFrame.size.height;
-    NSLog(@"tabs_modalWebViewController::statusBarHeight is 0.0, 20.0 or 44.0 => %f pixels high", statusBarHeight);
-    return statusBarHeight; // 20.0f, 44.0f on iPhone-X
-}
-
 #pragma mark - View lifecycle
 
-- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
-{
-    if ( self.presentedViewController) {
-        [super dismissViewControllerAnimated:flag completion:completion];
-    }
-}
-
-
-- (void)viewWillAppear:(BOOL)animated
-{
+- (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     // save app status bar style
@@ -54,8 +40,7 @@ static UIBarButtonItem *reload = nil;
 }
 
 
-- (void)viewWillDisappear:(BOOL)animated
-{
+- (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
 
     // restore app status bar style
@@ -63,13 +48,21 @@ static UIBarButtonItem *reload = nil;
 }
 
 
-- (void)viewDidLoad
-{
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if (@available(iOS 11.0, *)) {
+        [self setAdditionalSafeAreaInsets:UIEdgeInsetsMake(navigationBar.frame.size.height, 0.0, 0.0, 0.0)];
+    }
+}
+
+
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     self.webView.opaque = NO;
     self.webView.backgroundColor = [UIColor clearColor];
 
+    [backButton setTarget:self];
     [backButton setAction:@selector(cancel:)];
 
     // Start URL loading
@@ -99,34 +92,10 @@ static UIBarButtonItem *reload = nil;
         [backButton setTintColor:buttonTint];
     }
 
-    // Workaround for buggy auto layout implementation on iOS < 11
-    if (@available(iOS 11.0, *)) {
-        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navigationBar
-                                                           attribute:NSLayoutAttributeTop
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.view.safeAreaLayoutGuide
-                                                           attribute:NSLayoutAttributeTop
-                                                          multiplier:1.0f
-                                                            constant:0.0f];
-    } else {
-        navBarTopConstraint = [NSLayoutConstraint constraintWithItem:navigationBar
-                                                           attribute:NSLayoutAttributeTop
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.topLayoutGuide
-                                                           attribute:NSLayoutAttributeTop
-                                                          multiplier:1.0f
-                                                            constant:[self statusBarHeightDynamic]];
-    }
-    navBarTopConstraint.active = YES;
-
     // Because safeAreas don't help squat if they're broken on iOS 11 and not supported on iOS 10
     if (@available(iOS 11.0, *)) {
         [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
-
-    // Set content inset for navigationBar
-    CGFloat insetHeight = [self statusBarHeightDynamic] + ForgeConstant.navigationBarHeightStatic;
-    [self setTopInset:insetHeight];
 
     // Blurview
     [self createStatusBarVisualEffect:self.webView];
@@ -227,14 +196,11 @@ static UIBarButtonItem *reload = nil;
         }
     }
 
-    // refresh content insets once rotation is complete
+    // refresh safe area insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        UIEdgeInsets insets = UIEdgeInsetsMake(0, 0, 0, 0);
         if (@available(iOS 11.0, *)) {
-            insets = self.view.safeAreaInsets; // currently this only matters for the iPhone-X
+            [self setAdditionalSafeAreaInsets:UIEdgeInsetsMake(navigationBar.frame.size.height, 0.0, 0.0, 0.0)];
         }
-        [self setLeftInset:insets.left];
-        [self setRightInset:insets.right];
     }];
 }
 
@@ -245,12 +211,6 @@ static UIBarButtonItem *reload = nil;
     UIEdgeInsets safeAreaInsets = UIEdgeInsetsMake(0, 0, 0, 0);
     if (@available(iOS 11.0, *)) {
         safeAreaInsets = UIApplication.sharedApplication.keyWindow.safeAreaInsets;
-    }
-    if (hidden == YES) {
-        [self setBottomInset:safeAreaInsets.bottom];
-    } else {
-        CGSize size = navigationToolbar.intrinsicContentSize;
-        [self setBottomInset:safeAreaInsets.bottom + size.height];
     }
 }
 
@@ -265,7 +225,13 @@ static UIBarButtonItem *reload = nil;
 
     if (returnObj != nil) {
         [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", task.callid] withParam:returnObj];
+    } else {
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", task.callid] withParam:@{
+            @"userCancelled": [NSNumber numberWithBool:YES]
+        }];
     }
+
+    [super viewDidDisappear:animated];
 }
 
 
@@ -279,18 +245,12 @@ static UIBarButtonItem *reload = nil;
                  [NSNumber numberWithBool:YES], @"userCancelled",
                  nil];
 
-    [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-    [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
 - (void)setUrl:(NSURL*)newUrl {
     url = newUrl;
-}
-
-
-- (void)setRootView:(UIViewController*)newRootView {
-    rootView = newRootView;
 }
 
 
@@ -409,8 +369,7 @@ static UIBarButtonItem *reload = nil;
         }
 
         returnObj = [NSDictionary dictionary];
-        [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-        [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+        [self dismissViewControllerAnimated:YES completion:nil];
 
         return NO;
     }
@@ -425,11 +384,7 @@ static UIBarButtonItem *reload = nil;
                 @"userCancelled",
                         nil];
 
-        [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES
-                                                                  completion:nil];
-        [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:)
-                                                    withObject:[NSNumber numberWithBool:YES]
-                                                    afterDelay:0.5f];
+        [self dismissViewControllerAnimated:YES completion:nil];
 
         return NO;
     }
@@ -550,8 +505,7 @@ static UIBarButtonItem *reload = nil;
                  nil
                  ];
 
-    [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-    [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -630,38 +584,10 @@ static UIBarButtonItem *reload = nil;
 }
 
 
-- (void) setTopInset:(CGFloat) topInset {
-    UIEdgeInsets scrollInset  = self.webView.scrollView.scrollIndicatorInsets;
-    UIEdgeInsets contentInset = self.webView.scrollView.contentInset;
-    scrollInset = UIEdgeInsetsMake(topInset, scrollInset.left, scrollInset.bottom, scrollInset.right);
-    contentInset = UIEdgeInsetsMake(topInset, contentInset.left, contentInset.bottom, contentInset.right);
-    self.webView.scrollView.scrollIndicatorInsets = scrollInset;
-    self.webView.scrollView.contentInset = contentInset;
-}
-
-
-- (void) setBottomInset:(CGFloat) bottomInset {
-    UIEdgeInsets scrollInset  = self.webView.scrollView.scrollIndicatorInsets;
-    UIEdgeInsets contentInset = self.webView.scrollView.contentInset;
-    scrollInset = UIEdgeInsetsMake(scrollInset.top, scrollInset.left, bottomInset, scrollInset.right);
-    contentInset = UIEdgeInsetsMake(contentInset.top, contentInset.left, bottomInset, contentInset.right);
-    self.webView.scrollView.scrollIndicatorInsets = scrollInset;
-    self.webView.scrollView.contentInset = contentInset;
-}
-
-- (void) setLeftInset:(CGFloat) leftInset {
-    self.webView.frame = CGRectMake(leftInset,
-                                    self.webView.frame.origin.y,
-                                    ForgeConstant.screenWidth - leftInset,
-                                    self.webView.frame.size.height);
-}
-
-
-- (void) setRightInset:(CGFloat) rightInset {
-    self.webView.frame = CGRectMake(self.webView.frame.origin.x,
-                                    self.webView.frame.origin.y,
-                                    self.webView.frame.size.width - rightInset,
-                                    self.webView.frame.size.height);
+- (void) forceUpdateWebView {
+    CGRect f = self.webView.frame;
+    self.webView.frame = CGRectMake(f.origin.x, f.origin.y, f.size.width + 1, f.size.height + 1);
+    self.webView.frame = f;
 }
 
 @end

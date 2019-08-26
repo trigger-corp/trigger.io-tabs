@@ -7,9 +7,11 @@
 //
 
 #import "tabs_API.h"
-#import "tabs_modalWebViewController.h"
+#import "tabs_UIWebViewController.h"
+#import "tabs_WKWebViewController.h"
 
 static NSMutableDictionary* tabs_modal_map;
+static NSMutableDictionary* tabs_viewControllers;
 
 @implementation tabs_API
 
@@ -19,112 +21,147 @@ static NSMutableDictionary* tabs_modal_map;
         return;
     }
 
-    tabs_modalWebViewController *modalView = [[tabs_modalWebViewController alloc] initWithNibName:@"tabs_modalWebViewController"
+    tabs_WKWebViewController *viewController = [[tabs_WKWebViewController alloc] initWithNibName:@"tabs_WKWebViewController"
                  bundle:[NSBundle bundleWithPath:[[NSBundle mainBundle]
         pathForResource:@"tabs"
                  ofType:@"bundle"]]];
 
-    [modalView setUrl:[NSURL URLWithString:[task.params objectForKey:@"url"]]];
-    [modalView setPattern:[task.params objectForKey:@"pattern"]];
-    [modalView setRootView:[[ForgeApp sharedApp] viewController]];
+    viewController.url = [NSURL URLWithString:task.params[@"url"]];
+
+    // https://medium.com/@hacknicity/view-controller-presentation-changes-in-ios-13-ac8c901ebc4e
+    if (@available(iOS 13.0, *)) {
+        viewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:nil];
+    });
+    [task success:task.callid];
+
+    if (tabs_viewControllers == nil) {
+        tabs_viewControllers = [[NSMutableDictionary alloc] init];
+    }
+    tabs_viewControllers[task.callid] = [NSValue valueWithNonretainedObject:viewController];
+}
+
+
++ (void)open_:(ForgeTask*)task {
+    if (![task.params objectForKey:@"url"]) {
+        [task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
+        return;
+    }
+
+    tabs_UIWebViewController *viewController = [[tabs_UIWebViewController alloc] initWithNibName:@"tabs_UIWebViewController"
+                 bundle:[NSBundle bundleWithPath:[[NSBundle mainBundle]
+        pathForResource:@"tabs"
+                 ofType:@"bundle"]]];
+
+    [viewController setUrl:[NSURL URLWithString:[task.params objectForKey:@"url"]]];
+    [viewController setPattern:[task.params objectForKey:@"pattern"]];
+    //[modalView setRootView:ForgeApp.sharedApp.viewController];
 
     if ([task.params objectForKey:@"title"] != nil) {
-        [modalView setTitle:[task.params objectForKey:@"title"]];
+        [viewController setTitle:[task.params objectForKey:@"title"]];
     } else {
-        [modalView setTitle:@""];
+        [viewController setTitle:@""];
     }
 
     if ([task.params objectForKey:@"buttonIcon"] != nil) {
-        [modalView setBackImage:[task.params objectForKey:@"buttonIcon"]];
+        [viewController setBackImage:[task.params objectForKey:@"buttonIcon"]];
     } else if ([task.params objectForKey:@"buttonText"] != nil) {
-        [modalView setBackLabel:[task.params objectForKey:@"buttonText"]];
+        [viewController setBackLabel:[task.params objectForKey:@"buttonText"]];
     } else {
-        [modalView setBackLabel:@"Close"];
+        [viewController setBackLabel:@"Close"];
     }
 
     if ([task.params objectForKey:@"tint"] != nil) {
         NSArray* color = [task.params objectForKey:@"tint"];
-        [modalView setTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
-                                                green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255
-                                                 blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255
-                                                alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
-    }
-
-    if ([task.params objectForKey:@"titleTint"] != nil) {
-        NSArray* color = [task.params objectForKey:@"titleTint"];
-        [modalView setTitleTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
+        [viewController setTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
                                                      green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255
                                                       blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255
                                                      alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
     }
 
+    if ([task.params objectForKey:@"titleTint"] != nil) {
+        NSArray* color = [task.params objectForKey:@"titleTint"];
+        [viewController setTitleTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
+                                                          green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255
+                                                           blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255
+                                                          alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
+    }
+
     if ([task.params objectForKey:@"buttonTint"] != nil) {
         NSArray* color = [task.params objectForKey:@"buttonTint"];
-        [modalView setButtonTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
-                                                      green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255
-                                                       blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255
-                                                      alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
+        [viewController setButtonTintColor:[UIColor colorWithRed:[(NSNumber*)[color objectAtIndex:0] floatValue]/255
+                                                           green:[(NSNumber*)[color objectAtIndex:1] floatValue]/255
+                                                            blue:[(NSNumber*)[color objectAtIndex:2] floatValue]/255
+                                                           alpha:[(NSNumber*)[color objectAtIndex:3] floatValue]/255]];
     }
 
     if ([task.params objectForKey:@"opaqueTopBar"] != nil) {
-        [modalView setOpaqueTopBar:[[task.params objectForKey:@"opaqueTopBar"] boolValue]];
+        [viewController setOpaqueTopBar:[[task.params objectForKey:@"opaqueTopBar"] boolValue]];
     } else {
-        [modalView setOpaqueTopBar:false];
+        [viewController setOpaqueTopBar:false];
     }
 
     if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
         ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
-        [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
+        [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
     } else {
-        [modalView setStatusBarStyle:UIStatusBarStyleDefault];
+        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
     }
 
     // status bar options
     if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
         ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
-            [modalView setStatusBarStyle:UIStatusBarStyleLightContent];
+            [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
     } else {
-        [modalView setStatusBarStyle:UIStatusBarStyleDefault];
+        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
     }
 
     // scaling options
     if ([task.params objectForKey:@"scalePagesToFit"] != nil) {
-        modalView.scalePagesToFit = [NSNumber numberWithBool:[[task.params objectForKey:@"scalePagesToFit"] boolValue]];
+        viewController.scalePagesToFit = [NSNumber numberWithBool:[[task.params objectForKey:@"scalePagesToFit"] boolValue]];
     } else {
-        modalView.scalePagesToFit = [NSNumber numberWithBool:NO];
+        viewController.scalePagesToFit = [NSNumber numberWithBool:NO];
     }
 
     // navigation toolbar options
     if ([task.params objectForKey:@"navigationToolbar"] != nil) {
-        modalView.enableNavigationToolbar = [NSNumber numberWithBool:[[task.params objectForKey:@"navigationToolbar"] boolValue]];
+        viewController.enableNavigationToolbar = [NSNumber numberWithBool:[[task.params objectForKey:@"navigationToolbar"] boolValue]];
     } else {
-        modalView.enableNavigationToolbar = [NSNumber numberWithBool:NO];
+        viewController.enableNavigationToolbar = [NSNumber numberWithBool:NO];
     }
 
     // basic auth options
     if ([task.params objectForKey:@"basicAuth"] != nil) {
-        modalView.enableBasicAuth = [NSNumber numberWithBool:[[task.params objectForKey:@"basicAuth"] boolValue]];
+        viewController.enableBasicAuth = [NSNumber numberWithBool:[[task.params objectForKey:@"basicAuth"] boolValue]];
     } else {
-        modalView.enableBasicAuth = [NSNumber numberWithBool:NO];
+        viewController.enableBasicAuth = [NSNumber numberWithBool:NO];
     }
 
     NSDictionary *basicAuthConfig = [task.params objectForKey:@"basicAuthConfig"];
     if (basicAuthConfig != nil && [basicAuthConfig objectForKey:@"insecure"] != nil) {
-        modalView.enableInsecureBasicAuth = [NSNumber numberWithBool:[[basicAuthConfig objectForKey:@"insecure"] boolValue]];
+        viewController.enableInsecureBasicAuth = [NSNumber numberWithBool:[[basicAuthConfig objectForKey:@"insecure"] boolValue]];
     } else {
-        modalView.enableInsecureBasicAuth = [NSNumber numberWithBool:NO];;
+        viewController.enableInsecureBasicAuth = [NSNumber numberWithBool:NO];;
     }
 
-    [modalView setTask:task];
+    [viewController setTask:task];
 
-    [[[ForgeApp sharedApp] viewController] presentViewController:modalView animated:YES completion:nil];
+    // https://medium.com/@hacknicity/view-controller-presentation-changes-in-ios-13-ac8c901ebc4e
+    if (@available(iOS 13.0, *)) {
+        viewController.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
 
+    [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:nil];
     [task success:task.callid];
+
 
     if (tabs_modal_map == nil) {
         tabs_modal_map = [[NSMutableDictionary alloc] init];
     }
-    [tabs_modal_map setObject:[NSValue valueWithNonretainedObject:modalView] forKey:task.callid];
+    [tabs_modal_map setObject:[NSValue valueWithNonretainedObject:viewController] forKey:task.callid];
 }
 
 

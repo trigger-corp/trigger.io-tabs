@@ -10,8 +10,8 @@
 
 #import "tabs_NavigationToolbar.h"
 
-@interface tabs_modalWebViewController : UIViewController <UIWebViewDelegate, UIBarPositioningDelegate> {
-    UIViewController *rootView;
+@interface tabs_UIWebViewController : UIViewController <UIWebViewDelegate, UIBarPositioningDelegate> {
+    //UIViewController *rootView;
 
     UIStatusBarStyle statusBarStyle;
     UIStatusBarStyle savedStatusBarStyle;
@@ -42,15 +42,16 @@
 	NSDictionary *returnObj;
 }
 
-@property (strong, nonatomic) IBOutlet UIWebView* webView;
-@property (strong, nonatomic) IBOutlet NSNumber* scalePagesToFit;
-@property (strong, nonatomic) IBOutlet NSNumber* enableNavigationToolbar;
-@property (strong, nonatomic) IBOutlet NSNumber* enableBasicAuth;
-@property (strong, nonatomic) IBOutlet NSNumber* enableInsecureBasicAuth;
+@property (strong, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationItem;
 
+@property (strong, nonatomic) NSNumber *scalePagesToFit;
+@property (strong, nonatomic) NSNumber *enableNavigationToolbar;
+@property (strong, nonatomic) NSNumber *enableBasicAuth;
+@property (strong, nonatomic) NSNumber *enableInsecureBasicAuth;
+
 - (void)setUrl:(NSURL*)newUrl;
-- (void)setRootView:(UIViewController*)newRootView;
+//- (void)setRootView:(UIViewController*)newRootView;
 
 - (void)setBackLabel:(NSString *)newLabel;
 - (void)setBackImage:(NSString *)newImage;
@@ -77,5 +78,5 @@
 - (void)removeButtonsWithTask:(ForgeTask*)newTask;
 - (void)setTitleWithTask:(ForgeTask*)newTask title:(NSString*)title;
 
+- (void) forceUpdateWebView;
 @end
-

@@ -9,11 +9,11 @@
 #import "tabs_NavigationToolbar.h"
 #import "tabs_Activities.h"
 
-#import "tabs_modalWebViewController.h"
+#import "tabs_UIWebViewController.h"
 
 @implementation tabs_NavigationToolbar
 
-- initForWebViewController:(tabs_modalWebViewController*)webViewController
+- initForWebViewController:(tabs_UIWebViewController*)webViewController
 {
     self = [super init];
     if (self) {

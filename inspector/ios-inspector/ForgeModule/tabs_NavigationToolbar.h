@@ -8,13 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-@class tabs_modalWebViewController;
+@class tabs_UIWebViewController;
 
 @interface tabs_NavigationToolbar : UIToolbar <UIPopoverControllerDelegate> {
     bool _hasStartedLoading;
 }
 
-@property (strong, nonatomic) tabs_modalWebViewController *webViewController;
+@property (strong, nonatomic) tabs_UIWebViewController *webViewController;
 
 @property (strong, nonatomic) UIBarButtonItem *stopButton;
 @property (strong, nonatomic) UIBarButtonItem *reloadButton;
@@ -26,7 +26,7 @@
 @property (strong, nonatomic) NSArray *applicationActivities;
 
 
-- initForWebViewController:(tabs_modalWebViewController*)webViewController;
+- initForWebViewController:(tabs_UIWebViewController*)webViewController;
 
 - (void)webViewDidStartLoad:(UIWebView *)webView;
 - (void)webViewDidFinishLoad:(UIWebView *)webView;

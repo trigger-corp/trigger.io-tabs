@@ -7,6 +7,7 @@
 //
 
 #import "tabs_ConnectionDelegate.h"
+#import "tabs_LoginDialog.h"
 
 #pragma mark - ConnectionDelegate
 
@@ -19,7 +20,7 @@
     }
 }
 
-- (ConnectionDelegate*) initWithModalView:(tabs_modalWebViewController*)newModalInstance webView:(UIWebView *)newWebView pattern:(NSString*)newPattern {
+- (ConnectionDelegate*) initWithModalView:(tabs_UIWebViewController*)newModalInstance webView:(UIWebView *)newWebView pattern:(NSString*)newPattern {
     if (self = [super init]) {
         modalInstance = newModalInstance;
         webView = newWebView;
@@ -186,7 +187,7 @@
                                               cancelButtonTitle:i8n.cancelButton
                                               otherButtonTitles:i8n.loginButton, nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
-        [LoginDialogDelegate showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+        [tabs_LoginDialog showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
                 [self log:@"User cancelled username/password request for basic auth"];
                 _basic_authorized_failed = YES;
@@ -234,9 +235,8 @@
         if ([regex numberOfMatchesInString:responseURL options:0 range:NSMakeRange(0, [responseURL length])] > 0) {
             NSDictionary *returnObj = [NSDictionary dictionaryWithObjectsAndKeys:responseURL, @"url",
                                                         [NSNumber numberWithBool:NO], @"userCancelled", nil];
-            [modalInstance setReturnObj:returnObj];
-            [[[ForgeApp sharedApp] viewController] dismissViewControllerAnimated:YES completion:nil];
-            [[[ForgeApp sharedApp] viewController] performSelector:@selector(dismissModalViewControllerAnimated:) withObject:[NSNumber numberWithBool:YES] afterDelay:0.5f];
+            [modalInstance setReturnObj:returnObj];            
+            [modalInstance dismissViewControllerAnimated:YES completion:nil];
             return;
         }
     }
@@ -284,25 +284,3 @@
 @end
 
 
-
-#pragma mark - LoginDialogDelegate
-
-@implementation LoginDialogDelegate
-@synthesize callback;
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    callback(buttonIndex);
-}
-
-+ (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback {
-    __block LoginDialogDelegate *delegate = [[LoginDialogDelegate alloc] init];
-    alertView.delegate = delegate;
-    delegate.callback = ^(NSInteger buttonIndex) {
-        callback(buttonIndex);
-        alertView.delegate = nil;
-        delegate = nil;
-    };
-    [alertView show];
-}
-
-@end
