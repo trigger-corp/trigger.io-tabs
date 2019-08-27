@@ -33,7 +33,7 @@
                 <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hNZ-gg-ev8">
                     <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                     <items>
-                        <navigationItem title="Title" id="5xR-Ji-8V7">
+                        <navigationItem id="5xR-Ji-8V7">
                             <barButtonItem key="leftBarButtonItem" title="Close" id="u56-zL-cve" userLabel="Close Button"/>
                         </navigationItem>
                     </items>

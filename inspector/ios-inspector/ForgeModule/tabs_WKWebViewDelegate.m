@@ -17,7 +17,7 @@
 
 + (tabs_WKWebViewDelegate*)withViewController:(tabs_WKWebViewController *)viewController {
     tabs_WKWebViewDelegate *me = [[tabs_WKWebViewDelegate alloc] init];
-    if (me != NULL) {
+    if (me != nil) {
         me.viewController = viewController;
     }
     return me;

@@ -30,7 +30,54 @@ static NSMutableDictionary* tabs_viewControllers;
                  ofType:@"bundle"]]];
 
     viewController.url = [NSURL URLWithString:task.params[@"url"]];
+    viewController.pattern = task.params[@"pattern"];
     viewController.task = task;
+
+    viewController.title = task.params[@"title"] ?: @"";
+
+    viewController.navigationBarTint = [tabs_Util colorFromArrayU8:task.params[@"tint"]];
+    viewController.navigationBarTitleTint = [tabs_Util colorFromArrayU8:task.params[@"titleTint"]];
+
+    viewController.navigationBarButtonTint = [tabs_Util colorFromArrayU8:task.params[@"buttonTint"]];
+    viewController.navigationBarButtonIconPath = task.params[@"buttonIcon"];
+    viewController.navigationBarButtonText = task.params[@"buttonText"];
+
+    /*
+    if ([task.params objectForKey:@"opaqueTopBar"] != nil) {
+        [viewController setOpaqueTopBar:[[task.params objectForKey:@"opaqueTopBar"] boolValue]];
+    } else {
+        [viewController setOpaqueTopBar:false];
+    }
+
+    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
+        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
+        [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
+    } else {
+        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
+    }
+
+    // status bar options
+    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
+        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
+            [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
+    } else {
+        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
+    }
+
+    // scaling options
+    if ([task.params objectForKey:@"scalePagesToFit"] != nil) {
+        viewController.scalePagesToFit = [NSNumber numberWithBool:[[task.params objectForKey:@"scalePagesToFit"] boolValue]];
+    } else {
+        viewController.scalePagesToFit = [NSNumber numberWithBool:NO];
+    }
+
+    // navigation toolbar options
+    if ([task.params objectForKey:@"navigationToolbar"] != nil) {
+        viewController.enableNavigationToolbar = [NSNumber numberWithBool:[[task.params objectForKey:@"navigationToolbar"] boolValue]];
+    } else {
+        viewController.enableNavigationToolbar = [NSNumber numberWithBool:NO];
+    }
+     */
 
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];

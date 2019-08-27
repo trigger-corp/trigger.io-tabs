@@ -59,6 +59,29 @@
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
 
+    // set ui properties
+    self.navigationBarTitle.title = self.title;
+    if (self.navigationBarButtonIconPath != nil) {
+        [[[ForgeFile alloc] initWithObject:self.navigationBarButtonIconPath] data:^(NSData *data) {
+            UIImage *image = [[UIImage alloc] initWithData:data];
+            image = [image imageWithWidth:0 andHeight:28 andRetina:YES];
+            self.navigationBarButton.image = image;
+        } errorBlock:^(NSError *error) { }];
+    } else if (self.navigationBarButtonText != nil) {
+        self.navigationBarButton.title = self.navigationBarButtonText;
+    }
+    if (self.navigationBarTint != nil) {
+        _blurView.backgroundColor = self.navigationBarTint;
+    }
+    if (self.navigationBarTitleTint != nil) {
+        self.navigationBar.titleTextAttributes = @{
+            NSForegroundColorAttributeName: self.navigationBarTitleTint
+        };
+    }
+    if (self.navigationBarButtonTint != nil) {
+        self.navigationBarButton.tintColor = self.navigationBarButtonTint;
+    }
+
     // start URL loading
     if (_url == nil) {
         _url = [NSURL URLWithString:@"about:blank"];
@@ -133,13 +156,6 @@
 
 
 #pragma mark API // TODO consider moving these guys to tabs_API
-
-- (void) setTitleWithTask:(ForgeTask*)task title:(NSString*)title {
-    self.title = title;
-    self.navigationBarTitle.title = title;
-    [task success:nil];
-}
-
 
 - (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint {
     UIBarButtonItem* buttonItem = [[UIBarButtonItem alloc] init];

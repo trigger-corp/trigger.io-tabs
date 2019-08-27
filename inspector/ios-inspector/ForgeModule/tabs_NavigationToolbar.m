@@ -123,7 +123,7 @@
     UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.webViewController.webView.request.URL]
                                                                      applicationActivities:self.applicationActivities];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [self.webViewController presentViewController:vc animated:YES completion:NULL];
+        [self.webViewController presentViewController:vc animated:YES completion:nil];
     } else {
         if (!self.popoverController) {
             self.popoverController = [[UIPopoverController alloc] initWithContentViewController:vc];
