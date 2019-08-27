@@ -27,17 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UINavigationItem *navigationBarTitle;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *navigationBarButton;
 
-
 @property (nonatomic, retain) NSURL *url;
 @property (nonatomic, retain) ForgeTask *task;
 @property (nonatomic, retain) NSDictionary *result;
 
-- (void)addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint;
-- (void)removeButtonsWithTask:(ForgeTask*)task;
-- (void)setTitleWithTask:(ForgeTask*)task title:(NSString*)title;
+- (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint;
+- (void) removeButtonsWithTask:(ForgeTask*)task;
 
-- (void)cancel:(id)nothing;
-//- (void)close;
+//- (void) close;
 
 @end
 

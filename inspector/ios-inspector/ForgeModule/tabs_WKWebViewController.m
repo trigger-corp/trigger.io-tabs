@@ -20,13 +20,6 @@
 - (void) viewDidLoad {
     [super viewDidLoad];
 
-    // install SafeAreaInsets handler
-    /*self.webView.safeAreaInsetsHandler = ^UIEdgeInsets(UIEdgeInsets insets) {
-        [ForgeLog i:@"tabs_WKWebViewController :: safeAreaInsetsHandler"];
-        insets.top += ;
-        return insets;
-    };*/
-
     // fix rotation
     self.view.autoresizesSubviews = YES;
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -54,8 +47,6 @@
     _blurViewVisualEffect.hidden = opaqueTopBar;*/
 
     // connect close button
-    //[self.navigationBarButton setTarget:self];
-    //[self.navigationBarButton setAction:@selector(cancel:)];
     [self.navigationBarButton setTarget:[tabs_ButtonDelegate withHandler:^{
         self.result = @{
             @"userCancelled": [NSNumber numberWithBool:YES]
@@ -126,25 +117,10 @@
     contentInset = UIEdgeInsetsMake(topInset, contentInset.left, contentInset.bottom, contentInset.right);
     self.webView.scrollView.scrollIndicatorInsets = scrollInset;
     self.webView.scrollView.contentInset = contentInset;
-
-    //CGRect rect = CGRectMake(0, 0, self.webView.scrollView., <#CGFloat height#>);
-    //[self.webView.scrollView scrollRectToVisible:rect animated:NO];
 }
 
 
 #pragma mark UI Delegates
-
-/*- (void) cancel:(id)nothing {
-    self.result = @{
-        @"userCancelled": [NSNumber numberWithBool:YES]
-    };
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //[self dismissViewControllerAnimated:YES completion:nil];
-        //[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
-    });
-}*/
 
 /*- (void)close {
     self.result = @{

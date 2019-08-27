@@ -7,6 +7,8 @@
 //
 
 #import "tabs_API.h"
+#import "tabs_Util.h"
+
 #import "tabs_UIWebViewController.h"
 #import "tabs_WKWebViewController.h"
 
@@ -21,7 +23,8 @@ static NSMutableDictionary* tabs_viewControllers;
         return;
     }
 
-    tabs_WKWebViewController *viewController = [[tabs_WKWebViewController alloc] initWithNibName:@"tabs_WKWebViewController"
+    tabs_WKWebViewController *viewController = [[tabs_WKWebViewController alloc]
+        initWithNibName:@"tabs_WKWebViewController"
                  bundle:[NSBundle bundleWithPath:[[NSBundle mainBundle]
         pathForResource:@"tabs"
                  ofType:@"bundle"]]];
@@ -29,23 +32,21 @@ static NSMutableDictionary* tabs_viewControllers;
     viewController.url = [NSURL URLWithString:task.params[@"url"]];
     viewController.task = task;
 
+    if (tabs_viewControllers == nil) {
+        tabs_viewControllers = [[NSMutableDictionary alloc] init];
+    }
+    tabs_viewControllers[task.callid] = [NSValue valueWithNonretainedObject:viewController];
+
     // https://medium.com/@hacknicity/view-controller-presentation-changes-in-ios-13-ac8c901ebc4e
     if (@available(iOS 13.0, *)) {
         viewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        //[ForgeApp.sharedApp.viewController addChildViewController:viewController];
-        //[ForgeApp.sharedApp.appDelegate.window addSubview:viewController.view];
-        //[ForgeApp.sharedApp.appDelegate.window bringSubviewToFront:viewController.view];
-        [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:nil];
+        [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:^{
+            [task success:task.callid];
+        }];
     });
-    [task success:task.callid];
-
-    if (tabs_viewControllers == nil) {
-        tabs_viewControllers = [[NSMutableDictionary alloc] init];
-    }
-    tabs_viewControllers[task.callid] = [NSValue valueWithNonretainedObject:viewController];
 }
 
 
@@ -175,8 +176,14 @@ static NSMutableDictionary* tabs_viewControllers;
 
 
 + (void)close:(ForgeTask*)task modal:(NSString*)modal {
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] close];
-    [task success:nil];
+    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
+    viewController.result = @{
+        @"userCancelled": [NSNumber numberWithBool:NO],
+        @"url": viewController.webView.URL.absoluteString
+    };
+    [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:^{
+        [task success:nil];
+    }];
 }
 
 
@@ -201,23 +208,21 @@ static NSMutableDictionary* tabs_viewControllers;
     }
     if ([params objectForKey:@"tint"] != nil) {
         NSArray* array = [params objectForKey:@"tint"];
-        tint = [UIColor colorWithRed:[(NSNumber*)[array objectAtIndex:0] floatValue]/255
-                               green:[(NSNumber*)[array objectAtIndex:1] floatValue]/255
-                                blue:[(NSNumber*)[array objectAtIndex:2] floatValue]/255
-                               alpha:[(NSNumber*)[array objectAtIndex:3] floatValue]/255];
+        tint = [tabs_Util colorFromArrayU8:array];
     }
 
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position style:style tint:tint];
+    [[((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position style:style tint:tint];
 }
 
 
 + (void)removeButtons:(ForgeTask*)task modal:(NSString*)modal {
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] removeButtonsWithTask:task];
+    [[((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue] removeButtonsWithTask:task];
 }
 
 
 + (void)setTitle:(ForgeTask*)task modal:(NSString*)modal title:(NSString*)title {
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] setTitleWithTask:task title:title];
+    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
+    viewController.navigationBarTitle.title = title;
 }
 
 @end
