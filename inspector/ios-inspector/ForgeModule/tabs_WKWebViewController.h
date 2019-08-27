@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeButton;
 
 @property (nonatomic, retain) NSURL *url;
+@property (nonatomic, retain) ForgeTask *task;
 @property (nonatomic, retain) NSDictionary *result;
 
 - (void)cancel:(id)nothing;

@@ -11,9 +11,10 @@
 		710A44941FC563D100C77999 /* tabs_Activities.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A44931FC563D100C77999 /* tabs_Activities.m */; };
 		710EBE21230E804600401FB7 /* tabs_WKWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */; };
 		711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */; };
+		711D4DED23151AFE0013C59A /* tabs_Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 711D4DEC23151AFE0013C59A /* tabs_Util.m */; };
 		7130F946230EB58800A4F65B /* tabs_WKWebViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7130F945230EB58800A4F65B /* tabs_WKWebViewDelegate.m */; };
 		714F6AC01E7BD9E0001618FF /* tabs_ConnectionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 714F6ABF1E7BD9E0001618FF /* tabs_ConnectionDelegate.m */; };
-		71B1A76123101E3A0028BF77 /* tabs_LoginDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */; };
+		71B1A76123101E3A0028BF77 /* tabs_LoginAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 71B1A76023101E3A0028BF77 /* tabs_LoginAlertView.m */; };
 		71B378361F8769E8000DD4EB /* tabs_UIWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71B378351F8769E8000DD4EB /* tabs_UIWebViewController.xib */; };
 		71CC15C61C995DC40032A613 /* tabs_Delegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 71CC15C51C995DC40032A613 /* tabs_Delegate.m */; };
 		71D9A93C2313C0E100F77E13 /* tabs_WKWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 710EBE1D230E7DD400401FB7 /* tabs_WKWebViewController.xib */; };
@@ -38,13 +39,15 @@
 		710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_WKWebViewController.m; sourceTree = "<group>"; };
 		711D4DDC2313FBFE0013C59A /* tabs_EventListener.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_EventListener.h; sourceTree = "<group>"; };
 		711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_EventListener.m; sourceTree = "<group>"; };
+		711D4DEB23151AFE0013C59A /* tabs_Util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_Util.h; sourceTree = "<group>"; };
+		711D4DEC23151AFE0013C59A /* tabs_Util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_Util.m; sourceTree = "<group>"; };
 		7130F944230EB58800A4F65B /* tabs_WKWebViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_WKWebViewDelegate.h; sourceTree = "<group>"; };
 		7130F945230EB58800A4F65B /* tabs_WKWebViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_WKWebViewDelegate.m; sourceTree = "<group>"; };
 		714F6ABE1E7BD9E0001618FF /* tabs_ConnectionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tabs_ConnectionDelegate.h; sourceTree = "<group>"; };
 		714F6ABF1E7BD9E0001618FF /* tabs_ConnectionDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tabs_ConnectionDelegate.m; sourceTree = "<group>"; };
 		719331791F28D2EB009919E5 /* placeholder.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = placeholder.plist; sourceTree = "<group>"; };
-		71B1A75F23101E3A0028BF77 /* tabs_LoginDialog.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_LoginDialog.h; sourceTree = "<group>"; };
-		71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_LoginDialog.m; sourceTree = "<group>"; };
+		71B1A75F23101E3A0028BF77 /* tabs_LoginAlertView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_LoginAlertView.h; sourceTree = "<group>"; };
+		71B1A76023101E3A0028BF77 /* tabs_LoginAlertView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_LoginAlertView.m; sourceTree = "<group>"; };
 		71B378351F8769E8000DD4EB /* tabs_UIWebViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tabs_UIWebViewController.xib; sourceTree = "<group>"; };
 		71CC15C51C995DC40032A613 /* tabs_Delegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tabs_Delegate.m; sourceTree = "<group>"; };
 		71CC15C71C995E620032A613 /* tabs_Delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_Delegate.h; sourceTree = "<group>"; };
@@ -117,8 +120,8 @@
 			children = (
 				710A44921FC563D100C77999 /* tabs_Activities.h */,
 				710A44931FC563D100C77999 /* tabs_Activities.m */,
-				71B1A75F23101E3A0028BF77 /* tabs_LoginDialog.h */,
-				71B1A76023101E3A0028BF77 /* tabs_LoginDialog.m */,
+				71B1A75F23101E3A0028BF77 /* tabs_LoginAlertView.h */,
+				71B1A76023101E3A0028BF77 /* tabs_LoginAlertView.m */,
 				710A448E1FC471FD00C77999 /* tabs_NavigationToolbar.h */,
 				710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */,
 			);
@@ -138,6 +141,8 @@
 				711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */,
 				71CC15C71C995E620032A613 /* tabs_Delegate.h */,
 				71CC15C51C995DC40032A613 /* tabs_Delegate.m */,
+				711D4DEB23151AFE0013C59A /* tabs_Util.h */,
+				711D4DEC23151AFE0013C59A /* tabs_Util.m */,
 				B31B6D5015C13D5200854074 /* Frameworks */,
 				B31B6D4F15C13D5200854074 /* Products */,
 			);
@@ -256,7 +261,8 @@
 				711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */,
 				7130F946230EB58800A4F65B /* tabs_WKWebViewDelegate.m in Sources */,
 				710A44901FC471FD00C77999 /* tabs_NavigationToolbar.m in Sources */,
-				71B1A76123101E3A0028BF77 /* tabs_LoginDialog.m in Sources */,
+				71B1A76123101E3A0028BF77 /* tabs_LoginAlertView.m in Sources */,
+				711D4DED23151AFE0013C59A /* tabs_Util.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

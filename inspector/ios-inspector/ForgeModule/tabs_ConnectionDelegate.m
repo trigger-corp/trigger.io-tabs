@@ -7,7 +7,7 @@
 //
 
 #import "tabs_ConnectionDelegate.h"
-#import "tabs_LoginDialog.h"
+#import "tabs_LoginAlertView.h"
 
 #pragma mark - ConnectionDelegate
 
@@ -187,7 +187,7 @@
                                               cancelButtonTitle:i8n.cancelButton
                                               otherButtonTitles:i8n.loginButton, nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
-        [tabs_LoginDialog showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+        [tabs_LoginAlertView showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
                 [self log:@"User cancelled username/password request for basic auth"];
                 _basic_authorized_failed = YES;

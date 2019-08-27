@@ -27,6 +27,7 @@ static NSMutableDictionary* tabs_viewControllers;
                  ofType:@"bundle"]]];
 
     viewController.url = [NSURL URLWithString:task.params[@"url"]];
+    viewController.task = task;
 
     // https://medium.com/@hacknicity/view-controller-presentation-changes-in-ios-13-ac8c901ebc4e
     if (@available(iOS 13.0, *)) {

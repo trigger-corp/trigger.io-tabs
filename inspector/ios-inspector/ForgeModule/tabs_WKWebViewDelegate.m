@@ -8,6 +8,8 @@
 
 #import "tabs_WKWebViewDelegate.h"
 
+#import "tabs_LoginAlertView.h"
+
 
 @implementation tabs_WKWebViewDelegate
 
@@ -75,29 +77,12 @@
 
     // support basic auth
     } else if (isBasicAuth == YES) {
-        [ForgeLog d:@"[tabs_WKWebView] Handling Basic Auth challenge"];
-        UIAlertController *alert = [UIAlertController
-            alertControllerWithTitle:self.viewController.webView.title
-                             message:[NSString stringWithFormat:@"AUTH_CHALLENGE_REQUIRE_PASSWORD: %@", self.viewController.webView.URL.host]
-                      preferredStyle:UIAlertControllerStyleAlert];
-        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = @"USER_ID";
-        }];
-        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-            textField.placeholder = @"PASSWORD";
-            textField.secureTextEntry = YES;
-        }];
-        [alert addAction:[UIAlertAction actionWithTitle:@"BUTTON_OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            NSString *username = alert.textFields.firstObject.text;
-            NSString *password = alert.textFields.lastObject.text;
-            NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
+        [ForgeLog d:@"[tabs_WKWebView] Handling Basic Auth challenge"];    
+        [tabs_LoginAlertView showWithViewController:self.viewController login:^(NSURLCredential * _Nonnull credential) {
             completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"BUTTON_CANCEL" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        } cancel:^{
             completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
-        }]];
-
-        [self.viewController presentViewController:alert animated:YES completion:nil];
+        }];
 
     // default handling
     } else {
