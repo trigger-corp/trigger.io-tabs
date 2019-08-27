@@ -10,8 +10,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="tabs_WKWebViewController">
             <connections>
-                <outlet property="closeButton" destination="u56-zL-cve" id="tUZ-yy-FLW"/>
                 <outlet property="navigationBar" destination="hNZ-gg-ev8" id="sjo-5f-IBK"/>
+                <outlet property="navigationBarButton" destination="u56-zL-cve" id="LIg-aO-Wab"/>
+                <outlet property="navigationBarTitle" destination="5xR-Ji-8V7" id="ibi-W8-HIA"/>
                 <outlet property="view" destination="iN0-l3-epB" id="QcC-xN-dZO"/>
                 <outlet property="webView" destination="ImK-xw-yhH" id="Lo8-cq-8ep"/>
             </connections>

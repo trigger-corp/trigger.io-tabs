@@ -8,6 +8,7 @@
 
 #import "tabs_WKWebViewController.h"
 #import "tabs_WKWebViewDelegate.h"
+#import "tabs_Util.h"
 
 #import <ForgeCore/WKWebView+AdditionalSafeAreaInsets.h>
 
@@ -16,7 +17,7 @@
 
 #pragma mark UIViewController
 
-- (void)viewDidLoad {
+- (void) viewDidLoad {
     [super viewDidLoad];
 
     // install SafeAreaInsets handler
@@ -53,8 +54,19 @@
     _blurViewVisualEffect.hidden = opaqueTopBar;*/
 
     // connect close button
-    [self.closeButton setTarget:self];
-    [self.closeButton setAction:@selector(cancel:)];
+    //[self.navigationBarButton setTarget:self];
+    //[self.navigationBarButton setAction:@selector(cancel:)];
+    [self.navigationBarButton setTarget:[tabs_ButtonDelegate withHandler:^{
+        self.result = @{
+            @"userCancelled": [NSNumber numberWithBool:YES]
+        };
+        // TODO consider rather triggering event here instead of relying on viewDidDisappear
+        //      to return ?
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
+        });
+    }]];
+    [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
 
     // start URL loading
     if (_url == nil) {
@@ -64,7 +76,24 @@
 }
 
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+- (void) viewDidDisappear:(BOOL)animated {
+    // make sure the network indicator is turned off
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+
+    // trigger closed event
+    if (self.result != nil) {
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", self.task.callid] withParam:self.result];
+    } else {
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", self.task.callid] withParam:@{
+            @"userCancelled": [NSNumber numberWithBool:YES]
+        }];
+    }
+
+    [super viewDidDisappear:animated];
+}
+
+
+- (void) viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
@@ -103,9 +132,106 @@
 }
 
 
+#pragma mark UI Delegates
+
+/*- (void) cancel:(id)nothing {
+    self.result = @{
+        @"userCancelled": [NSNumber numberWithBool:YES]
+    };
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        //[self dismissViewControllerAnimated:YES completion:nil];
+        //[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
+    });
+}*/
+
+/*- (void)close {
+    self.result = @{
+        @"userCancelled": [NSNumber numberWithBool:NO],
+        @"url": self.webView.URL.absoluteString
+    };
+
+    [self dismissViewControllerAnimated:YES completion:nil];
+}*/
+
+
+#pragma mark API // TODO consider moving these guys to tabs_API
+
+- (void) setTitleWithTask:(ForgeTask*)task title:(NSString*)title {
+    self.title = title;
+    self.navigationBarTitle.title = title;
+    [task success:nil];
+}
+
+
+- (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint {
+    UIBarButtonItem* buttonItem = [[UIBarButtonItem alloc] init];
+
+    if (style != nil && [style isEqualToString:@"done"]) {
+        [buttonItem setStyle:UIBarButtonItemStyleDone];
+    } else {
+        [buttonItem setStyle:UIBarButtonItemStylePlain];
+    }
+
+    if (text != nil) {
+        [buttonItem setTitle:text];
+
+    } else if (icon != nil) {
+        [[[ForgeFile alloc] initWithObject:icon] data:^(NSData *data) {
+            UIImage *icon = [[UIImage alloc] initWithData:data];
+            icon = [icon imageWithWidth:0 andHeight:28 andRetina:YES];
+            [buttonItem setImage:icon];
+        } errorBlock:^(NSError *error) {
+        }];
+
+    } else {
+        [task error:@"You need to specify either a 'text' or 'icon' property for your button."];
+        return;
+    }
+
+    if (tint != nil) {
+        [buttonItem setTintColor:tint];
+    }
+
+    [buttonItem setTarget:[tabs_ButtonDelegate withHandler:^{
+        NSString *eventName = [NSString stringWithFormat:@"tabs.buttonPressed.%@", self.task.callid];
+        [[ForgeApp sharedApp] event:eventName withParam:[NSNull null]];
+    }]];
+    [buttonItem setAction:@selector(tabs_ButtonDelegate_clicked)];
+
+
+    UINavigationItem *navigationItem = ((UINavigationItem*)[self.navigationBar.items objectAtIndex:0]);
+    if (position != nil && [position isEqualToString:@"right"]) {
+        [navigationItem setRightBarButtonItem:buttonItem];
+    } else {
+        [navigationItem setLeftBarButtonItem:buttonItem];
+    }
+
+    [task success:task.callid];
+}
+
+
+- (void) removeButtonsWithTask:(ForgeTask*)task {
+    UINavigationItem *navigationItem = ((UINavigationItem*)[self.navigationBar.items objectAtIndex:0]);
+
+    if (navigationItem.leftBarButtonItem.target != nil) {
+        [((tabs_ButtonDelegate*)navigationItem.leftBarButtonItem.target) releaseDelegate];
+    }
+    [navigationItem setLeftBarButtonItem:nil];
+
+    if (navigationItem.rightBarButtonItem.target != nil) {
+        [((tabs_ButtonDelegate*)navigationItem.rightBarButtonItem.target) releaseDelegate];
+    }
+    [navigationItem setRightBarButtonItem:nil];
+
+    [task success:nil];
+}
+
+
 #pragma mark Blur Effect
 
-- (void)createStatusBarVisualEffect:(UIView*)theWebView {
+- (void) createStatusBarVisualEffect:(UIView*)theWebView {
     // remove existing status bar blur effect
     [_navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [_navigationBar setShadowImage:[[UIImage alloc] init]];
@@ -146,31 +272,6 @@
     [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_blurView.topAnchor].active = YES;
     [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_blurView.bottomAnchor].active = YES;
 }
-
-
-#pragma mark UI Delegates
-
-- (void)cancel:(id)nothing {
-    self.result = @{
-        @"userCancelled": [NSNumber numberWithBool:YES]
-    };
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //[self dismissViewControllerAnimated:YES completion:nil];
-        //[self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
-    });
-}
-
-/*- (void)close {
-    self.result = @{
-        @"userCancelled": [NSNumber numberWithBool:NO],
-        @"url": self.webView.URL.absoluteString
-    };
-
-    [self dismissViewControllerAnimated:YES completion:nil];
-}*/
-
 
 
 #pragma mark Helpers

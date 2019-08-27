@@ -23,19 +23,14 @@ struct tabs_LoginAlertText {
 extern const struct tabs_LoginAlertText tabs_i8n;
 
 
-@interface tabs_LoginAlertView : NSObject<UIAlertViewDelegate> {
+@interface tabs_LoginAlertView : NSObject<UIAlertViewDelegate>
 
-
-}
++ (void)showWithViewController:(tabs_WKWebViewController * _Nonnull)viewController login:(void(^)(NSURLCredential*))login cancel:(void(^)(void))cancel;
 
 // TODO deprecate these
 typedef void (^AlertViewCompletionBlock)(NSInteger buttonIndex);
 @property (strong,nonatomic) AlertViewCompletionBlock callback;
 + (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback;
-
-
-+ (void)showWithViewController:(tabs_WKWebViewController * _Nonnull)viewController login:(void(^)(NSURLCredential*))login cancel:(void(^)(void))cancel;
-
 
 @end
 
