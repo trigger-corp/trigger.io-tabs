@@ -21,3 +21,26 @@
 @end
 
 
+@implementation tabs_ButtonDelegate
+
++ (tabs_ButtonDelegate*) withHandler:(void(^_Nonnull)(void))handler {
+    tabs_ButtonDelegate *buttonDelegate = [[tabs_ButtonDelegate alloc] init];
+    if (buttonDelegate) {
+        buttonDelegate->handler = handler;
+        buttonDelegate->me = buttonDelegate;
+    }
+    return buttonDelegate;
+}
+
+- (void) tabs_ButtonDelegate_clicked {
+    //NSString *eventName = [NSString stringWithFormat:@"tabs.buttonPressed.%@", callId];
+    //[[ForgeApp sharedApp] event:eventName withParam:[NSNull null]];
+    handler();
+}
+
+
+- (void) releaseDelegate {
+    me = nil;
+}
+
+@end
