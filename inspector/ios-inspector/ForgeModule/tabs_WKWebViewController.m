@@ -19,7 +19,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Install SafeAreaInsets handler
+    // install SafeAreaInsets handler
     /*self.webView.safeAreaInsetsHandler = ^UIEdgeInsets(UIEdgeInsets insets) {
         [ForgeLog i:@"tabs_WKWebViewController :: safeAreaInsetsHandler"];
         insets.top += ;
@@ -38,10 +38,6 @@
     self.webView.opaque = NO;
     self.webView.backgroundColor = [UIColor clearColor];
 
-    // connect close button
-    [self.closeButton setTarget:self];
-    [self.closeButton setAction:@selector(cancel:)];
-
     // set content insets
     if (@available(iOS 11.0, *)) {
         [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
@@ -49,17 +45,16 @@
     CGFloat topInset = self.navigationBar.frame.origin.y + self.navigationBar.frame.size.height;
     [self setTopInset:topInset];
 
-    // create blurview
+    // create blur view for status and navigation bar
     [self createStatusBarVisualEffect:self.webView];
     /*if (tint != nil) {
         _blurView.backgroundColor = tint;
     }
     _blurViewVisualEffect.hidden = opaqueTopBar;*/
 
-    // Page scaling
-    /*if (self.scalePagesToFit == [NSNumber numberWithBool:YES]) {
-        self.webView.scalesPageToFit = YES;
-    }*/
+    // connect close button
+    [self.closeButton setTarget:self];
+    [self.closeButton setAction:@selector(cancel:)];
 
     // start URL loading
     if (_url == nil) {
@@ -89,6 +84,8 @@
         //self.view.frame = f;
     }];
 }
+
+
 
 
 #pragma mark Insets
