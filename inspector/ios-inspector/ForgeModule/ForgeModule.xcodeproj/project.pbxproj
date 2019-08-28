@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		710A44901FC471FD00C77999 /* tabs_NavigationToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */; };
-		710A44941FC563D100C77999 /* tabs_Activities.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A44931FC563D100C77999 /* tabs_Activities.m */; };
+		710A44901FC471FD00C77999 /* tabs_ToolBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A448F1FC471FD00C77999 /* tabs_ToolBar.m */; };
+		710A44941FC563D100C77999 /* tabs_ActivityPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = 710A44931FC563D100C77999 /* tabs_ActivityPopover.m */; };
 		710EBE21230E804600401FB7 /* tabs_WKWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */; };
 		711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 711D4DDD2313FBFE0013C59A /* tabs_EventListener.m */; };
 		711D4DED23151AFE0013C59A /* tabs_Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 711D4DEC23151AFE0013C59A /* tabs_Util.m */; };
@@ -30,10 +30,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		710A448E1FC471FD00C77999 /* tabs_NavigationToolbar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_NavigationToolbar.h; sourceTree = "<group>"; };
-		710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_NavigationToolbar.m; sourceTree = "<group>"; };
-		710A44921FC563D100C77999 /* tabs_Activities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_Activities.h; sourceTree = "<group>"; };
-		710A44931FC563D100C77999 /* tabs_Activities.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_Activities.m; sourceTree = "<group>"; };
+		710A448E1FC471FD00C77999 /* tabs_ToolBar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_ToolBar.h; sourceTree = "<group>"; };
+		710A448F1FC471FD00C77999 /* tabs_ToolBar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_ToolBar.m; sourceTree = "<group>"; };
+		710A44921FC563D100C77999 /* tabs_ActivityPopover.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_ActivityPopover.h; sourceTree = "<group>"; };
+		710A44931FC563D100C77999 /* tabs_ActivityPopover.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_ActivityPopover.m; sourceTree = "<group>"; };
 		710EBE1D230E7DD400401FB7 /* tabs_WKWebViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tabs_WKWebViewController.xib; sourceTree = "<group>"; };
 		710EBE1F230E804600401FB7 /* tabs_WKWebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tabs_WKWebViewController.h; sourceTree = "<group>"; };
 		710EBE20230E804600401FB7 /* tabs_WKWebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = tabs_WKWebViewController.m; sourceTree = "<group>"; };
@@ -120,12 +120,12 @@
 		714072332313BF9F00AE7879 /* UI Elements */ = {
 			isa = PBXGroup;
 			children = (
-				710A44921FC563D100C77999 /* tabs_Activities.h */,
-				710A44931FC563D100C77999 /* tabs_Activities.m */,
+				710A44921FC563D100C77999 /* tabs_ActivityPopover.h */,
+				710A44931FC563D100C77999 /* tabs_ActivityPopover.m */,
 				71B1A75F23101E3A0028BF77 /* tabs_LoginAlertView.h */,
 				71B1A76023101E3A0028BF77 /* tabs_LoginAlertView.m */,
-				710A448E1FC471FD00C77999 /* tabs_NavigationToolbar.h */,
-				710A448F1FC471FD00C77999 /* tabs_NavigationToolbar.m */,
+				710A448E1FC471FD00C77999 /* tabs_ToolBar.h */,
+				710A448F1FC471FD00C77999 /* tabs_ToolBar.m */,
 			);
 			name = "UI Elements";
 			sourceTree = "<group>";
@@ -257,10 +257,10 @@
 				71CC15C61C995DC40032A613 /* tabs_Delegate.m in Sources */,
 				B3127A1D16AD9F660027B9B8 /* tabs_UIWebViewController.m in Sources */,
 				714F6AC01E7BD9E0001618FF /* tabs_ConnectionDelegate.m in Sources */,
-				710A44941FC563D100C77999 /* tabs_Activities.m in Sources */,
+				710A44941FC563D100C77999 /* tabs_ActivityPopover.m in Sources */,
 				711D4DDE2313FBFE0013C59A /* tabs_EventListener.m in Sources */,
 				7130F946230EB58800A4F65B /* tabs_WKWebViewDelegate.m in Sources */,
-				710A44901FC471FD00C77999 /* tabs_NavigationToolbar.m in Sources */,
+				710A44901FC471FD00C77999 /* tabs_ToolBar.m in Sources */,
 				71B1A76123101E3A0028BF77 /* tabs_LoginAlertView.m in Sources */,
 				711D4DED23151AFE0013C59A /* tabs_Util.m in Sources */,
 			);

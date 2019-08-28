@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
+#import "tabs_ToolBar.h"
+
 @class tabs_WKWebViewDelegate;
 
 
@@ -21,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;
 
+
+    UIStatusBarStyle parentStatusBarStyle;
+
     BOOL opaqueTopBar;
 }
 
@@ -29,18 +34,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UINavigationItem *navigationBarTitle;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *navigationBarButton;
 
-@property (nonatomic, retain) NSURL *url;
-@property (nonatomic, retain) NSString *pattern;
-@property (nonatomic, retain) ForgeTask *task;
-@property (nonatomic, retain) NSDictionary *result;
+@property (retain, nonatomic) NSURL *url;
+@property (retain, nonatomic) NSString *pattern;
+@property (retain, nonatomic) ForgeTask *task;
+@property (retain, nonatomic) NSDictionary *result;
 
-@property (nonatomic, retain) UIColor *navigationBarTint; // TODO should we deprecate?
-@property (nonatomic, retain) UIColor *navigationBarTitleTint; // TODO should we deprecate?
+@property (assign, nonatomic) UIStatusBarStyle statusBarStyle;
 
-@property (nonatomic, retain) UIColor *navigationBarButtonTint;
-@property (nonatomic, retain) NSString *navigationBarButtonText;
-@property (nonatomic, retain) NSString *navigationBarButtonIconPath;
+@property (retain, nonatomic) UIColor *navigationBarTint; // TODO should we deprecate?
+@property (retain, nonatomic) UIColor *navigationBarTitleTint; // TODO should we deprecate?
+@property (assign, nonatomic) BOOL navigationBarIsOpaque;
 
+@property (retain, nonatomic) UIColor *navigationBarButtonTint;
+@property (retain, nonatomic) NSString *navigationBarButtonText;
+@property (retain, nonatomic) NSString *navigationBarButtonIconPath;
+
+@property (retain, nonatomic) tabs_ToolBar *toolBar;
+@property (assign, nonatomic) BOOL enableToolBar;
 
 - (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint;
 - (void) removeButtonsWithTask:(ForgeTask*)task;

@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (weak, nonatomic) tabs_WKWebViewController* viewController;
 
+@property (nonatomic, assign) BOOL hasLoaded;
+
 + (tabs_WKWebViewDelegate*)withViewController:(tabs_WKWebViewController *)viewController;
 
 @end

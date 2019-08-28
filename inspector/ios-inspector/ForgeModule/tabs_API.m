@@ -33,51 +33,29 @@ static NSMutableDictionary* tabs_viewControllers;
     viewController.pattern = task.params[@"pattern"];
     viewController.task = task;
 
+    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
+        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
+        viewController.statusBarStyle = UIStatusBarStyleLightContent;
+    } else {
+        viewController.statusBarStyle = UIStatusBarStyleDefault;
+    }
+
     viewController.title = task.params[@"title"] ?: @"";
 
     viewController.navigationBarTint = [tabs_Util colorFromArrayU8:task.params[@"tint"]];
     viewController.navigationBarTitleTint = [tabs_Util colorFromArrayU8:task.params[@"titleTint"]];
+    viewController.navigationBarIsOpaque = task.params[@"opaqueTopBar"]
+                                         ? [[task.params objectForKey:@"opaqueTopBar"] boolValue]
+                                         : NO;
 
     viewController.navigationBarButtonTint = [tabs_Util colorFromArrayU8:task.params[@"buttonTint"]];
     viewController.navigationBarButtonIconPath = task.params[@"buttonIcon"];
     viewController.navigationBarButtonText = task.params[@"buttonText"];
 
-    /*
-    if ([task.params objectForKey:@"opaqueTopBar"] != nil) {
-        [viewController setOpaqueTopBar:[[task.params objectForKey:@"opaqueTopBar"] boolValue]];
-    } else {
-        [viewController setOpaqueTopBar:false];
-    }
-
-    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
-        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
-        [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
-    } else {
-        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
-    }
-
-    // status bar options
-    if (([task.params objectForKey:@"statusBarStyle"] != nil) &&
-        ([[task.params objectForKey:@"statusBarStyle"] isEqualToString:@"light_content"])) {
-            [viewController setStatusBarStyle:UIStatusBarStyleLightContent];
-    } else {
-        [viewController setStatusBarStyle:UIStatusBarStyleDefault];
-    }
-
-    // scaling options
-    if ([task.params objectForKey:@"scalePagesToFit"] != nil) {
-        viewController.scalePagesToFit = [NSNumber numberWithBool:[[task.params objectForKey:@"scalePagesToFit"] boolValue]];
-    } else {
-        viewController.scalePagesToFit = [NSNumber numberWithBool:NO];
-    }
-
-    // navigation toolbar options
-    if ([task.params objectForKey:@"navigationToolbar"] != nil) {
-        viewController.enableNavigationToolbar = [NSNumber numberWithBool:[[task.params objectForKey:@"navigationToolbar"] boolValue]];
-    } else {
-        viewController.enableNavigationToolbar = [NSNumber numberWithBool:NO];
-    }
-     */
+    viewController.enableToolBar = task.params[@"navigationToolbar"]
+                                 ? [[task.params objectForKey:@"navigationToolbar"] boolValue]
+                                 : NO;
+    viewController.enableToolBar = YES;
 
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];
@@ -218,7 +196,18 @@ static NSMutableDictionary* tabs_viewControllers;
 
 
 + (void)executeJS:(ForgeTask*)task modal:(NSString*)modal script:(NSString*)script {
-    [[((NSValue *)[tabs_modal_map objectForKey:modal]) nonretainedObjectValue] stringByEvaluatingJavaScriptFromString:task string:script];
+    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
+    if (viewController == nil) {
+        [task error:[NSString stringWithFormat:@"No tab found for callid: %@", modal]];
+        return;
+    }
+    [viewController.webView evaluateJavaScript:script completionHandler:^(id _Nullable result, NSError * _Nullable error) {
+        if (error) {
+            [task error:[error localizedDescription]];
+            return;
+        }
+        [task success:result];
+    }];
 }
 
 

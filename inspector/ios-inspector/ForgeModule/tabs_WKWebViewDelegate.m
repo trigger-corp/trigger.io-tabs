@@ -19,6 +19,7 @@
     tabs_WKWebViewDelegate *me = [[tabs_WKWebViewDelegate alloc] init];
     if (me != nil) {
         me.viewController = viewController;
+        me.hasLoaded = NO;
     }
     return me;
 }
@@ -32,6 +33,32 @@
 
 #pragma mark WKNavigationDelegate
 
+- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    [self.viewController.toolBar webView:webView didStartProvisionalNavigation:navigation];
+}
+
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    if (self.hasLoaded == NO) {
+        [[ForgeApp sharedApp] nativeEvent:@selector(firstWebViewLoad) withArgs:@[]];
+    }
+    self.hasLoaded = YES;
+    [self.viewController.toolBar webView:webView didFinishNavigation:navigation];
+}
+
+
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailProvisionalNavigation error: %@", error]];
+    [self.viewController.toolBar webView:webView didFailProvisionalNavigation:navigation withError:error];
+}
+
+
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailNavigation error: %@", error]];
+    [self.viewController.toolBar webView:webView didFailNavigation:navigation withError:error];
+}
+
+
 /*- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     return [self shouldAllowRequest:navigationAction.request]
         ? decisionHandler(WKNavigationActionPolicyAllow)
@@ -39,23 +66,10 @@
 }
 
 
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    [ForgeLog w:[NSString stringWithFormat:@"Webview error: %@", error]];
-}
 
 
-- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    [ForgeLog w:[NSString stringWithFormat:@"Webview error: %@", error]];
-}
 
-
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    if (hasLoaded == NO) {
-        // First webview load
-        [[ForgeApp sharedApp] nativeEvent:@selector(firstWebViewLoad) withArgs:@[]];
-    }
-    hasLoaded = YES;
-}*/
+*/
 
 
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {

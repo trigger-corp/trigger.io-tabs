@@ -1,53 +1,50 @@
 //
-//  tabs_NavigationToolbar.m
+//  tabs_ToolbarBar.m
 //  ForgeModule
 //
 //  Created by Antoine van Gelder on 2017/11/21.
 //  Copyright © 2017 Trigger Corp. All rights reserved.
 //
 
-#import "tabs_NavigationToolbar.h"
-#import "tabs_Activities.h"
+#import "tabs_ToolBar.h"
+#import "tabs_ActivityPopover.h"
 
-#import "tabs_UIWebViewController.h"
+#import "tabs_WKWebViewController.h"
 
-@implementation tabs_NavigationToolbar
+@implementation tabs_ToolBar
 
-- initForWebViewController:(tabs_UIWebViewController*)webViewController
-{
+- initWithViewController:(tabs_WKWebViewController*)viewController {
     self = [super init];
     if (self) {
         _hasStartedLoading = NO;
-        self.webViewController = webViewController;
+        self.viewController = viewController;
         [self createToolbar];
     }
     return self;
 }
 
 
-- (void)createToolbar
-{
-
+- (void)createToolbar {
     self.stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
-                                                                    target:self.webViewController.webView
+                                                                    target:self.viewController.webView
                                                                     action:@selector(stopLoading)];
     self.reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                      target:self.webViewController.webView
+                                                                      target:self.viewController.webView
                                                                       action:@selector(reload)];
     self.backButton = [[UIBarButtonItem alloc] initWithImage:[self backImage]
                                                        style:UIBarButtonItemStylePlain
-                                                      target:self.webViewController.webView
+                                                      target:self.viewController.webView
                                                       action:@selector(goBack)];
     self.backButton.enabled = NO;
     self.forwardButton = [[UIBarButtonItem alloc] initWithImage:[self forwardImage]
                                                           style:UIBarButtonItemStylePlain
-                                                         target:self.webViewController.webView
+                                                         target:self.viewController.webView
                                                          action:@selector(goForward)];
     self.forwardButton.enabled = NO;
     self.actionButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                                                       target:self
                                                                       action:@selector(action:)];
-    self.actionButton.enabled = NO;
+
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                            target:nil
                                                                            action:nil];
@@ -61,8 +58,7 @@
 }
 
 
-- (UIImage *)backImage
-{
+- (UIImage *)backImage {
     static UIImage *image;
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
@@ -85,8 +81,8 @@
     return image;
 }
 
-- (UIImage *)forwardImage
-{
+
+- (UIImage *)forwardImage {
     static UIImage *rightTriangleImage;
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
@@ -108,22 +104,21 @@
 
 #pragma mark - Action button
 
-- (void)action:(id)sender
-{
+- (void)action:(id)sender {
     if (self.popoverController.popoverVisible) {
         [self.popoverController dismissPopoverAnimated:YES];
         return;
     }
 
-    NSURL *url = self.webViewController.webView.request.URL;
+    NSURL *url = self.viewController.webView.URL;
     if (_hasStartedLoading == NO || url == nil || [[url absoluteString] isEqualToString:@""]){
         return;
     }
 
-    UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.webViewController.webView.request.URL]
+    UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.viewController.webView.URL]
                                                                      applicationActivities:self.applicationActivities];
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [self.webViewController presentViewController:vc animated:YES completion:nil];
+        [self.viewController presentViewController:vc animated:YES completion:nil];
     } else {
         if (!self.popoverController) {
             self.popoverController = [[UIPopoverController alloc] initWithContentViewController:vc];
@@ -134,14 +129,14 @@
     }
 }
 
-- (void)toggleState
-{
-    NSURL *url = self.webViewController.webView.request.URL;
+
+- (void)toggleState {
+    NSURL *url = self.viewController.webView.URL;
     self.actionButton.enabled = _hasStartedLoading && url != nil && ![[url absoluteString] isEqualToString:@""];
-    self.backButton.enabled = self.webViewController.webView.canGoBack;
-    self.forwardButton.enabled = self.webViewController.webView.canGoForward;
+    self.backButton.enabled = self.viewController.webView.canGoBack;
+    self.forwardButton.enabled = self.viewController.webView.canGoForward;
     NSMutableArray *toolbarItems = [self.items mutableCopy];
-    if (self.webViewController.webView.loading) {
+    if (self.viewController.webView.loading) {
         toolbarItems[6] = self.stopButton;
     } else {
         toolbarItems[6] = self.reloadButton;
@@ -150,30 +145,33 @@
 }
 
 
-#pragma mark - Web view delegate
+#pragma mark - WKNavigationDelegate
 
-- (void)webViewDidStartLoad:(UIWebView *)webView
-{
+- (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     _hasStartedLoading = YES;
     [self toggleState];
 }
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self toggleState];
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
+
+- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self toggleState];
 }
+
+
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [self toggleState];
+}
+
 
 #pragma mark - Popover controller delegate
 
-- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
-{
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     self.popoverController = nil;
 }
-
 
 @end

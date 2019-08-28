@@ -41,10 +41,6 @@
 
     // create blur view for status and navigation bar
     [self createStatusBarVisualEffect:self.webView];
-    /*if (tint != nil) {
-        _blurView.backgroundColor = tint;
-    }
-    _blurViewVisualEffect.hidden = opaqueTopBar;*/
 
     // connect close button
     [self.navigationBarButton setTarget:[tabs_ButtonDelegate withHandler:^{
@@ -59,8 +55,22 @@
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
 
-    // set ui properties
+    // apply ui properties
     self.navigationBarTitle.title = self.title;
+
+    if (self.navigationBarTint != nil) {
+        _blurView.backgroundColor = self.navigationBarTint;
+    }
+    if (self.navigationBarTitleTint != nil) {
+        self.navigationBar.titleTextAttributes = @{
+            NSForegroundColorAttributeName: self.navigationBarTitleTint
+        };
+    }
+    _blurViewVisualEffect.hidden = self.navigationBarIsOpaque;
+
+    if (self.navigationBarButtonTint != nil) {
+        self.navigationBarButton.tintColor = self.navigationBarButtonTint;
+    }
     if (self.navigationBarButtonIconPath != nil) {
         [[[ForgeFile alloc] initWithObject:self.navigationBarButtonIconPath] data:^(NSData *data) {
             UIImage *image = [[UIImage alloc] initWithData:data];
@@ -70,17 +80,11 @@
     } else if (self.navigationBarButtonText != nil) {
         self.navigationBarButton.title = self.navigationBarButtonText;
     }
-    if (self.navigationBarTint != nil) {
-        _blurView.backgroundColor = self.navigationBarTint;
-    }
-    if (self.navigationBarTitleTint != nil) {
-        self.navigationBar.titleTextAttributes = @{
-            NSForegroundColorAttributeName: self.navigationBarTitleTint
-        };
-    }
-    if (self.navigationBarButtonTint != nil) {
-        self.navigationBarButton.tintColor = self.navigationBarButtonTint;
-    }
+
+    self.toolBar = [[tabs_ToolBar alloc] initWithViewController:self];
+    self.toolBar.hidden = !self.enableToolBar;
+    [self.view insertSubview:self.toolBar aboveSubview:self.webView];
+    [self layoutNavigationToolbar];
 
     // start URL loading
     if (_url == nil) {
@@ -129,6 +133,34 @@
 }
 
 
+#pragma mark Layout Helpers
+
+- (void)layoutStatusBarVisualEffect {
+    _blurView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [_blurView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+
+    _blurViewBottomConstraint.active = YES;
+
+    _blurViewVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
+    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_blurView.leadingAnchor].active = YES;
+    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_blurView.trailingAnchor].active = YES;
+    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_blurView.topAnchor].active = YES;
+    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_blurView.bottomAnchor].active = YES;
+}
+
+
+- (void)layoutNavigationToolbar {
+    self.toolBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.toolBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.toolBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    if (@available(iOS 11.0, *)) {
+        [self.toolBar.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor].active = YES;
+    } else {
+        [self.toolBar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    }
+}
 
 
 #pragma mark Insets
@@ -249,29 +281,5 @@
     [self layoutStatusBarVisualEffect];
 }
 
-
-- (void)layoutStatusBarVisualEffect {
-    _blurView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-    [_blurView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-
-    _blurViewBottomConstraint.active = YES;
-
-    _blurViewVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
-    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_blurView.leadingAnchor].active = YES;
-    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_blurView.trailingAnchor].active = YES;
-    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_blurView.topAnchor].active = YES;
-    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_blurView.bottomAnchor].active = YES;
-}
-
-
-#pragma mark Helpers
-
-/*- (void)forceUpdateWebView {
-    CGRect f = self.webView.frame;
-    self.webView.frame = CGRectMake(f.origin.x, f.origin.y, f.size.width + 1, f.size.height + 1);
-    self.webView.frame = f;
-}*/
 
 @end

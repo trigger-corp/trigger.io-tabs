@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "tabs_NavigationToolbar.h"
+#import "tabs_ToolBar.h"
 
 @interface tabs_UIWebViewController : UIViewController <UIWebViewDelegate, UIBarPositioningDelegate> {
     //UIViewController *rootView;
@@ -33,7 +33,7 @@
     NSString *backImage;
     UIColor *buttonTint;
 
-    tabs_NavigationToolbar *navigationToolbar;
+    tabs_ToolBar *navigationToolbar;
 
 	NSURL *url;
     NSString *retryUrl;

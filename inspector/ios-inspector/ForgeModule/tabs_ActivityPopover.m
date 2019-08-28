@@ -6,7 +6,7 @@
 //  Copyright © 2017 Trigger Corp. All rights reserved.
 //
 
-#import "tabs_Activities.h"
+#import "tabs_ActivityPopover.h"
 
 // = tabs_SafariActivity =======================================================
 

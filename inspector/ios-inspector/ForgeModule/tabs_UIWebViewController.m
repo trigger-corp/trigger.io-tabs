@@ -110,14 +110,14 @@ static UIBarButtonItem *reload = nil;
     }
 
     // Navigation toolbar
-    navigationToolbar = [[tabs_NavigationToolbar alloc] initForWebViewController:self];
+    /*navigationToolbar = [[tabs_ToolBar alloc] initWithViewController:self];
     if (self.enableNavigationToolbar == [NSNumber numberWithBool:YES]) {
         [self setNavigationToolbarHidden:NO];
     } else {
         [self setNavigationToolbarHidden:YES];
     }
     [self.view insertSubview:navigationToolbar aboveSubview:self.webView];
-    [self layoutNavigationToolbar];
+    [self layoutNavigationToolbar];*/
 }
 
 
@@ -432,7 +432,7 @@ static UIBarButtonItem *reload = nil;
 - (void)webViewDidStartLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     if (navigationToolbar != nil) {
-        [navigationToolbar webViewDidStartLoad:webView];
+        //[navigationToolbar webViewDidStartLoad:webView];
     }
     if (self.title == nil || [self.title isEqualToString:@""]) {
         [navigationItem setTitle:@""];
@@ -444,7 +444,7 @@ static UIBarButtonItem *reload = nil;
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     if (navigationToolbar != nil) {
-        [navigationToolbar webViewDidFinishLoad:webView];
+        //[navigationToolbar webViewDidFinishLoad:webView];
     }
     if (self.title == nil || [self.title isEqualToString:@""]) {
         NSString *documentTitle = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
@@ -457,7 +457,7 @@ static UIBarButtonItem *reload = nil;
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     if (navigationToolbar != nil) {
-        [navigationToolbar webView:webView didFailLoadWithError:error];
+        //[navigationToolbar webView:webView didFailLoadWithError:error];
     }
     if (error.code == -1009) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading"
