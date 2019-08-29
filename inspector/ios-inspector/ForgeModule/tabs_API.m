@@ -12,7 +12,7 @@
 #import "tabs_UIWebViewController.h"
 #import "tabs_WKWebViewController.h"
 
-static NSMutableDictionary* tabs_modal_map;
+//static NSMutableDictionary* tabs_modal_map;
 static NSMutableDictionary* tabs_viewControllers;
 
 @implementation tabs_API
@@ -55,27 +55,22 @@ static NSMutableDictionary* tabs_viewControllers;
     viewController.enableToolBar = task.params[@"navigationToolbar"]
                                  ? [[task.params objectForKey:@"navigationToolbar"] boolValue]
                                  : NO;
-    viewController.enableToolBar = YES;
 
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];
     }
     tabs_viewControllers[task.callid] = [NSValue valueWithNonretainedObject:viewController];
 
-    // https://medium.com/@hacknicity/view-controller-presentation-changes-in-ios-13-ac8c901ebc4e
     if (@available(iOS 13.0, *)) {
         viewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:^{
-            [task success:task.callid];
-        }];
-    });
+    [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:^{
+        [task success:task.callid];
+    }];
 }
 
 
-+ (void)open_:(ForgeTask*)task {
+/*+ (void)open_:(ForgeTask*)task {
     if (![task.params objectForKey:@"url"]) {
         [task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
         return;
@@ -187,12 +182,11 @@ static NSMutableDictionary* tabs_viewControllers;
     [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:nil];
     [task success:task.callid];
 
-
     if (tabs_modal_map == nil) {
         tabs_modal_map = [[NSMutableDictionary alloc] init];
     }
     [tabs_modal_map setObject:[NSValue valueWithNonretainedObject:viewController] forKey:task.callid];
-}
+}*/
 
 
 + (void)executeJS:(ForgeTask*)task modal:(NSString*)modal script:(NSString*)script {

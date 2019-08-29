@@ -49,9 +49,7 @@
         };
         // TODO consider rather triggering event here instead of relying on viewDidDisappear
         //      to return ?
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
-        });
+        [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
 

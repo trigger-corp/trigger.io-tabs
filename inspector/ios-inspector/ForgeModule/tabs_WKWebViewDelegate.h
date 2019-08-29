@@ -14,8 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface tabs_WKWebViewDelegate : NSObject </*WKHTTPCookieStoreObserver,*/
-                                              WKNavigationDelegate,
+@interface tabs_WKWebViewDelegate : NSObject <WKNavigationDelegate,
                                               WKScriptMessageHandler
                                               /*WKUIDelegate*/>
 

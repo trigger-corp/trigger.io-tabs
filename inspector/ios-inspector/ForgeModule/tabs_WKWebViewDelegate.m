@@ -25,13 +25,30 @@
 }
 
 
-#pragma mark WKHTTPCookieStoreObserver
-
-//- (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore  API_AVAILABLE(ios(11.0)){
-//}
-
-
 #pragma mark WKNavigationDelegate
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+
+    NSURL *url = navigationAction.request.URL;
+
+    if ([self matchesPattern:url]) {
+        [ForgeLog w:[NSString stringWithFormat:@"Encountered url matching pattern, closing the tab now: %@", url]];
+        self.viewController.result = @{
+            @"url": [url absoluteString],
+            @"userCancelled": [NSNumber numberWithBool:NO]
+        };
+        [self.viewController dismissViewControllerAnimated:YES completion:nil];
+        //[ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
+        return decisionHandler(WKNavigationActionPolicyCancel);
+    }
+
+    /*return [self shouldAllowRequest:navigationAction.request]
+        ? decisionHandler(WKNavigationActionPolicyAllow)
+        : decisionHandler(WKNavigationActionPolicyCancel);*/
+        
+    return decisionHandler(WKNavigationActionPolicyAllow);
+}
+
 
 - (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     [self.viewController.toolBar webView:webView didStartProvisionalNavigation:navigation];
@@ -57,14 +74,6 @@
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailNavigation error: %@", error]];
     [self.viewController.toolBar webView:webView didFailNavigation:navigation withError:error];
 }
-
-
-/*- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    return [self shouldAllowRequest:navigationAction.request]
-        ? decisionHandler(WKNavigationActionPolicyAllow)
-        : decisionHandler(WKNavigationActionPolicyCancel);
-}
-*/
 
 
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
@@ -99,7 +108,7 @@
 
 #pragma mark WKScriptMessageHandler
 
-- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
+- (void) userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
     if (![message.name isEqualToString:@"forge"]) {
         [ForgeLog d:[NSString stringWithFormat:@"Unknown native call: %@ -> %@", message.name, message.body]];
         return;
@@ -111,5 +120,20 @@
 
 #pragma mark WKUIDelegate
 
+
+#pragma mark Helpers
+
+- (BOOL) matchesPattern:(NSURL*)url {
+    if (self.viewController.pattern == nil) {
+        return NO;
+    }
+
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.viewController.pattern
+                                                                           options:NSRegularExpressionCaseInsensitive
+                                                                             error:nil];
+    NSString *urlStr = [url absoluteString];
+
+    return [regex numberOfMatchesInString:urlStr options:0 range:NSMakeRange(0, [urlStr length])] > 0;
+}
 
 @end

@@ -20,7 +20,6 @@
                            alpha:[(NSNumber*)[array objectAtIndex:3] floatValue] / 255.];
 }
 
-
 @end
 
 
@@ -35,8 +34,8 @@
     return buttonDelegate;
 }
 
+
 - (void) tabs_ButtonDelegate_clicked {
-    //NSString *eventName = [NSString stringWithFormat:@"tabs.buttonPressed.%@", callId];
     //[[ForgeApp sharedApp] event:eventName withParam:[NSNull null]];
     handler();
 }
