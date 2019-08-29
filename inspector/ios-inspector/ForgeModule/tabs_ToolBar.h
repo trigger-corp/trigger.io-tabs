@@ -9,9 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
 
+@class tabs_ActivityPopover;
 @class tabs_WKWebViewController;
 
-@interface tabs_ToolBar : UIToolbar <UIPopoverControllerDelegate> {
+@interface tabs_ToolBar : UIToolbar {
     bool _hasStartedLoading;
 }
 
@@ -23,18 +24,12 @@
 @property (strong, nonatomic) UIBarButtonItem *forwardButton;
 @property (strong, nonatomic) UIBarButtonItem *actionButton;
 
-@property (strong, nonatomic) UIPopoverController *popoverController;
-@property (strong, nonatomic) NSArray *applicationActivities;
-
 - initWithViewController:(tabs_WKWebViewController*)viewController;
 
 // WKNavigationDelegate
 - (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation;
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation;
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error;
-- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error;
-
-// UIPopOverControllerDelegate
-- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation;
+- (void) webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error;
+- (void) webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error;
 
 @end

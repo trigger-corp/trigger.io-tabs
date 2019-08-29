@@ -8,7 +8,28 @@
 
 #import "tabs_ActivityPopover.h"
 
-// = tabs_SafariActivity =======================================================
+// = tabs_ActivityPopover =====================================================
+
+@implementation tabs_ActivityPopover
+
++ (void) presentWithViewController:(tabs_WKWebViewController*)viewController barButtonItem:(UIBarButtonItem*)barButtonItem completion:(UIActivityViewControllerCompletionWithItemsHandler)completion {
+
+    tabs_ActivityPopover *activityPopover = [[tabs_ActivityPopover alloc]
+        initWithActivityItems:@[viewController.webView.URL]
+        applicationActivities:@[[[tabs_SafariActivity alloc] init], [[tabs_ChromeActivity alloc] init]]];
+
+    activityPopover.popoverPresentationController.barButtonItem = barButtonItem;
+    
+    activityPopover.completionWithItemsHandler = completion;
+
+    activityPopover.modalPresentationStyle = UIModalPresentationPopover;
+    [viewController presentViewController:activityPopover animated:YES completion:nil];
+}
+
+@end
+
+
+// = tabs_SafariActivity ======================================================
 
 @implementation tabs_SafariActivity
 
@@ -56,7 +77,7 @@
 @end
 
 
-// = tabs_ChromeActivity =======================================================
+// = tabs_ChromeActivity ======================================================
 
 @implementation tabs_ChromeActivity
 

@@ -50,11 +50,6 @@
                                                                            action:nil];
 
     [self setItems:@[self.backButton, space , self.forwardButton, space, self.actionButton, space, self.stopButton]];
-
-
-    tabs_SafariActivity *safari = [[tabs_SafariActivity alloc] init];
-    tabs_ChromeActivity *chrome = [[tabs_ChromeActivity alloc] init];
-    self.applicationActivities = @[safari,chrome];
 }
 
 
@@ -102,31 +97,17 @@
 }
 
 
-#pragma mark - Action button
-
 - (void)action:(id)sender {
-    if (self.popoverController.popoverVisible) {
-        [self.popoverController dismissPopoverAnimated:YES];
-        return;
-    }
-
     NSURL *url = self.viewController.webView.URL;
     if (_hasStartedLoading == NO || url == nil || [[url absoluteString] isEqualToString:@""]){
         return;
     }
 
-    UIActivityViewController *vc = [[UIActivityViewController alloc] initWithActivityItems:@[self.viewController.webView.URL]
-                                                                     applicationActivities:self.applicationActivities];
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        [self.viewController presentViewController:vc animated:YES completion:nil];
-    } else {
-        if (!self.popoverController) {
-            self.popoverController = [[UIPopoverController alloc] initWithContentViewController:vc];
-        }
-        self.popoverController.delegate = self;
-        [self.popoverController presentPopoverFromBarButtonItem:self.items[4]
-                                       permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    }
+    [tabs_ActivityPopover presentWithViewController:self.viewController
+        barButtonItem:self.items[4]
+        completion:^(UIActivityType activityType, BOOL completed, NSArray * returnedItems, NSError * activityError) {
+
+    }];
 }
 
 
@@ -165,13 +146,6 @@
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self toggleState];
-}
-
-
-#pragma mark - Popover controller delegate
-
-- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-    self.popoverController = nil;
 }
 
 @end
