@@ -64,18 +64,10 @@
         ? decisionHandler(WKNavigationActionPolicyAllow)
         : decisionHandler(WKNavigationActionPolicyCancel);
 }
-
-
-
-
-
 */
 
 
 - (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
-
-    NSLog(@"didReceiveAuthenticationChallenge -> %@", challenge);
-
     NSString *method = challenge.protectionSpace.authenticationMethod;
     BOOL isLocalhost = [method isEqualToString:NSURLAuthenticationMethodServerTrust]
                     && [challenge.protectionSpace.host isEqualToString:@"localhost"];
