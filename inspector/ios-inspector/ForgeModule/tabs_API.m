@@ -54,8 +54,7 @@ static NSMutableDictionary* tabs_viewControllers = nil;
     viewController.enableToolBar = task.params[@"navigationToolbar"]
                                  ? [[task.params objectForKey:@"navigationToolbar"] boolValue]
                                  : NO;
-    viewController.enableToolBar = YES; // TODO
-
+                                 
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];
     }
@@ -207,9 +206,10 @@ static NSMutableDictionary* tabs_viewControllers = nil;
 
 + (void)close:(ForgeTask*)task modal:(NSString*)modal {
     tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
+    NSString *url = viewController.webView.URL.absoluteString ?: viewController.failingURL;
     viewController.result = @{
         @"userCancelled": [NSNumber numberWithBool:NO],
-        @"url": viewController.webView.URL.absoluteString
+        @"url": url
     };
     [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:^{
         [task success:nil];

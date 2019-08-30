@@ -30,7 +30,6 @@
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
     NSURL *url = navigationAction.request.URL;
-
     if ([self matchesPattern:url]) {
         [ForgeLog w:[NSString stringWithFormat:@"Encountered url matching pattern, closing the tab now: %@", url]];
         self.viewController.result = @{
@@ -38,39 +37,98 @@
             @"userCancelled": [NSNumber numberWithBool:NO]
         };
         [self.viewController dismissViewControllerAnimated:YES completion:nil];
-        //[ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
         return decisionHandler(WKNavigationActionPolicyCancel);
     }
 
-    /*return [self shouldAllowRequest:navigationAction.request]
-        ? decisionHandler(WKNavigationActionPolicyAllow)
-        : decisionHandler(WKNavigationActionPolicyCancel);*/
-        
     return decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 
 - (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+
     [self.viewController.toolBar webView:webView didStartProvisionalNavigation:navigation];
+
+    if (self.viewController.title == nil || [self.viewController.title isEqualToString:@""]) {
+        self.viewController.navigationBarTitle.title =@"";
+    }
+
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadStarted", self.viewController.task.callid] withParam:@{@"url": webView.URL.absoluteString}];
 }
 
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+
     if (self.hasLoaded == NO) {
         [[ForgeApp sharedApp] nativeEvent:@selector(firstWebViewLoad) withArgs:@[]];
     }
     self.hasLoaded = YES;
+
     [self.viewController.toolBar webView:webView didFinishNavigation:navigation];
+
+    if (self.viewController.title == nil || [self.viewController.title isEqualToString:@""]) {
+        [webView evaluateJavaScript:@"document.title" completionHandler:^(id result, NSError *error) {
+            if (!error) {
+                self.viewController.navigationBarTitle.title = result;
+            }
+        }];
+    }
+
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadFinished", self.viewController.task.callid] withParam:@{@"url": webView.URL.absoluteString}];
 }
 
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailProvisionalNavigation error: %@", error]];
     [self.viewController.toolBar webView:webView didFailProvisionalNavigation:navigation withError:error];
+
+    // URL is not always set if navigation failed
+    NSString *url = webView.URL.absoluteString;
+    if (url == nil) {
+        url = error.userInfo[NSURLErrorFailingURLStringErrorKey];
+        self.viewController.failingURL = url;
+    }
+
+    /*if (error.code == -1009) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading"
+                                                        message:@"No Internet connection available."
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+
+    } else if (error.code == 102) { // loading interupted - TODO check handling with @scthi
+        NSString *urlStr = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
+        NSURL *failedRequestURL = [NSURL URLWithString:urlStr];
+
+        // If we haven't done yet, we retry to load the failed url
+        // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
+        if (![urlStr isEqualToString:retryUrl]) {
+            retryUrl = urlStr;
+            [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", urlStr]];
+            [self.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
+        }
+
+        // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
+        // Example: ics, vcf -> Calendar
+        else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+           [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", urlStr]];
+           [[UIApplication sharedApplication]openURL:failedRequestURL];
+        }
+    }*/
+
+    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", self.viewController.task.callid] withParam:@{
+        @"url": url,
+        @"description": error.localizedDescription
+    }];
 }
 
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailNavigation error: %@", error]];
     [self.viewController.toolBar webView:webView didFailNavigation:navigation withError:error];
 }
@@ -113,12 +171,16 @@
         [ForgeLog d:[NSString stringWithFormat:@"Unknown native call: %@ -> %@", message.name, message.body]];
         return;
     }
+
+    NSURL *url = message.webView.URL;
+    if (![ForgeApp.sharedApp.viewController isWhiteListedURL:url]) {
+        [ForgeLog w:[NSString stringWithFormat:@"Blocking execution of script for untrusted URL: %@", url]];
+        return;
+    }
+
     [ForgeLog d:[NSString stringWithFormat:@"Native call: %@", message.body]];
-    [BorderControl runTask:message.body forWebView:self.viewController.webView];
+    [BorderControl runTask:message.body forWebView:message.webView];
 }
-
-
-#pragma mark WKUIDelegate
 
 
 #pragma mark Helpers

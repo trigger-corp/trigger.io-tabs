@@ -15,8 +15,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface tabs_WKWebViewDelegate : NSObject <WKNavigationDelegate,
-                                              WKScriptMessageHandler
-                                              /*WKUIDelegate*/>
+                                              WKScriptMessageHandler>
 
 @property (weak, nonatomic) tabs_WKWebViewController* viewController;
 
