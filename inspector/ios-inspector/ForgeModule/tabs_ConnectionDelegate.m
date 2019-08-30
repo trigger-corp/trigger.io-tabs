@@ -187,7 +187,7 @@
                                               cancelButtonTitle:i8n.cancelButton
                                               otherButtonTitles:i8n.loginButton, nil];
         alert.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
-        [tabs_LoginAlertView showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+        /*[tabs_LoginAlertView showAlertView:alert withCallback:^(NSInteger buttonIndex) {
             if (buttonIndex == 0) {
                 [self log:@"User cancelled username/password request for basic auth"];
                 _basic_authorized_failed = YES;
@@ -205,7 +205,7 @@
                                                                          password:password
                                                                       persistence:NSURLCredentialPersistenceForSession]
                    forAuthenticationChallenge:challenge];
-        }];
+        }];*/
     });
 }
 

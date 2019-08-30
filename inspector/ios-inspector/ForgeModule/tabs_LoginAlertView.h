@@ -27,11 +27,6 @@ extern const struct tabs_LoginAlertText tabs_i8n;
 
 + (void)showWithViewController:(tabs_WKWebViewController * _Nonnull)viewController login:(void(^)(NSURLCredential*))login cancel:(void(^)(void))cancel;
 
-// TODO deprecate these
-typedef void (^AlertViewCompletionBlock)(NSInteger buttonIndex);
-@property (strong,nonatomic) AlertViewCompletionBlock callback;
-+ (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback;
-
 @end
 
 NS_ASSUME_NONNULL_END

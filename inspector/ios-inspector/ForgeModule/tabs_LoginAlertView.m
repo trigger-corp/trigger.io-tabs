@@ -58,21 +58,4 @@ const struct tabs_LoginAlertText tabs_i8n = {
     [viewController presentViewController:alert animated:YES completion:nil];
 }
 
-
-// TODO DEPRECATE
-@synthesize callback;
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    callback(buttonIndex);
-}
-+ (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback {
-    __block tabs_LoginAlertView *loginDialog = [[tabs_LoginAlertView alloc] init];
-    alertView.delegate = loginDialog;
-    loginDialog.callback = ^(NSInteger buttonIndex) {
-        callback(buttonIndex);
-        alertView.delegate = nil;
-        loginDialog = nil;
-    };
-    [alertView show];
-}
-
 @end
