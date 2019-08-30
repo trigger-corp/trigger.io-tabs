@@ -23,8 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;
 
-    UIStatusBarStyle _parentStatusBarStyle;
-
     BOOL _opaqueTopBar;
 }
 
