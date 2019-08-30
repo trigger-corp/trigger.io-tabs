@@ -44,8 +44,7 @@ Optional:
    view.
 - ``scalePagesToFit``: Set to `true` to scale pages to fit to view. (iOS only)
 - ``navigationToolbar``: Set to `true` to enable a navigation toolbar with forward, backword, stop, reload and share buttons. (iOS only)
-- ``basicAuth``: Set to `true` to enable [Basic Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) support for sites opened in the tab.
-- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `useCredentialStorage`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`, `insecure`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
+- ``basicAuthConfig``: Configuration for Basic Authentication. An object containing one or more of the following fields: `closeTabOnCancel`, `titleText`, `usernameHintText`, `passwordHintText`, `loginButtonText`, `cancelButtonText`. If you include the pattern, `%host%`, in the `titleText` field it will be replaced by the hostname of the site being logged into.
 
 **Example**:
 

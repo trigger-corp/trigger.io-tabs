@@ -1,5 +1,5 @@
 {
-    "changes": "* Add file upload support for Android\n* Migrate to AndroidX.\n* Deprecate iOS UIWebView in favor of WKWebView.\n* Support built-in httpd module.",
+    "changes": "* Add file upload support for Android\n* Migrate to AndroidX\n* Deprecate iOS UIWebView in favor of WKWebView\n* Support built-in httpd module",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
     "min_platform_version": "v2.8.0",
     "namespace": "tabs",
