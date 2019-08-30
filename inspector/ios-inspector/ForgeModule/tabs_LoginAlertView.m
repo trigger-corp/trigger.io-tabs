@@ -48,7 +48,7 @@ const struct tabs_LoginAlertText tabs_i8n = {
              handler:^(UIAlertAction * _Nonnull action) {
         NSString *username = alert.textFields.firstObject.text;
         NSString *password = alert.textFields.lastObject.text;
-        NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceNone];
+        NSURLCredential *credential = [NSURLCredential credentialWithUser:username password:password persistence:NSURLCredentialPersistenceSynchronizable];
         login(credential);
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:cancelButtonText style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
