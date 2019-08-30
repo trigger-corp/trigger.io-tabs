@@ -14,7 +14,7 @@
 @interface tabs_ActivityPopover : UIActivityViewController <UIPopoverPresentationControllerDelegate>
 + (void) presentWithViewController:(tabs_WKWebViewController * _Nonnull)viewController
                      barButtonItem:(UIBarButtonItem * _Nonnull)barButtonItem
-                        completion:(UIActivityViewControllerCompletionWithItemsHandler)completion;
+                        completion:(UIActivityViewControllerCompletionWithItemsHandler _Nonnull)completion;
 @end
 
 
