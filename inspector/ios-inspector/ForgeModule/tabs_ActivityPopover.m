@@ -36,19 +36,19 @@
 
 @implementation tabs_SafariActivity
 
-- (NSString *)activityType {
+- (NSString *) activityType {
     return NSStringFromClass([self class]);
 }
 
-- (NSString *)activityTitle {
+- (NSString *) activityTitle {
     return @"Open in Safari";
 }
 
-- (UIImage *)activityImage {
+- (UIImage *) activityImage {
     return [UIImage imageNamed:@"ActivityImages.bundle/Safari"];
 }
 
-- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+- (BOOL) canPerformWithActivityItems:(NSArray *)activityItems {
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:activityItem]) {
             return YES;
@@ -57,7 +57,7 @@
     return NO;
 }
 
-- (void)prepareWithActivityItems:(NSArray *)activityItems {
+- (void) prepareWithActivityItems:(NSArray *)activityItems {
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]]) {
             url = activityItem;
@@ -67,7 +67,7 @@
     }
 }
 
-- (void)performActivity {
+- (void) performActivity {
     if (url == nil) {
         NSLog(@"No active URL for tabs_SafariActivity");
         return;
@@ -84,23 +84,23 @@
 
 @implementation tabs_ChromeActivity
 
-- (NSString *)activityType {
+- (NSString *) activityType {
     return NSStringFromClass([self class]);
 }
 
-- (NSString *)schemePrefix {
+- (NSString *) schemePrefix {
     return @"googlechrome://";
 }
 
-- (NSString *)activityTitle {
+- (NSString *) activityTitle {
     return @"Open in Chrome";
 }
 
-- (UIImage *)activityImage {
+- (UIImage *) activityImage {
     return [UIImage imageNamed:@"ActivityImages.bundle/Chrome"];
 }
 
-- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+- (BOOL) canPerformWithActivityItems:(NSArray *)activityItems {
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:self.schemePrefix]]) {
             return YES;
@@ -109,7 +109,7 @@
     return NO;
 }
 
-- (void)prepareWithActivityItems:(NSArray *)activityItems {
+- (void) prepareWithActivityItems:(NSArray *)activityItems {
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]]) {
             url = activityItem;
@@ -119,7 +119,7 @@
     }
 }
 
-- (void)performActivity {
+- (void) performActivity {
     if (url == nil) {
         NSLog(@"No active URL for tabs_ChromeActivity");
         return;

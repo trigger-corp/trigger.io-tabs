@@ -17,7 +17,7 @@
 
 #pragma mark Life Cycle
 
-+ (tabs_WKWebViewDelegate*)withViewController:(tabs_WKWebViewController *)viewController {
++ (tabs_WKWebViewDelegate*) withViewController:(tabs_WKWebViewController *)viewController {
     tabs_WKWebViewDelegate *me = [[tabs_WKWebViewDelegate alloc] init];
     if (me != nil) {
         me.viewController = viewController;
@@ -29,7 +29,7 @@
 
 #pragma mark WKNavigationDelegate
 
-- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+- (void) webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
     NSURL *url = navigationAction.request.URL;
     if ([self matchesPattern:url]) {
@@ -59,7 +59,7 @@
 }
 
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
     if (self.hasLoaded == NO) {
@@ -81,7 +81,7 @@
 }
 
 
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+- (void) webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailProvisionalNavigation error: %@", error]];
@@ -133,14 +133,14 @@
 }
 
 
-- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+- (void) webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailNavigation error: %@", error]];
     [self.viewController.toolBar webView:webView didFailNavigation:navigation withError:error];
 }
 
 
-- (void)webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
+- (void) webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
     NSString *method = challenge.protectionSpace.authenticationMethod;
     BOOL isLocalhost = [method isEqualToString:NSURLAuthenticationMethodServerTrust]
                     && [challenge.protectionSpace.host isEqualToString:@"localhost"];

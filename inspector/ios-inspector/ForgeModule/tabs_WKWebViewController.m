@@ -146,7 +146,7 @@
 
 #pragma mark Layout Helpers
 
-- (void)layoutStatusBarVisualEffect {
+- (void) layoutStatusBarVisualEffect {
     _blurView.translatesAutoresizingMaskIntoConstraints = NO;
     [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
@@ -162,7 +162,7 @@
 }
 
 
-- (void)layoutNavigationToolbar {
+- (void) layoutNavigationToolbar {
     self.toolBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.toolBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [self.toolBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;

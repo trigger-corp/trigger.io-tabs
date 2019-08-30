@@ -24,7 +24,7 @@
 }
 
 
-- (void)createToolbar {
+- (void) createToolbar {
     self.stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
                                                                     target:self.viewController.webView
                                                                     action:@selector(stopLoading)];
@@ -53,7 +53,7 @@
 }
 
 
-- (UIImage *)backImage {
+- (UIImage*) backImage {
     static UIImage *image;
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
@@ -77,7 +77,7 @@
 }
 
 
-- (UIImage *)forwardImage {
+- (UIImage*) forwardImage {
     static UIImage *rightTriangleImage;
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
@@ -97,7 +97,7 @@
 }
 
 
-- (void)action:(id)sender {
+- (void) action:(id)sender {
     NSURL *url = self.viewController.webView.URL;
     if (_hasStartedLoading == NO || url == nil || [[url absoluteString] isEqualToString:@""]){
         return;
@@ -111,7 +111,7 @@
 }
 
 
-- (void)toggleState {
+- (void) toggleState {
     NSURL *url = self.viewController.webView.URL;
     self.actionButton.enabled = _hasStartedLoading && url != nil && ![[url absoluteString] isEqualToString:@""];
     self.backButton.enabled = self.viewController.webView.canGoBack;
@@ -134,17 +134,17 @@
 }
 
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+- (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [self toggleState];
 }
 
 
-- (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+- (void) webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self toggleState];
 }
 
 
-- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+- (void) webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [self toggleState];
 }
 

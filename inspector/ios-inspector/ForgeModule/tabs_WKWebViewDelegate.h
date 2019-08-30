@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
     NSURL *_retryURL;
 }
 
-@property (weak, nonatomic) tabs_WKWebViewController* viewController;
+@property (weak, nonatomic) tabs_WKWebViewController *viewController;
 
 @property (nonatomic, assign) BOOL hasLoaded;
 
