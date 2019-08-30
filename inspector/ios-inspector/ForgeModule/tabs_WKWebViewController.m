@@ -75,8 +75,6 @@
         self.result = @{
             @"userCancelled": [NSNumber numberWithBool:YES]
         };
-        // TODO consider rather triggering event here instead of relying on viewDidDisappear
-        //      to return ?
         [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
@@ -188,19 +186,7 @@
 }
 
 
-#pragma mark UI Delegates
-
-/*- (void)close {
-    self.result = @{
-        @"userCancelled": [NSNumber numberWithBool:NO],
-        @"url": self.webView.URL.absoluteString
-    };
-
-    [self dismissViewControllerAnimated:YES completion:nil];
-}*/
-
-
-#pragma mark API // TODO consider moving these guys to tabs_API
+#pragma mark API
 
 - (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint {
     UIBarButtonItem* buttonItem = [[UIBarButtonItem alloc] init];

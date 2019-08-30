@@ -19,7 +19,6 @@ const struct tabs_LoginAlertText tabs_i8n = {
 
 @implementation tabs_LoginAlertView
 
-
 + (void)showWithViewController:(tabs_WKWebViewController * _Nonnull)viewController login:(void(^)(NSURLCredential*))login cancel:(void(^)(void))cancel {
     NSDictionary *configuration = [viewController.task.params objectForKey:@"basicAuthConfig"];
     if (configuration == nil) {

@@ -19,11 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
  * tabs_ButtonDelegate
  */
 @interface tabs_ButtonDelegate : UIViewController <UINavigationControllerDelegate, UINavigationBarDelegate, UITabBarDelegate> {
-    tabs_ButtonDelegate *me;
-    void (^handler)(void);
+    tabs_ButtonDelegate *_me;
+    void (^_handler)(void);
 }
 
 + (tabs_ButtonDelegate*) withHandler:(void(^_Nonnull)(void))handler;
+
 - (void) releaseDelegate;
 @end
 

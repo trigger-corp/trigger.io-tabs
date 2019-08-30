@@ -23,10 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;
 
+    UIStatusBarStyle _parentStatusBarStyle;
 
-    UIStatusBarStyle parentStatusBarStyle;
-
-    BOOL opaqueTopBar;
+    BOOL _opaqueTopBar;
 }
 
 @property (weak, nonatomic) IBOutlet WKWebView *webView;
@@ -42,8 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (assign, nonatomic) UIStatusBarStyle statusBarStyle;
 
-@property (retain, nonatomic) UIColor *navigationBarTint; // TODO should we deprecate?
-@property (retain, nonatomic) UIColor *navigationBarTitleTint; // TODO should we deprecate?
+@property (retain, nonatomic) UIColor *navigationBarTint;
+@property (retain, nonatomic) UIColor *navigationBarTitleTint;
 @property (assign, nonatomic) BOOL navigationBarIsOpaque;
 
 @property (retain, nonatomic) UIColor *navigationBarButtonTint;
@@ -55,8 +54,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint;
 - (void) removeButtonsWithTask:(ForgeTask*)task;
-
-//- (void) close;
 
 @end
 
