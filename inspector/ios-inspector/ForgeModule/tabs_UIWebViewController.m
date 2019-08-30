@@ -459,7 +459,7 @@ static UIBarButtonItem *reload = nil;
     if (navigationToolbar != nil) {
         //[navigationToolbar webView:webView didFailLoadWithError:error];
     }
-    if (error.code == -1009) {
+    if (error.code == NSURLErrorNotConnectedToInternet) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading"
                                                         message:@"No Internet connection available."
                                                        delegate:nil

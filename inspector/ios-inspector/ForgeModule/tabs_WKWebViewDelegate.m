@@ -10,6 +10,8 @@
 
 #import "tabs_LoginAlertView.h"
 
+#define WebKitErrorFrameLoadInterruptedByPolicyChange 102
+
 
 @implementation tabs_WKWebViewDelegate
 
@@ -92,38 +94,42 @@
         self.viewController.failingURL = url;
     }
 
-    /*if (error.code == -1009) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error loading"
-                                                        message:@"No Internet connection available."
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
+    if (error.code == NSURLErrorNotConnectedToInternet) {
+        UIAlertController *alert = [UIAlertController
+            alertControllerWithTitle:@"Error loading"
+                             message:@"No Internet connection available."
+                      preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                                  style:UIAlertActionStyleDefault
+                                                handler:nil]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.viewController presentViewController:alert animated:YES completion:nil];
+        });
 
-    } else if (error.code == 102) { // loading interupted - TODO check handling with @scthi
-        NSString *urlStr = [error.userInfo objectForKey:@"NSErrorFailingURLStringKey"];
-        NSURL *failedRequestURL = [NSURL URLWithString:urlStr];
+    } else if ([error.domain isEqualToString:@"WebKitErrorDomain"] &&
+                error.code == WebKitErrorFrameLoadInterruptedByPolicyChange) {
+        NSURL *failedRequestURL = [NSURL URLWithString:url];
 
         // If we haven't done yet, we retry to load the failed url
         // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
-        if (![urlStr isEqualToString:retryUrl]) {
-            retryUrl = urlStr;
-            [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", urlStr]];
-            [self.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
-        }
+        if (![failedRequestURL.absoluteString isEqualToString:_retryURL.absoluteString]) {
+            _retryURL = failedRequestURL;
+            [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", url]];
+            [self.viewController.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
 
         // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
         // Example: ics, vcf -> Calendar
-        else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
-           [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", urlStr]];
+        } else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+           [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", url]];
            [[UIApplication sharedApplication]openURL:failedRequestURL];
         }
-    }*/
 
-    [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", self.viewController.task.callid] withParam:@{
-        @"url": url,
-        @"description": error.localizedDescription
-    }];
+    } else {
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", self.viewController.task.callid] withParam:@{
+            @"url": url,
+            @"description": error.localizedDescription
+        }];
+    }
 }
 
 

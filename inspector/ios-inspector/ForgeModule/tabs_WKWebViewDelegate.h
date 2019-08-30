@@ -15,7 +15,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface tabs_WKWebViewDelegate : NSObject <WKNavigationDelegate,
-                                              WKScriptMessageHandler>
+                                              WKScriptMessageHandler> {
+    NSURL *_retryURL;
+}
 
 @property (weak, nonatomic) tabs_WKWebViewController* viewController;
 
