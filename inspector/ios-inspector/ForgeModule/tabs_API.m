@@ -12,11 +12,11 @@
 #import "tabs_UIWebViewController.h"
 #import "tabs_WKWebViewController.h"
 
-static NSMutableDictionary* tabs_viewControllers = nil;
+static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewControllers = nil;
 
 @implementation tabs_API
 
-+ (void)open:(ForgeTask*)task {
++ (void) open:(ForgeTask*)task {
     if (![task.params objectForKey:@"url"]) {
         [task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
         return;
@@ -58,7 +58,11 @@ static NSMutableDictionary* tabs_viewControllers = nil;
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];
     }
-    tabs_viewControllers[task.callid] = [NSValue valueWithNonretainedObject:viewController];
+    tabs_viewControllers[task.callid] = viewController;
+    viewController.releaseHandler = ^{
+        [ForgeLog d:[NSString stringWithFormat:@"Deleting tab with callid:%@ url:%@", task.callid, task.params[@"url"]]];
+        tabs_viewControllers[task.callid] = nil;
+    };
 
     if (@available(iOS 13.0, *)) {
         viewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
@@ -69,7 +73,7 @@ static NSMutableDictionary* tabs_viewControllers = nil;
 }
 
 
-/*+ (void)open_:(ForgeTask*)task {
+/*+ (void) open_:(ForgeTask*)task {
     if (![task.params objectForKey:@"url"]) {
         [task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
         return;
@@ -188,12 +192,13 @@ static NSMutableDictionary* tabs_viewControllers = nil;
 }*/
 
 
-+ (void)executeJS:(ForgeTask*)task modal:(NSString*)modal script:(NSString*)script {
-    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
++ (void) executeJS:(ForgeTask*)task modal:(NSString*)modal script:(NSString*)script {
+    tabs_WKWebViewController *viewController = tabs_viewControllers[modal];
     if (viewController == nil) {
-        [task error:[NSString stringWithFormat:@"No tab found for callid: %@", modal]];
+        [task error:[NSString stringWithFormat:@"No tab found with callid: %@", modal]];
         return;
     }
+
     [viewController.webView evaluateJavaScript:script completionHandler:^(id _Nullable result, NSError * _Nullable error) {
         if (error) {
             [task error:[error localizedDescription]];
@@ -204,8 +209,13 @@ static NSMutableDictionary* tabs_viewControllers = nil;
 }
 
 
-+ (void)close:(ForgeTask*)task modal:(NSString*)modal {
-    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
++ (void) close:(ForgeTask*)task modal:(NSString*)modal {
+    tabs_WKWebViewController *viewController = tabs_viewControllers[modal];
+    if (viewController == nil) {
+        [task error:[NSString stringWithFormat:@"No tab found with callid: %@", modal]];
+        return;
+    }
+
     NSString *url = viewController.webView.URL.absoluteString ?: viewController.failingURL;
     viewController.result = @{
         @"userCancelled": [NSNumber numberWithBool:NO],
@@ -217,7 +227,13 @@ static NSMutableDictionary* tabs_viewControllers = nil;
 }
 
 
-+ (void)addButton:(ForgeTask*)task modal:(NSString*)modal params:(NSDictionary*)params {
++ (void) addButton:(ForgeTask*)task modal:(NSString*)modal params:(NSDictionary*)params {
+    tabs_WKWebViewController *viewController = tabs_viewControllers[modal];
+    if (viewController == nil) {
+        [task error:[NSString stringWithFormat:@"No tab found with callid: %@", modal]];
+        return;
+    }
+
     NSString* text = nil;
     NSString* icon = nil;
     NSString* position = nil;
@@ -241,17 +257,25 @@ static NSMutableDictionary* tabs_viewControllers = nil;
         tint = [tabs_Util colorFromArrayU8:array];
     }
 
-    [[((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue] addButtonWithTask:task text:text icon:icon position:position style:style tint:tint];
+    [viewController addButtonWithTask:task text:text icon:icon position:position style:style tint:tint];
 }
 
 
-+ (void)removeButtons:(ForgeTask*)task modal:(NSString*)modal {
-    [[((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue] removeButtonsWithTask:task];
++ (void) removeButtons:(ForgeTask*)task modal:(NSString*)modal {
+    tabs_WKWebViewController *viewController = tabs_viewControllers[modal];
+    if (viewController == nil) {
+        [task error:[NSString stringWithFormat:@"No tab found with callid: %@", modal]];
+        return;
+    }
+    [viewController removeButtonsWithTask:task];
 }
 
 
-+ (void)setTitle:(ForgeTask*)task modal:(NSString*)modal title:(NSString*)title {
-    tabs_WKWebViewController *viewController = [((NSValue *)tabs_viewControllers[modal]) nonretainedObjectValue];
++ (void) setTitle:(ForgeTask*)task modal:(NSString*)modal title:(NSString*)title {
+    tabs_WKWebViewController *viewController = tabs_viewControllers[modal];
+    if (viewController == nil) {
+        return;
+    }
     viewController.navigationBarTitle.title = title;
 }
 

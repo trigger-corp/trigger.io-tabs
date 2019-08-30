@@ -130,6 +130,9 @@
     }
 
     [super viewDidDisappear:animated];
+
+    // if you love someone set them free…
+    self.releaseHandler();
 }
 
 

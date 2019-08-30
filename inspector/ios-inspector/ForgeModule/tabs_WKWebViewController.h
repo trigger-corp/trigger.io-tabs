@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (retain, nonatomic) NSDictionary *result;
 @property (retain, nonatomic) NSString *failingURL; // WKWebView does not set the webView.URL property if navigation failed
 
+@property (nonatomic, copy, nonnull) void (^releaseHandler)(void);
+
 @property (assign, nonatomic) UIStatusBarStyle statusBarStyle;
 
 @property (retain, nonatomic) UIColor *navigationBarTint;
