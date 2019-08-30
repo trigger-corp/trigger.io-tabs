@@ -13,16 +13,19 @@
 @implementation tabs_ActivityPopover
 
 + (void) presentWithViewController:(tabs_WKWebViewController*)viewController barButtonItem:(UIBarButtonItem*)barButtonItem completion:(UIActivityViewControllerCompletionWithItemsHandler)completion {
+    static NSArray *applicationActivities = nil;
+    if (applicationActivities == nil) {
+        applicationActivities = @[[[tabs_SafariActivity alloc] init], [[tabs_ChromeActivity alloc] init]];
+    }
 
     tabs_ActivityPopover *activityPopover = [[tabs_ActivityPopover alloc]
         initWithActivityItems:@[viewController.webView.URL]
-        applicationActivities:@[[[tabs_SafariActivity alloc] init], [[tabs_ChromeActivity alloc] init]]];
+        applicationActivities:applicationActivities];
 
     activityPopover.popoverPresentationController.barButtonItem = barButtonItem;
-    
     activityPopover.completionWithItemsHandler = completion;
-
     activityPopover.modalPresentationStyle = UIModalPresentationPopover;
+
     [viewController presentViewController:activityPopover animated:YES completion:nil];
 }
 

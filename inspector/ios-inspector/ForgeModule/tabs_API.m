@@ -12,8 +12,7 @@
 #import "tabs_UIWebViewController.h"
 #import "tabs_WKWebViewController.h"
 
-//static NSMutableDictionary* tabs_modal_map;
-static NSMutableDictionary* tabs_viewControllers;
+static NSMutableDictionary* tabs_viewControllers = nil;
 
 @implementation tabs_API
 
@@ -55,6 +54,7 @@ static NSMutableDictionary* tabs_viewControllers;
     viewController.enableToolBar = task.params[@"navigationToolbar"]
                                  ? [[task.params objectForKey:@"navigationToolbar"] boolValue]
                                  : NO;
+    viewController.enableToolBar = YES; // TODO
 
     if (tabs_viewControllers == nil) {
         tabs_viewControllers = [[NSMutableDictionary alloc] init];
