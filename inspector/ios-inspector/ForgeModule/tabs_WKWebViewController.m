@@ -11,6 +11,7 @@
 #import "tabs_Util.h"
 
 #import <ForgeCore/WKWebView+AdditionalSafeAreaInsets.h>
+#import <ForgeCore/ForgeContentSchemeHandler.h>
 
 @implementation tabs_WKWebViewController
 
@@ -24,9 +25,36 @@
     self.view.autoresizesSubviews = YES;
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
+    // configure webview preferences
+    self.webView.configuration.preferences.minimumFontSize = 1.0;
+    self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = NO;
+    self.webView.configuration.preferences.javaScriptEnabled = YES;
+
+    // configure overscroll behaviour
+    NSNumber *bounces = [[[[[ForgeApp sharedApp] appConfig] objectForKey:@"core"] objectForKey:@"ios"] objectForKey:@"bounces"];
+    if (bounces != nil) {
+        [self.webView.scrollView setBounces:[bounces boolValue]];
+    } else {
+        [self.webView.scrollView setBounces:NO];
+    }
+
     // connect web view delegate
     webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
     self.webView.navigationDelegate = webViewDelegate;
+    [self.webView.configuration.userContentController addScriptMessageHandler:webViewDelegate name:@"forge"];
+
+    // install custom protocol handler
+    if (@available(iOS 11.0, *)) {
+        [self.webView.configuration setURLSchemeHandler:[[ForgeContentSchemeHandler alloc] init] forURLScheme:@"content"];
+    }
+
+    // workaround CORS errors when using file:/// - also see: https://bugs.webkit.org/show_bug.cgi?id=154916
+    @try {
+        [self.webView.configuration.preferences setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
+    } @catch (NSException *exception) {}
+    @try {
+        [self.webView.configuration setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
+    } @catch (NSException *exception) {}
 
     // set background color to clear
     self.webView.opaque = NO;
@@ -65,7 +93,6 @@
         };
     }
     _blurViewVisualEffect.hidden = self.navigationBarIsOpaque;
-
     if (self.navigationBarButtonTint != nil) {
         self.navigationBarButton.tintColor = self.navigationBarButtonTint;
     }
@@ -79,6 +106,7 @@
         self.navigationBarButton.title = self.navigationBarButtonText;
     }
 
+    // create toolbar
     self.toolBar = [[tabs_ToolBar alloc] initWithViewController:self];
     self.toolBar.hidden = !self.enableToolBar;
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
@@ -93,10 +121,8 @@
 
 
 - (void) viewDidDisappear:(BOOL)animated {
-    // make sure the network indicator is turned off
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 
-    // trigger closed event
     if (self.result != nil) {
         [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", self.task.callid] withParam:self.result];
     } else {
@@ -112,21 +138,10 @@
 - (void) viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        if (UIDeviceOrientationIsLandscape(UIDevice.currentDevice.orientation)) {
-            //[self setNavigationToolbarHidden:YES];
-        } else {
-            //[self setNavigationToolbarHidden:NO];
-        }
-    }
-
     // refresh insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         CGFloat topInset = self.navigationBar.frame.origin.y + self.navigationBar.frame.size.height;
         [self setTopInset:topInset];
-        //CGRect f = self.view.frame;
-        //self.view.frame = CGRectMake(f.origin.x, f.origin.y, f.size.width + 1, f.size.height + 1);
-        //self.view.frame = f;
     }];
 }
 
@@ -217,8 +232,7 @@
     }
 
     [buttonItem setTarget:[tabs_ButtonDelegate withHandler:^{
-        NSString *eventName = [NSString stringWithFormat:@"tabs.buttonPressed.%@", self.task.callid];
-        [[ForgeApp sharedApp] event:eventName withParam:[NSNull null]];
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.buttonPressed.%@", self.task.callid] withParam:[NSNull null]];
     }]];
     [buttonItem setAction:@selector(tabs_ButtonDelegate_clicked)];
 
