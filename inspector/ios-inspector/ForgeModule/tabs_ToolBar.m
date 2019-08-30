@@ -49,7 +49,7 @@
                                                                            target:nil
                                                                            action:nil];
 
-    [self setItems:@[self.backButton, space , self.forwardButton, space, self.actionButton, space, self.stopButton]];
+    [self setItems:@[self.backButton, space, self.forwardButton, space, self.actionButton, space, self.stopButton]];
 }
 
 
