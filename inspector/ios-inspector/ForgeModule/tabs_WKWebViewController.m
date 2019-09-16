@@ -64,7 +64,7 @@
     if (@available(iOS 11.0, *)) {
         [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
-    CGFloat topInset = self.navigationBar.frame.origin.y + self.navigationBar.frame.size.height;
+    CGFloat topInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
     [self setTopInset:topInset];
 
     // create blur view for status and navigation bar
@@ -141,7 +141,7 @@
 
     // refresh insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        CGFloat topInset = self.navigationBar.frame.origin.y + self.navigationBar.frame.size.height;
+        CGFloat topInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
         [self setTopInset:topInset];
     }];
 }
