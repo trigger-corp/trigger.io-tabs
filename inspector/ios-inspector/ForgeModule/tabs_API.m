@@ -64,8 +64,12 @@ static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewContr
         tabs_viewControllers[task.callid] = nil;
     };
 
+
     if (@available(iOS 13.0, *)) {
         viewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+        // As of Xcode 11 GM "UIModalPresentationOverFullScreen" also works on iOS 13 devices (until Apple breaks it again?)
+    } else {
+        viewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     }
     [ForgeApp.sharedApp.viewController presentViewController:viewController animated:YES completion:^{
         [task success:task.callid];
