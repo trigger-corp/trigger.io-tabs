@@ -75,7 +75,7 @@
         self.result = @{
             @"userCancelled": [NSNumber numberWithBool:YES]
         };
-        [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:nil];
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
 

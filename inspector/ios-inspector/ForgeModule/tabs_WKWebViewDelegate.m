@@ -38,7 +38,7 @@
             @"url": [url absoluteString],
             @"userCancelled": [NSNumber numberWithBool:NO]
         };
-        [self.viewController dismissViewControllerAnimated:YES completion:nil];
+        [self.viewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         return decisionHandler(WKNavigationActionPolicyCancel);
     }
 

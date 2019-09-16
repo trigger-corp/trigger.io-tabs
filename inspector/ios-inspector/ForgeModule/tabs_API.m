@@ -225,7 +225,7 @@ static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewContr
         @"userCancelled": [NSNumber numberWithBool:NO],
         @"url": url
     };
-    [ForgeApp.sharedApp.viewController dismissViewControllerAnimated:YES completion:^{
+    [viewController.presentingViewController dismissViewControllerAnimated:YES completion:^{
         [task success:nil];
     }];
 }
