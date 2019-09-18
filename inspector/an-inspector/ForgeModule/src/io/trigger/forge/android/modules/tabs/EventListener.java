@@ -44,14 +44,4 @@ public class EventListener extends ForgeEventListener {
 			ModalView.instance.onFileUploadSelected(result);
 		}
 	}
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-		if (ModalView.instance == null) {
-			ForgeLog.i("onConfigurationChanged: ModalView.instance is null (already closed)");
-			return;
-		}
-
-		ModalView.instance.updateContentInsets();
-    }
 }

@@ -11,10 +11,14 @@ import io.trigger.forge.android.core.ForgeWebView;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.view.Display;
+import android.view.WindowManager;
 import android.webkit.DownloadListener;
 import android.webkit.HttpAuthHandler;
 import android.webkit.ValueCallback;
@@ -53,8 +57,9 @@ public class WebViewProxy {
 			webSettings.setDomStorageEnabled(true);
 		}
 		webSettings.setGeolocationEnabled(true);
-		webSettings.setBuiltInZoomControls(true); // Make webview behave more like Android browser
-		webSettings.setUseWideViewPort(true);     // Make webview behave more like Android browser
+		webView.setInitialScale(1);                // Make webview behave more like Android browser
+		webSettings.setBuiltInZoomControls(true);  // Make webview behave more like Android browser
+		webSettings.setUseWideViewPort(true);      // Make webview behave more like Android browser
 		if (Build.VERSION.SDK_INT >= 16) {
 			webSettings.setAllowFileAccessFromFileURLs(true);
 			webSettings.setAllowUniversalAccessFromFileURLs(true);

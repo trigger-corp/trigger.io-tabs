@@ -8,7 +8,7 @@ import io.trigger.forge.android.core.ForgeParam;
 import io.trigger.forge.android.core.ForgeTask;
 
 public class API {
-	private static WeakHashMap<String, ModalView> modalViews = new WeakHashMap<String, ModalView>();
+	public static WeakHashMap<String, ModalView> modalViews = new WeakHashMap<String, ModalView>();
 	
 	public static void open(final ForgeTask task) {
 		ModalView modal = new ModalView();

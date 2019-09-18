@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.*;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -134,9 +135,16 @@ public class ModalView {
     }
 
     public void closeModal(final ForgeActivity currentActivity, final String url, boolean cancelled) {
+        // Re-enable  status bar transparency effects if needed
+        if (ForgeViewController.statusBarTransparent) {
+            ForgeApp.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            ForgeApp.getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+
         if (view == null) {
             return;
         }
+
         final JsonObject result = new JsonObject();
         result.addProperty("url", url);
         result.addProperty("userCancelled", cancelled);
@@ -150,6 +158,8 @@ public class ModalView {
             instance = null;
         }
         view = null;
+
+        API.modalViews.remove(task.callid);
     }
 
     public void close() {
@@ -169,6 +179,10 @@ public class ModalView {
 
         task.performUI(new Runnable() {
             public void run() {
+                // Disable any status bar transparency effects
+                ForgeApp.getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                ForgeApp.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
                 // Parse options
                 String url = null;
                 String titleText = null;
@@ -251,8 +265,6 @@ public class ModalView {
                 final ForgeWebView webView = webViewProxy.register(ForgeApp.getActivity(), url);
                 view.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, 1));
                 webView.loadUrl(url);
-
-                updateContentInsets();
 
                 // Add to the view group and switch
                 ForgeApp.getActivity().addModalView(view);
@@ -656,15 +668,4 @@ public class ModalView {
             }
         });
     }
-
-
-    public void updateContentInsets() {
-        Rect safeAreaInsets = new Rect();
-        ForgeViewController.getSafeAreaInsets().round(safeAreaInsets);
-
-        view.setPadding(safeAreaInsets.left, safeAreaInsets.top, safeAreaInsets.right, safeAreaInsets.bottom);
-
-        getWebView().forceLayout();
-    }
-
 }
