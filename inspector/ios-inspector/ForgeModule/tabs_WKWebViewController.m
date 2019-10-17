@@ -221,7 +221,7 @@
     }
 
     [buttonItem setTarget:[tabs_ButtonDelegate withHandler:^{
-        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.buttonPressed.%@", self.task.callid] withParam:[NSNull null]];
+        [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.buttonPressed.%@", task.callid] withParam:[NSNull null]];
     }]];
     [buttonItem setAction:@selector(tabs_ButtonDelegate_clicked)];
 

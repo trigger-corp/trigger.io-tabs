@@ -1,8 +1,8 @@
 {
-    "changes": "* Update screen layout behaviours for Android v2.8.1beta-2\n* Fixed: Memory is not released when closing tab on Android.\n* Fixed: Xcode 11 GM release returns incorrect y position for navigation bar\n* Fixed: Xcode 11 GM release corrupts iOS 12.4 display when tab is dismissed.",
+    "changes": "* Fixed: Clicking a button added with 'addButton' does not trigger its callback on iOS",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
     "min_platform_version": "v2.8.0",
     "namespace": "tabs",
     "platform_version": "v2.8.0",
-    "version": "3.1"
+    "version": "3.2"
 }
