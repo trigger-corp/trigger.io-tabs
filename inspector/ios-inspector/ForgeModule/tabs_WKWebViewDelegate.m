@@ -121,7 +121,7 @@
         // Example: ics, vcf -> Calendar
         } else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
            [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", url]];
-           [[UIApplication sharedApplication]openURL:failedRequestURL];
+           //[[UIApplication sharedApplication]openURL:failedRequestURL];
         }
 
     } else {
