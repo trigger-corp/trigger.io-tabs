@@ -41,6 +41,12 @@
         [self.viewController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         return decisionHandler(WKNavigationActionPolicyCancel);
     }
+    
+    if (![url.scheme hasPrefix:@"http"] && [[UIApplication sharedApplication]openURL:url]) {
+        [ForgeLog w:[NSString stringWithFormat:@"Encountered custom scheme, opening it externally: %@", url]];
+        [[UIApplication sharedApplication]openURL:url];
+        return decisionHandler(WKNavigationActionPolicyCancel);
+    }
 
     return decisionHandler(WKNavigationActionPolicyAllow);
 }
@@ -108,22 +114,23 @@
 
     } else if ([error.domain isEqualToString:@"WebKitErrorDomain"] &&
                 error.code == WebKitErrorFrameLoadInterruptedByPolicyChange) {
-        NSURL *failedRequestURL = [NSURL URLWithString:url];
+        NSURL *failedRequestURL = [self getFailedUrlFromError:error];
 
-        // If we haven't done yet, we retry to load the failed url
-        // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
-        if (![failedRequestURL.absoluteString isEqualToString:_retryURL.absoluteString]) {
-            _retryURL = failedRequestURL;
-            [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", url]];
-            [self.viewController.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
+        if (failedRequestURL != nil) {
+            // If we haven't done yet, we retry to load the failed url
+            // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
+            if (![failedRequestURL.absoluteString isEqualToString:_retryURL.absoluteString]) {
+                _retryURL = failedRequestURL;
+                [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", failedRequestURL]];
+                [self.viewController.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
 
-        // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
-        // Example: ics, vcf -> Calendar
-        } else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
-           [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", url]];
-           //[[UIApplication sharedApplication]openURL:failedRequestURL];
+            // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
+            // Example: ics, vcf -> Calendar
+            } else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
+               [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", failedRequestURL]];
+               [[UIApplication sharedApplication]openURL:failedRequestURL];
+            }
         }
-
     } else {
         [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadError", self.viewController.task.callid] withParam:@{
             @"url": url,
@@ -132,6 +139,20 @@
     }
 }
 
+-(NSURL*)getFailedUrlFromError:(NSError *)error
+{
+    id errorUserInfoDict=[error userInfo];
+    
+    if (errorUserInfoDict == nil || ![errorUserInfoDict isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    
+    if ([errorUserInfoDict objectForKey:@"NSErrorFailingURLKey"] == nil) {
+        return nil;
+    }
+    
+    return [errorUserInfoDict objectForKey:@"NSErrorFailingURLKey"];
+}
 
 - (void) webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;

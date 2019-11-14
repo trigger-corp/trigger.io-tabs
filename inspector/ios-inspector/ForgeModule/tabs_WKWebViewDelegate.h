@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (tabs_WKWebViewDelegate*)withViewController:(tabs_WKWebViewController *)viewController;
 
+- (NSURL*)getFailedUrlFromError:(NSError *)error;
+
 @end
 
 NS_ASSUME_NONNULL_END
