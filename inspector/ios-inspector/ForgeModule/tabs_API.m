@@ -16,10 +16,20 @@ static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewContr
 @implementation tabs_API
 
 + (void) open:(ForgeTask*)task {
-    if (![task.params objectForKey:@"url"]) {
+    NSString *url = task.params[@"url"];
+    if (url == nil) {
         [task error:@"Missing url" type:@"BAD_INPUT" subtype:nil];
         return;
     }
+    NSURL* param_url = [NSURL URLWithString:url];
+    if (param_url == nil) {
+        param_url = [NSURL fileURLWithPath:url];
+    }
+    if (param_url == nil) {
+        [task error:@"Invalid url" type:@"BAD_INPUT" subtype:nil];
+        return;
+    }
+    NSString *param_pattern = task.params[@"pattern"];
 
     tabs_WKWebViewController *viewController = [[tabs_WKWebViewController alloc]
         initWithNibName:@"tabs_WKWebViewController"
@@ -27,8 +37,8 @@ static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewContr
         pathForResource:@"tabs"
                  ofType:@"bundle"]]];
 
-    viewController.url = [NSURL URLWithString:task.params[@"url"]];
-    viewController.pattern = task.params[@"pattern"];
+    viewController.url = param_url;
+    viewController.pattern = param_pattern;
     viewController.task = task;
 
     if (([task.params objectForKey:@"statusBarStyle"] != nil) &&

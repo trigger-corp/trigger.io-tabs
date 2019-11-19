@@ -1,5 +1,12 @@
 {
     "modules": {
+        "file": {
+            "disabled": true,
+            "version": "2.24",
+            "config": {
+                "usage_description": "file: this is not a usage description"
+            }
+        }
     },
     "this_module": {
         "config": {}
