@@ -2,6 +2,65 @@
 
 module("forge.tabs");
 
+if (forge.file) {
+    var pdf_url = "https://ops.trigger.io/75d92dce/tests/test.pdf";
+    asyncTest("Save remote PDF locally and open it", 1, function() {
+        forge.file.saveURL(pdf_url, function (file) {
+            forge.tools.getURL(file, function (url) {
+                forge.tabs.openAdvanced({
+                    url: url,
+                    title: "PDF File",
+                    buttonText: "Done"
+                }, function (modal) {
+                    modal.closed.addListener(function () {
+                        askQuestion("Did a tab/view just open containing a pdf file?", {
+                            Yes: function () {
+                                ok(true, "Success");
+                                start();
+                            },
+                            No: function () {
+                                ok(false, "User claims failure");
+                                start();
+                            }
+                        });
+                    });
+                }, function (e) {
+                    ok(false, "API call failure: "+e.message);
+                    start();
+                });
+            });
+        });
+    });
+}
+
+
+asyncTest("Open Local PDF", 1, function() {
+    forge.tools.getURL("fixtures/tabs/size.pdf", function (url) {
+        forge.tabs.openAdvanced({
+            url: url,
+            title: "PDF File",
+            buttonText: "Done"
+        }, function (modal) {
+            modal.closed.addListener(function () {
+                askQuestion("Did a tab/view just open containing a pdf file?", {
+                    Yes: function () {
+                        ok(true, "Success");
+                        start();
+                    },
+                    No: function () {
+                        ok(false, "User claims failure");
+                        start();
+                    }
+                });
+            });
+        }, function (e) {
+            ok(false, "API call failure: "+e.message);
+            start();
+        });
+    });
+});
+
+
 asyncTest("Open tab with website", 1, function() {
     forge.tabs.open("https://trigger.io", function () {
         askQuestion("Did a tab/view just open in the foreground with the Trigger.io website?", {
