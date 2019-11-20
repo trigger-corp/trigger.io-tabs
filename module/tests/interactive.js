@@ -10,7 +10,8 @@ if (forge.file) {
                 forge.tabs.openAdvanced({
                     url: url,
                     title: "PDF File",
-                    buttonText: "Done"
+                    buttonText: "Done",
+                    opaqueTopBar: true
                 }, function (modal) {
                     modal.closed.addListener(function () {
                         askQuestion("Did a tab/view just open containing a pdf file?", {
