@@ -64,11 +64,17 @@
     if (@available(iOS 11.0, *)) {
         [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
     }
-    CGFloat topInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
-    [self setTopInset:topInset];
+    if (self.navigationBarIsOpaque) {
+        [self setContentInset:0.0 scrollInset:0.0];
+    } else {
+        CGFloat contentInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
+        CGFloat scrollInset = self.navigationBar.frame.size.height;
+        [self setContentInset:contentInset scrollInset:scrollInset];
+    }
 
-    // create blur view for status and navigation bar
-    [self createStatusBarVisualEffect:self.webView];
+    // setup translucency or blur effects for status and navigation bar
+    [self createNavigationBarVisualEffect:self.webView];
+    [self layoutNavigationBar];
 
     // connect close button
     [self.navigationBarButton setTarget:[tabs_ButtonDelegate withHandler:^{
@@ -81,8 +87,7 @@
 
     // apply ui properties
     self.navigationBarTitle.title = self.title;
-
-    if (self.navigationBarTint != nil) {
+    if (self.navigationBarTint != nil && self.navigationBarIsOpaque == NO) {
         _blurView.backgroundColor = self.navigationBarTint;
     }
     if (self.navigationBarTitleTint != nil) {
@@ -90,7 +95,6 @@
             NSForegroundColorAttributeName: self.navigationBarTitleTint
         };
     }
-    _blurViewVisualEffect.hidden = self.navigationBarIsOpaque;
     if (self.navigationBarButtonTint != nil) {
         self.navigationBarButton.tintColor = self.navigationBarButtonTint;
     }
@@ -108,7 +112,7 @@
     self.toolBar = [[tabs_ToolBar alloc] initWithViewController:self];
     self.toolBar.hidden = !self.enableToolBar;
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
-    [self layoutNavigationToolbar];
+    [self layoutToolbar];
 
     // start URL loading
     if (_url == nil) {
@@ -145,15 +149,26 @@
 
     // refresh insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        CGFloat topInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
-        [self setTopInset:topInset];
+        if (self.navigationBarIsOpaque) {
+            [self setContentInset:0.0 scrollInset:0.0];
+        } else {
+            CGFloat contentInset = ForgeConstant.statusBarHeightDynamic + self.navigationBar.frame.size.height;
+            CGFloat scrollInset = self.navigationBar.frame.size.height;
+            [self setContentInset:contentInset scrollInset:scrollInset];
+        }
     }];
 }
 
 
 #pragma mark Layout Helpers
 
-- (void) layoutStatusBarVisualEffect {
+- (void) layoutNavigationBar {
+    if (self.navigationBarIsOpaque) {
+        webViewTopConstraint.active = NO;
+        [_webView.topAnchor constraintEqualToAnchor:self.navigationBar.bottomAnchor constant:0.0].active = YES;
+        return;
+    }
+
     _blurView.translatesAutoresizingMaskIntoConstraints = NO;
     [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
@@ -169,7 +184,7 @@
 }
 
 
-- (void) layoutNavigationToolbar {
+- (void) layoutToolbar {
     self.toolBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.toolBar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [self.toolBar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
@@ -183,13 +198,13 @@
 
 #pragma mark Insets
 
-- (void) setTopInset:(CGFloat) topInset {
-    UIEdgeInsets scrollInset  = self.webView.scrollView.scrollIndicatorInsets;
-    UIEdgeInsets contentInset = self.webView.scrollView.contentInset;
-    scrollInset = UIEdgeInsetsMake(topInset, scrollInset.left, scrollInset.bottom, scrollInset.right);
-    contentInset = UIEdgeInsetsMake(topInset, contentInset.left, contentInset.bottom, contentInset.right);
-    self.webView.scrollView.scrollIndicatorInsets = scrollInset;
-    self.webView.scrollView.contentInset = contentInset;
+- (void) setContentInset:(CGFloat) contentInset scrollInset:(CGFloat)scrollInset {
+    UIEdgeInsets scrollEdgeInset  = self.webView.scrollView.scrollIndicatorInsets;
+    UIEdgeInsets contentEdgeInset = self.webView.scrollView.contentInset;
+    scrollEdgeInset = UIEdgeInsetsMake(scrollInset, scrollEdgeInset.left, scrollEdgeInset.bottom, scrollEdgeInset.right);
+    contentEdgeInset = UIEdgeInsetsMake(contentInset, contentEdgeInset.left, contentEdgeInset.bottom, contentEdgeInset.right);
+    self.webView.scrollView.scrollIndicatorInsets = scrollEdgeInset;
+    self.webView.scrollView.contentInset = contentEdgeInset;
 }
 
 
@@ -260,7 +275,12 @@
 
 #pragma mark Blur Effect
 
-- (void) createStatusBarVisualEffect:(UIView*)theWebView {
+- (void) createNavigationBarVisualEffect:(UIView*)theWebView {
+    if (self.navigationBarIsOpaque) {
+        self.navigationBar.translucent = NO;
+        return;
+    }
+
     // remove existing status bar blur effect
     [_navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [_navigationBar setShadowImage:[[UIImage alloc] init]];
@@ -282,8 +302,6 @@
                                                             attribute:NSLayoutAttributeBottom
                                                            multiplier:1.0f
                                                              constant:0.0f];
-
-    [self layoutStatusBarVisualEffect];
 }
 
 

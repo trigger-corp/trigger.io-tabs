@@ -22,8 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
     UIView *_blurView;
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;
-
-    BOOL _opaqueTopBar;
+    __weak IBOutlet NSLayoutConstraint *webViewTopConstraint;
 }
 
 @property (weak, nonatomic) IBOutlet WKWebView *webView;
