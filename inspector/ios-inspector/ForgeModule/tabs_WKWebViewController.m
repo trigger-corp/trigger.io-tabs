@@ -114,7 +114,11 @@
     if (_url == nil) {
         _url = [NSURL URLWithString:@"about:blank"];
     }
-    [self.webView loadRequest:[NSURLRequest requestWithURL:_url]];
+    if (_url.isFileURL) {
+        [self.webView loadFileURL:_url allowingReadAccessToURL:[_url URLByDeletingLastPathComponent]];
+    } else {
+        [self.webView loadRequest:[NSURLRequest requestWithURL:_url]];
+    }
 }
 
 
