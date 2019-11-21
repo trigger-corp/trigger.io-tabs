@@ -87,7 +87,7 @@
 
     // apply ui properties
     self.navigationBarTitle.title = self.title;
-    if (self.navigationBarTint != nil && self.navigationBarIsOpaque == NO) {
+    if (self.navigationBarIsOpaque == NO && self.navigationBarTint != nil) {
         _blurView.backgroundColor = self.navigationBarTint;
     }
     if (self.navigationBarTitleTint != nil) {
@@ -123,6 +123,44 @@
     } else {
         [self.webView loadRequest:[NSURLRequest requestWithURL:_url]];
     }
+}
+
+
+- (void) viewDidAppear:(BOOL)animated {
+    // set status bar tint if we have an opaque navigation bar
+    if (self.navigationBarIsOpaque) {
+        _navigationBar.barTintColor = self.navigationBarTint;
+        if (@available(iOS 13.0, *)) {
+            _opaqueView = [[UIView alloc]initWithFrame:[UIApplication sharedApplication].keyWindow.windowScene.statusBarManager.statusBarFrame] ;
+            _opaqueView.backgroundColor = self.navigationBarTint;
+            [[UIApplication sharedApplication].keyWindow addSubview:_opaqueView];
+        } else {
+            UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+            if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+                _savedNavigationBarTint = statusBar.backgroundColor;
+                statusBar.backgroundColor = self.navigationBarTint;
+            }
+        }
+    }
+    [super viewDidAppear:animated];
+}
+
+
+- (void) viewWillDisappear:(BOOL)animated {
+    // reset status bar tint if we have an opaque navigation bar
+    if (self.navigationBarIsOpaque) {
+        if (@available(iOS 13.0, *)) {
+            if (_opaqueView != nil) {
+                [_opaqueView removeFromSuperview];
+            }
+        } else {
+            UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
+            if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
+                statusBar.backgroundColor = _savedNavigationBarTint;
+            }
+        }
+    }
+    [super viewWillDisappear:animated];
 }
 
 

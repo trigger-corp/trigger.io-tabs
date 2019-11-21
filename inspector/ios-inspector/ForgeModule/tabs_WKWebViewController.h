@@ -22,6 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
     UIView *_blurView;
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;
+
+    UIView *_opaqueView;
+    UIColor *_savedNavigationBarTint;
+
     __weak IBOutlet NSLayoutConstraint *webViewTopConstraint;
 }
 
