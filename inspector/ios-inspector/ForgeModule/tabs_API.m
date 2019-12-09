@@ -170,6 +170,7 @@ static NSMutableDictionary<NSString*, tabs_WKWebViewController*> *tabs_viewContr
     if (viewController == nil) {
         return;
     }
+    viewController.title = title;
     viewController.navigationBarTitle.title = title;
 }
 

@@ -1,8 +1,8 @@
 {
-    "changes": "* Fixed: Cannot open documents saved locally with `forge.file.saveURL`\n* Fixed: iOS 12 crashes when opening documents saved locally.\n* Fixed: `opaqueTopBar` property does not render properly on iOS 13.2.x.* Fixed: navigation and status bar tints aren't set on iOS when `opaqueTopBar` property is set.",
+    "changes": "* Fixed: Set title on iOS on tabs load",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
     "min_platform_version": "v2.8.4",
     "namespace": "tabs",
     "platform_version": "v2.8.4",
-    "version": "3.4.2"
+    "version": "3.4.4"
 }
