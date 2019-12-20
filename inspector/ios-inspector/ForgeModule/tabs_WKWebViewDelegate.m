@@ -51,6 +51,25 @@
     return decisionHandler(WKNavigationActionPolicyAllow);
 }
 
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
+    
+    NSURLResponse* response = [navigationResponse response];
+    if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+       NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*) [navigationResponse response];
+       //create cookie array from http response
+        NSDictionary* allHeaderFields = [httpResponse allHeaderFields];
+        NSURL* url = [httpResponse URL];
+       NSArray* httpCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:allHeaderFields forURL:url];
+       //iterate over each one and store them
+       for(NSHTTPCookie* cookie in httpCookies)
+       {
+         //group identifier is important and it should be created in the apple developer portal
+         [[NSHTTPCookieStorage sharedCookieStorageForGroupContainerIdentifier:@"group.com.yourorg.*"] setCookie:cookie];
+       }
+    }
+    
+    return decisionHandler(WKNavigationResponsePolicyAllow);
+}
 
 - (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
