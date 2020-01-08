@@ -19,12 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface tabs_WKWebViewController : UIViewController {
     tabs_WKWebViewDelegate *webViewDelegate;
 
-    UIView *_blurView;
+    UIView *_tintedView;
     UIVisualEffectView *_blurViewVisualEffect;
-    NSLayoutConstraint *_blurViewBottomConstraint;
-
-    UIView *_opaqueView;
-    UIColor *_savedNavigationBarTint;
+    NSLayoutConstraint *_tintedViewBottomConstraint;
 
     __weak IBOutlet NSLayoutConstraint *webViewTopConstraint;
 }

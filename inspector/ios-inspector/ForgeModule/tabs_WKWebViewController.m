@@ -87,8 +87,8 @@
 
     // apply ui properties
     self.navigationBarTitle.title = self.title;
-    if (self.navigationBarIsOpaque == NO && self.navigationBarTint != nil) {
-        _blurView.backgroundColor = self.navigationBarTint;
+    if (self.navigationBarTint != nil) {
+        _tintedView.backgroundColor = self.navigationBarTint;
     }
     if (self.navigationBarTitleTint != nil) {
         self.navigationBar.titleTextAttributes = @{
@@ -124,45 +124,6 @@
         [self.webView loadRequest:[NSURLRequest requestWithURL:_url]];
     }
 }
-
-
-- (void) viewDidAppear:(BOOL)animated {
-    // set status bar tint if we have an opaque navigation bar
-    if (self.navigationBarIsOpaque) {
-        _navigationBar.barTintColor = self.navigationBarTint;
-        if (@available(iOS 13.0, *)) {
-            _opaqueView = [[UIView alloc]initWithFrame:[UIApplication sharedApplication].keyWindow.windowScene.statusBarManager.statusBarFrame] ;
-            _opaqueView.backgroundColor = self.navigationBarTint;
-            [[UIApplication sharedApplication].keyWindow addSubview:_opaqueView];
-        } else {
-            UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-            if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
-                _savedNavigationBarTint = statusBar.backgroundColor;
-                statusBar.backgroundColor = self.navigationBarTint;
-            }
-        }
-    }
-    [super viewDidAppear:animated];
-}
-
-
-- (void) viewWillDisappear:(BOOL)animated {
-    // reset status bar tint if we have an opaque navigation bar
-    if (self.navigationBarIsOpaque) {
-        if (@available(iOS 13.0, *)) {
-            if (_opaqueView != nil) {
-                [_opaqueView removeFromSuperview];
-            }
-        } else {
-            UIView *statusBar = [[[UIApplication sharedApplication] valueForKey:@"statusBarWindow"] valueForKey:@"statusBar"];
-            if ([statusBar respondsToSelector:@selector(setBackgroundColor:)]) {
-                statusBar.backgroundColor = _savedNavigationBarTint;
-            }
-        }
-    }
-    [super viewWillDisappear:animated];
-}
-
 
 - (void) viewDidDisappear:(BOOL)animated {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -204,21 +165,20 @@
     if (self.navigationBarIsOpaque) {
         webViewTopConstraint.active = NO;
         [_webView.topAnchor constraintEqualToAnchor:self.navigationBar.bottomAnchor constant:0.0].active = YES;
-        return;
     }
 
-    _blurView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-    [_blurView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    _tintedView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_tintedView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [_tintedView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [_tintedView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
 
-    _blurViewBottomConstraint.active = YES;
+    _tintedViewBottomConstraint.active = YES;
 
     _blurViewVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
-    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_blurView.leadingAnchor].active = YES;
-    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_blurView.trailingAnchor].active = YES;
-    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_blurView.topAnchor].active = YES;
-    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_blurView.bottomAnchor].active = YES;
+    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_tintedView.leadingAnchor].active = YES;
+    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_tintedView.trailingAnchor].active = YES;
+    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_tintedView.topAnchor].active = YES;
+    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_tintedView.bottomAnchor].active = YES;
 }
 
 
@@ -314,26 +274,25 @@
 #pragma mark Blur Effect
 
 - (void) createNavigationBarVisualEffect:(UIView*)theWebView {
-    if (self.navigationBarIsOpaque) {
-        self.navigationBar.translucent = NO;
-        return;
-    }
-
     // remove existing status bar blur effect
     [_navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [_navigationBar setShadowImage:[[UIImage alloc] init]];
 
     // create a replacement blur effect that covers both the status bar and navigation bar
-    _blurView = [[UIView alloc] init];
-    _blurView.userInteractionEnabled = NO;
-    _blurView.backgroundColor = [UIColor clearColor];
-    _blurViewVisualEffect = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular]];
-    _blurViewVisualEffect.userInteractionEnabled = NO;
-    [_blurView addSubview:_blurViewVisualEffect];
-    [self.view insertSubview:_blurView aboveSubview:theWebView];
+    _tintedView = [[UIView alloc] init];
+    _tintedView.userInteractionEnabled = NO;
+    _tintedView.backgroundColor = [UIColor clearColor];
+    
+    if (self.navigationBarIsOpaque == NO) {
+        _blurViewVisualEffect = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular]];
+        _blurViewVisualEffect.userInteractionEnabled = NO;
+        [_tintedView addSubview:_blurViewVisualEffect];
+    }
+    
+    [self.view insertSubview:_tintedView aboveSubview:theWebView];
 
     // layout constraints
-    _blurViewBottomConstraint = [NSLayoutConstraint constraintWithItem:_blurView
+    _tintedViewBottomConstraint = [NSLayoutConstraint constraintWithItem:_tintedView
                                                             attribute:NSLayoutAttributeBottom
                                                             relatedBy:NSLayoutRelationEqual
                                                                toItem:self.navigationBar
