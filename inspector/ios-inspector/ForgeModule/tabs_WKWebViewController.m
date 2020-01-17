@@ -59,9 +59,6 @@
         [configuration.websiteDataStore.httpCookieStore addObserver:self];
     } else { } // not supported
 
-    // recreate WebView with configuration
-    [self recreateWebViewWithConfiguration:configuration];
-
     // configure overscroll behaviour
     NSNumber *bounces = [[[[[ForgeApp sharedApp] appConfig] objectForKey:@"core"] objectForKey:@"ios"] objectForKey:@"bounces"];
     if (bounces != nil) {
@@ -127,6 +124,9 @@
     self.toolBar.hidden = !self.enableToolBar;
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
     [self layoutToolbar];
+
+    // recreate WebView with configuration
+    [self recreateWebViewWithConfiguration:configuration];
 
     // connect web view delegate
     webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
