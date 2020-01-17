@@ -100,6 +100,10 @@
     self.navigationBarTitle.title = self.title;
     if (self.navigationBarTint != nil) {
         _blurView.backgroundColor = self.navigationBarTint;
+    } else if (@available(iOS 13.0, *)) {
+        _blurView.backgroundColor = UIColor.systemBackgroundColor;
+    } else {
+        _blurView.backgroundColor = UIColor.whiteColor;
     }
     if (self.navigationBarTitleTint != nil) {
         self.navigationBar.titleTextAttributes = @{
@@ -119,14 +123,14 @@
         self.navigationBarButton.title = self.navigationBarButtonText;
     }
 
+    // recreate WebView with configuration
+    [self recreateWebViewWithConfiguration:configuration];
+
     // create toolbar
     self.toolBar = [[tabs_ToolBar alloc] initWithViewController:self];
     self.toolBar.hidden = !self.enableToolBar;
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
     [self layoutToolbar];
-
-    // recreate WebView with configuration
-    [self recreateWebViewWithConfiguration:configuration];
 
     // connect web view delegate
     webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
