@@ -25,10 +25,42 @@
     self.view.autoresizesSubviews = YES;
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
+    WKWebViewConfiguration* configuration = [[WKWebViewConfiguration alloc] init];
+
+    // associate with the global WKProcessPool
+    WKWebView* parentWebView = (WKWebView*)ForgeApp.sharedApp.webView;
+    if (parentWebView.configuration.processPool != nil) {
+        configuration.processPool = parentWebView.configuration.processPool;
+    }
+
+    // add script message handler
+    [configuration.userContentController addScriptMessageHandler:webViewDelegate name:@"forge"];
+
     // configure webview preferences
-    self.webView.configuration.preferences.minimumFontSize = 1.0;
-    self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = NO;
-    self.webView.configuration.preferences.javaScriptEnabled = YES;
+    configuration.preferences.minimumFontSize = 1.0;
+    configuration.preferences.javaScriptCanOpenWindowsAutomatically = NO;
+    configuration.preferences.javaScriptEnabled = YES;
+
+    // install custom protocol handler
+    if (@available(iOS 11.0, *)) {
+        [configuration setURLSchemeHandler:[[ForgeContentSchemeHandler alloc] init] forURLScheme:@"content"];
+    }
+
+    // workaround CORS errors when using file:/// - also see: https://bugs.webkit.org/show_bug.cgi?id=154916
+    @try {
+        [configuration.preferences setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
+    } @catch (NSException *exception) {}
+    @try {
+        [configuration setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
+    } @catch (NSException *exception) {}
+
+    // add WKHTTPCookieStoreObserver
+    if (@available(iOS 11.0, *)) {
+        [configuration.websiteDataStore.httpCookieStore addObserver:self];
+    } else { } // not supported
+
+    // recreate WebView with configuration
+    [self recreateWebViewWithConfiguration:configuration];
 
     // configure overscroll behaviour
     NSNumber *bounces = [[[[[ForgeApp sharedApp] appConfig] objectForKey:@"core"] objectForKey:@"ios"] objectForKey:@"bounces"];
@@ -37,24 +69,6 @@
     } else {
         [self.webView.scrollView setBounces:NO];
     }
-
-    // connect web view delegate
-    webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
-    self.webView.navigationDelegate = webViewDelegate;
-    [self.webView.configuration.userContentController addScriptMessageHandler:webViewDelegate name:@"forge"];
-
-    // install custom protocol handler
-    if (@available(iOS 11.0, *)) {
-        [self.webView.configuration setURLSchemeHandler:[[ForgeContentSchemeHandler alloc] init] forURLScheme:@"content"];
-    }
-
-    // workaround CORS errors when using file:/// - also see: https://bugs.webkit.org/show_bug.cgi?id=154916
-    @try {
-        [self.webView.configuration.preferences setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
-    } @catch (NSException *exception) {}
-    @try {
-        [self.webView.configuration setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
-    } @catch (NSException *exception) {}
 
     // set background color to clear
     self.webView.opaque = NO;
@@ -114,14 +128,18 @@
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
     [self layoutToolbar];
 
+    // connect web view delegate
+    webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
+    self.webView.navigationDelegate = webViewDelegate;
+
     // start URL loading
-    if (_url == nil) {
-        _url = [NSURL URLWithString:@"about:blank"];
+    if (self.url == nil) {
+        self.url = [NSURL URLWithString:@"about:blank"];
     }
-    if (_url.isFileURL) {
-        [self.webView loadFileURL:_url allowingReadAccessToURL:[_url URLByDeletingLastPathComponent]];
+    if (self.url.isFileURL) {
+        [self.webView loadFileURL:self.url allowingReadAccessToURL:[self.url URLByDeletingLastPathComponent]];
     } else {
-        [self.webView loadRequest:[NSURLRequest requestWithURL:_url]];
+        [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
     }
 }
 
@@ -340,6 +358,33 @@
                                                             attribute:NSLayoutAttributeBottom
                                                            multiplier:1.0f
                                                              constant:0.0f];
+}
+
+
+#pragma mark - WKHTTPCookieStoreObserver
+
+- (void)cookiesDidChangeInCookieStore:(WKHTTPCookieStore *)cookieStore  API_AVAILABLE(ios(11.0)){
+    NSLog(@"tabs_WKWebViewController::cookiesDidChangeInCookieStore -> %@", cookieStore);
+}
+
+
+#pragma mark - Helpers
+
+// Some configuration options can only be set before WKWebView is created which
+// is rather silly given that Apple are so eager to have us use interface
+//  builder to create our WKWebViews 🤡
+- (void) recreateWebViewWithConfiguration:(WKWebViewConfiguration*)configuration {
+    [self.webView removeFromSuperview];
+
+    self.webView = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:configuration];
+    [self.view insertSubview:self.webView belowSubview:_navigationBar];
+    [self.view sendSubviewToBack:self.webView];
+
+    self.webView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.webView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.webView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [self.webView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [self.webView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
 }
 
 

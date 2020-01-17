@@ -16,7 +16,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface tabs_WKWebViewController : UIViewController {
+@interface tabs_WKWebViewController : UIViewController <WKHTTPCookieStoreObserver> {
     tabs_WKWebViewDelegate *webViewDelegate;
 
     UIView *_blurView;
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
     __weak IBOutlet NSLayoutConstraint *webViewTopConstraint;
 }
 
-@property (weak, nonatomic) IBOutlet WKWebView *webView;
+@property (strong, nonatomic) IBOutlet WKWebView *webView;
 @property (weak, nonatomic) IBOutlet UINavigationBar *navigationBar;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navigationBarTitle;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *navigationBarButton;
