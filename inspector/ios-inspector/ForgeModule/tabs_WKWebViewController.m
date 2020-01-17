@@ -88,7 +88,7 @@
     // apply ui properties
     self.navigationBarTitle.title = self.title;
     if (self.navigationBarTint != nil) {
-        _tintedView.backgroundColor = self.navigationBarTint;
+        _blurView.backgroundColor = self.navigationBarTint;
     }
     if (self.navigationBarTitleTint != nil) {
         self.navigationBar.titleTextAttributes = @{
@@ -167,18 +167,18 @@
         [_webView.topAnchor constraintEqualToAnchor:self.navigationBar.bottomAnchor constant:0.0].active = YES;
     }
 
-    _tintedView.translatesAutoresizingMaskIntoConstraints = NO;
-    [_tintedView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [_tintedView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
-    [_tintedView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    _blurView.translatesAutoresizingMaskIntoConstraints = NO;
+    [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [_blurView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
 
-    _tintedViewBottomConstraint.active = YES;
+    _blurViewBottomConstraint.active = YES;
 
     _blurViewVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
-    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_tintedView.leadingAnchor].active = YES;
-    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_tintedView.trailingAnchor].active = YES;
-    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_tintedView.topAnchor].active = YES;
-    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_tintedView.bottomAnchor].active = YES;
+    [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_blurView.leadingAnchor].active = YES;
+    [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_blurView.trailingAnchor].active = YES;
+    [_blurViewVisualEffect.topAnchor constraintEqualToAnchor:_blurView.topAnchor].active = YES;
+    [_blurViewVisualEffect.bottomAnchor constraintEqualToAnchor:_blurView.bottomAnchor].active = YES;
 }
 
 
@@ -279,20 +279,20 @@
     [_navigationBar setShadowImage:[[UIImage alloc] init]];
 
     // create a replacement blur effect that covers both the status bar and navigation bar
-    _tintedView = [[UIView alloc] init];
-    _tintedView.userInteractionEnabled = NO;
-    _tintedView.backgroundColor = [UIColor clearColor];
+    _blurView = [[UIView alloc] init];
+    _blurView.userInteractionEnabled = NO;
+    _blurView.backgroundColor = [UIColor clearColor];
     
     if (self.navigationBarIsOpaque == NO) {
         _blurViewVisualEffect = [[UIVisualEffectView alloc] initWithEffect:[UIBlurEffect effectWithStyle:UIBlurEffectStyleRegular]];
         _blurViewVisualEffect.userInteractionEnabled = NO;
-        [_tintedView addSubview:_blurViewVisualEffect];
+        [_blurView addSubview:_blurViewVisualEffect];
     }
     
-    [self.view insertSubview:_tintedView aboveSubview:theWebView];
+    [self.view insertSubview:_blurView aboveSubview:theWebView];
 
     // layout constraints
-    _tintedViewBottomConstraint = [NSLayoutConstraint constraintWithItem:_tintedView
+    _blurViewBottomConstraint = [NSLayoutConstraint constraintWithItem:_blurView
                                                             attribute:NSLayoutAttributeBottom
                                                             relatedBy:NSLayoutRelationEqual
                                                                toItem:self.navigationBar
