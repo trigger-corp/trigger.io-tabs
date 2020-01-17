@@ -1,8 +1,8 @@
 {
-    "changes": "* Fixed: Session cookies set in iOS tab views last for the lifetime of the app",
+    "changes": "* Fixed: Android trims first and last tokens of objects returned from `modal.executeJS()`",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
     "min_platform_version": "v2.8.5",
     "namespace": "tabs",
     "platform_version": "v2.8.5",
-    "version": "3.6"
+    "version": "3.6.1"
 }
