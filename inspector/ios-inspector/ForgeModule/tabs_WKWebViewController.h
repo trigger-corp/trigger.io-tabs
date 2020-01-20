@@ -16,9 +16,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface tabs_WKWebViewController : UIViewController <WKHTTPCookieStoreObserver> {
-    tabs_WKWebViewDelegate *webViewDelegate;
+@interface tabs_WKWebViewCustomClass : WKWebView <WKHTTPCookieStoreObserver> {
+}
+- (instancetype)initWithCoder:(NSCoder *)coder;
+@end
 
+NS_ASSUME_NONNULL_END
+
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface tabs_WKWebViewController : UIViewController  {
+    tabs_WKWebViewDelegate *webViewDelegate;
+    
     UIView *_blurView;
     UIVisualEffectView *_blurViewVisualEffect;
     NSLayoutConstraint *_blurViewBottomConstraint;

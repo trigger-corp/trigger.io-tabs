@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="4400" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -23,7 +23,7 @@
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ImK-xw-yhH">
+                <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ImK-xw-yhH" customClass="tabs_WKWebViewCustomClass">
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                     <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <wkWebViewConfiguration key="configuration">
@@ -45,13 +45,13 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="ImK-xw-yhH" secondAttribute="trailing" id="AJV-1m-ZzE"/>
+                <constraint firstItem="ImK-xw-yhH" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="AJV-1m-ZzE"/>
                 <constraint firstItem="ImK-xw-yhH" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="I9Q-WG-61D"/>
                 <constraint firstItem="hNZ-gg-ev8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="K8Y-bi-RTI"/>
                 <constraint firstItem="hNZ-gg-ev8" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="YM9-ac-gFR"/>
                 <constraint firstItem="ImK-xw-yhH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="i4A-GW-6jL"/>
-                <constraint firstAttribute="bottom" secondItem="ImK-xw-yhH" secondAttribute="bottom" id="pAF-FE-h13"/>
-                <constraint firstAttribute="trailing" secondItem="hNZ-gg-ev8" secondAttribute="trailing" id="vu4-cn-C67"/>
+                <constraint firstItem="ImK-xw-yhH" firstAttribute="bottom" secondItem="iN0-l3-epB" secondAttribute="bottom" id="pAF-FE-h13"/>
+                <constraint firstItem="hNZ-gg-ev8" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailing" id="vu4-cn-C67"/>
             </constraints>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <point key="canvasLocation" x="137.68115942028987" y="125.89285714285714"/>
