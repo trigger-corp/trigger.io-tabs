@@ -167,7 +167,8 @@
                     && [challenge.protectionSpace.host isEqualToString:@"localhost"];
     BOOL isBasicAuth = [method isEqualToString:NSURLAuthenticationMethodDefault]
                     || [method isEqualToString:NSURLAuthenticationMethodHTTPBasic]
-                    || [method isEqualToString:NSURLAuthenticationMethodHTTPDigest];
+                    || [method isEqualToString:NSURLAuthenticationMethodHTTPDigest]
+                    || [method isEqualToString:NSURLAuthenticationMethodNTLM];
 
     // support self-signed certificates for localhost
     if (isLocalhost == YES) {
