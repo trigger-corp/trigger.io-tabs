@@ -11,7 +11,6 @@
 #import "tabs_Util.h"
 
 #import <ForgeCore/WKWebView+AdditionalSafeAreaInsets.h>
-#import <ForgeCore/ForgeContentSchemeHandler.h>
 
 
 @implementation tabs_WKWebViewCustomClass
@@ -19,18 +18,18 @@
 - (instancetype)initWithCoder:(NSCoder*)coder {
     // create WKWebView configuration
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-
+    
     // associate with the global WKProcessPool
     WKWebView *parentWebView = (WKWebView*)ForgeApp.sharedApp.webView;
     if (parentWebView.configuration.processPool != nil) {
         configuration.processPool = parentWebView.configuration.processPool;
     }
-
+    
     // add WKHTTPCookieStoreObserver
     if (@available(iOS 11.0, *)) {
         [configuration.websiteDataStore.httpCookieStore addObserver:self];
     } else { } // not supported
-
+    
     // workaround CORS errors when using file:/// - also see: https://bugs.webkit.org/show_bug.cgi?id=154916
     @try {
         [configuration.preferences setValue:@TRUE forKey:@"allowFileAccessFromFileURLs"];
@@ -38,13 +37,13 @@
     @try {
         [configuration setValue:@TRUE forKey:@"allowUniversalAccessFromFileURLs"];
     } @catch (NSException *exception) {}
-
+    
     // create WKWebView
     self = [super initWithFrame:[[UIScreen mainScreen] bounds] configuration:configuration];
-
+    
     // set up constraints
     self.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     return self;
 }
 
@@ -64,32 +63,27 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-
+    
     // fix rotation
     self.view.autoresizesSubviews = YES;
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
+    
     // get configuration object
     WKWebViewConfiguration *configuration = self.webView.configuration;
-
+    
     // configure webview preferences
     configuration.preferences.minimumFontSize = 1.0;
     configuration.preferences.javaScriptCanOpenWindowsAutomatically = NO;
     configuration.preferences.javaScriptEnabled = YES;
-
-    // install custom protocol handler
-    if (@available(iOS 11.0, *)) {
-        [configuration setURLSchemeHandler:[[ForgeContentSchemeHandler alloc] init] forURLScheme:@"content"];
-    }
-
+    
     // add script message handler
     webViewDelegate = [tabs_WKWebViewDelegate withViewController:self];
     [configuration.userContentController addScriptMessageHandler:webViewDelegate name:@"forge"];
-
+    
     // setup translucency or blur effects for status and navigation bar
     [self createNavigationBarVisualEffect:self.webView];
     [self layoutNavigationBar];
-
+    
     // connect close button
     [self.navigationBarButton setTarget:[tabs_ButtonDelegate withHandler:^{
         self.result = @{
@@ -98,7 +92,7 @@
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }]];
     [self.navigationBarButton setAction:@selector(tabs_ButtonDelegate_clicked)];
-
+    
     // apply ui properties
     self.navigationBarTitle.title = self.title;
     if (self.navigationBarTint != nil) {
@@ -113,19 +107,22 @@
         self.navigationBarButton.tintColor = self.navigationBarButtonTint;
     }
     if (self.navigationBarButtonIconPath != nil) {
-        [[[ForgeFile alloc] initWithObject:self.navigationBarButtonIconPath] data:^(NSData *data) {
+        [[ForgeFile withEndpointId:ForgeStorage.EndpointIds.Source resource:self.navigationBarButtonIconPath] contents:^(NSData *data) {
             UIImage *image = [[UIImage alloc] initWithData:data];
             image = [image imageWithWidth:0 andHeight:28 andRetina:YES];
             self.navigationBarButton.image = image;
-        } errorBlock:^(NSError *error) { }];
+        } errorBlock:^(NSError *error) {
+            [ForgeLog w:[NSString stringWithFormat:@"Could not open navigation bar button icon file: %@", error.localizedDescription]];
+        }];
+        
     } else if (self.navigationBarButtonText != nil) {
         self.navigationBarButton.title = self.navigationBarButtonText;
     }
-
+    
     // set background color to clear
     self.webView.opaque = NO;
     self.webView.backgroundColor = [UIColor clearColor];
-
+    
     // configure overscroll behaviour
     NSNumber *bounces = [[[[[ForgeApp sharedApp] appConfig] objectForKey:@"core"] objectForKey:@"ios"] objectForKey:@"bounces"];
     if (bounces != nil) {
@@ -133,7 +130,7 @@
     } else {
         [self.webView.scrollView setBounces:NO];
     }
-
+    
     // set content insets
     if (@available(iOS 11.0, *)) {
         [self.webView.scrollView setContentInsetAdjustmentBehavior: UIScrollViewContentInsetAdjustmentNever];
@@ -145,16 +142,16 @@
         CGFloat scrollInset = self.navigationBar.frame.size.height;
         [self setContentInset:contentInset scrollInset:scrollInset];
     }
-
+    
     // create toolbar
     self.toolBar = [[tabs_ToolBar alloc] initWithViewController:self];
     self.toolBar.hidden = !self.enableToolBar;
     [self.view insertSubview:self.toolBar aboveSubview:self.webView];
     [self layoutToolbar];
-
+    
     // connect web view delegate
     self.webView.navigationDelegate = webViewDelegate;
-
+    
     // start URL loading
     if (self.url == nil) {
         self.url = [NSURL URLWithString:@"about:blank"];
@@ -168,7 +165,7 @@
 
 - (void) viewDidDisappear:(BOOL)animated {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-
+    
     if (self.result != nil) {
         [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.closed", self.task.callid] withParam:self.result];
     } else {
@@ -176,9 +173,9 @@
             @"userCancelled": [NSNumber numberWithBool:YES]
         }];
     }
-
+    
     [super viewDidDisappear:animated];
-
+    
     // if you love someone set them free…
     self.releaseHandler();
 }
@@ -186,7 +183,7 @@
 
 - (void) viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-
+    
     // refresh insets once rotation is complete
     [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         if (self.navigationBarIsOpaque) {
@@ -207,14 +204,14 @@
         webViewTopConstraint.active = NO;
         [_webView.topAnchor constraintEqualToAnchor:self.navigationBar.bottomAnchor constant:0.0].active = YES;
     }
-
+    
     _blurView.translatesAutoresizingMaskIntoConstraints = NO;
     [_blurView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [_blurView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
     [_blurView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-
+    
     _blurViewBottomConstraint.active = YES;
-
+    
     _blurViewVisualEffect.translatesAutoresizingMaskIntoConstraints = NO;
     [_blurViewVisualEffect.leadingAnchor constraintEqualToAnchor:_blurView.leadingAnchor].active = YES;
     [_blurViewVisualEffect.trailingAnchor constraintEqualToAnchor:_blurView.trailingAnchor].active = YES;
@@ -251,63 +248,64 @@
 
 - (void) addButtonWithTask:(ForgeTask*)task text:(NSString*)text icon:(NSString*)icon position:(NSString*)position style:(NSString*)style tint:(UIColor*)tint {
     UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] init];
-
+    
     if (style != nil && [style isEqualToString:@"done"]) {
         [buttonItem setStyle:UIBarButtonItemStyleDone];
     } else {
         [buttonItem setStyle:UIBarButtonItemStylePlain];
     }
-
+    
     if (text != nil) {
         [buttonItem setTitle:text];
-
+        
     } else if (icon != nil) {
-        [[[ForgeFile alloc] initWithObject:icon] data:^(NSData *data) {
+        [[ForgeFile withEndpointId:ForgeStorage.EndpointIds.Source resource:icon] contents:^(NSData *data) {
             UIImage *icon = [[UIImage alloc] initWithData:data];
             icon = [icon imageWithWidth:0 andHeight:28 andRetina:YES];
             [buttonItem setImage:icon];
         } errorBlock:^(NSError *error) {
+            [ForgeLog w:[NSString stringWithFormat:@"Could not open icon file: %@", error.localizedDescription]];
         }];
-
+        
     } else {
         [task error:@"You need to specify either a 'text' or 'icon' property for your button."];
         return;
     }
-
+    
     if (tint != nil) {
         [buttonItem setTintColor:tint];
     }
-
+    
     [buttonItem setTarget:[tabs_ButtonDelegate withHandler:^{
         [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.buttonPressed.%@", task.callid] withParam:[NSNull null]];
     }]];
     [buttonItem setAction:@selector(tabs_ButtonDelegate_clicked)];
-
-
+    
+    
     UINavigationItem *navigationItem = ((UINavigationItem*)[self.navigationBar.items objectAtIndex:0]);
     if (position != nil && [position isEqualToString:@"right"]) {
         [navigationItem setRightBarButtonItem:buttonItem];
     } else {
         [navigationItem setLeftBarButtonItem:buttonItem];
     }
-
+    
     [task success:task.callid];
 }
 
 
 - (void) removeButtonsWithTask:(ForgeTask*)task {
     UINavigationItem *navigationItem = ((UINavigationItem*)[self.navigationBar.items objectAtIndex:0]);
-
+    
     if (navigationItem.leftBarButtonItem.target != nil) {
         [((tabs_ButtonDelegate*)navigationItem.leftBarButtonItem.target) releaseDelegate];
     }
     [navigationItem setLeftBarButtonItem:nil];
-
+    
     if (navigationItem.rightBarButtonItem.target != nil) {
         [((tabs_ButtonDelegate*)navigationItem.rightBarButtonItem.target) releaseDelegate];
     }
     [navigationItem setRightBarButtonItem:nil];
-
+    
     [task success:nil];
 }
 
@@ -318,7 +316,7 @@
     // remove existing status bar blur effect
     [_navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     [_navigationBar setShadowImage:[[UIImage alloc] init]];
-
+    
     // create a replacement blur effect that covers both the status bar and navigation bar
     _blurView = [[UIView alloc] init];
     _blurView.userInteractionEnabled = NO;
@@ -331,15 +329,15 @@
     }
     
     [self.view insertSubview:_blurView aboveSubview:webView];
-
+    
     // layout constraints
     _blurViewBottomConstraint = [NSLayoutConstraint constraintWithItem:_blurView
-                                                            attribute:NSLayoutAttributeBottom
-                                                            relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.navigationBar
-                                                            attribute:NSLayoutAttributeBottom
-                                                           multiplier:1.0f
-                                                             constant:0.0f];
+                                                             attribute:NSLayoutAttributeBottom
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:self.navigationBar
+                                                             attribute:NSLayoutAttributeBottom
+                                                            multiplier:1.0f
+                                                              constant:0.0f];
 }
 
 

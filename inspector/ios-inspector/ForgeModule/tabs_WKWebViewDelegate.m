@@ -30,7 +30,7 @@
 #pragma mark WKNavigationDelegate
 
 - (void) webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-
+    
     NSURL *url = navigationAction.request.URL;
     if ([self matchesPattern:url]) {
         [ForgeLog w:[NSString stringWithFormat:@"Encountered url matching pattern, closing the tab now: %@", url]];
@@ -42,39 +42,39 @@
         return decisionHandler(WKNavigationActionPolicyCancel);
     }
     
-    if (![url.scheme hasPrefix:@"http"] && [[UIApplication sharedApplication]openURL:url]) {
+    if (![url.scheme hasPrefix:@"http"] && [[UIApplication sharedApplication] openURL:url]) {
         [ForgeLog w:[NSString stringWithFormat:@"Encountered custom scheme, opening it externally: %@", url]];
-        [[UIApplication sharedApplication]openURL:url];
+        [[UIApplication sharedApplication] openURL:url options:@{ } completionHandler:^(BOOL success) { }];
         return decisionHandler(WKNavigationActionPolicyCancel);
     }
-
+    
     return decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 
 - (void) webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-
+    
     [self.viewController.toolBar webView:webView didStartProvisionalNavigation:navigation];
-
+    
     if (self.viewController.title == nil || [self.viewController.title isEqualToString:@""]) {
         self.viewController.navigationBarTitle.title =@"";
     }
-
+    
     [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadStarted", self.viewController.task.callid] withParam:@{@"url": webView.URL.absoluteString}];
 }
 
 
 - (void) webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-
+    
     if (self.hasLoaded == NO) {
         [[ForgeApp sharedApp] nativeEvent:@selector(firstWebViewLoad) withArgs:@[]];
     }
     self.hasLoaded = YES;
-
+    
     [self.viewController.toolBar webView:webView didFinishNavigation:navigation];
-
+    
     if (self.viewController.title == nil || [self.viewController.title isEqualToString:@""]) {
         [webView evaluateJavaScript:@"document.title" completionHandler:^(id result, NSError *error) {
             if (!error) {
@@ -82,40 +82,40 @@
             }
         }];
     }
-
+    
     [[ForgeApp sharedApp] event:[NSString stringWithFormat:@"tabs.%@.loadFinished", self.viewController.task.callid] withParam:@{@"url": webView.URL.absoluteString}];
 }
 
 
 - (void) webView:(WKWebView *)webView didFailProvisionalNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-
+    
     [ForgeLog w:[NSString stringWithFormat:@"WKWebViewDelegate didFailProvisionalNavigation error: %@", error]];
     [self.viewController.toolBar webView:webView didFailProvisionalNavigation:navigation withError:error];
-
+    
     // URL is not always set if navigation failed
     NSString *url = webView.URL.absoluteString;
     if (url == nil) {
         url = error.userInfo[NSURLErrorFailingURLStringErrorKey];
         self.viewController.failingURL = url;
     }
-
+    
     if (error.code == NSURLErrorNotConnectedToInternet) {
         UIAlertController *alert = [UIAlertController
-            alertControllerWithTitle:@"Error loading"
-                             message:@"No Internet connection available."
-                      preferredStyle:UIAlertControllerStyleAlert];
+                                    alertControllerWithTitle:@"Error loading"
+                                    message:@"No Internet connection available."
+                                    preferredStyle:UIAlertControllerStyleAlert];
         [alert addAction:[UIAlertAction actionWithTitle:@"OK"
                                                   style:UIAlertActionStyleDefault
                                                 handler:nil]];
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.viewController presentViewController:alert animated:YES completion:nil];
         });
-
+        
     } else if ([error.domain isEqualToString:@"WebKitErrorDomain"] &&
-                error.code == WebKitErrorFrameLoadInterruptedByPolicyChange) {
+               error.code == WebKitErrorFrameLoadInterruptedByPolicyChange) {
         NSURL *failedRequestURL = [self getFailedUrlFromError:error];
-
+        
         if (failedRequestURL != nil) {
             // If we haven't done yet, we retry to load the failed url
             // Note: The 102 error can happen for various reasons, so we want to retry first to make sure we really can't open it "inline"
@@ -123,12 +123,12 @@
                 _retryURL = failedRequestURL;
                 [ForgeLog w:[NSString stringWithFormat:@"Retry to load url: %@", failedRequestURL]];
                 [self.viewController.webView loadRequest:[NSURLRequest requestWithURL:failedRequestURL]];
-
-            // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
-            // Example: ics, vcf -> Calendar
+                
+                // Retry failed, determine if the system can deal with the it. If so, open it with the appropriate application
+                // Example: ics, vcf -> Calendar
             } else if (![self matchesPattern:failedRequestURL] && [[UIApplication sharedApplication]canOpenURL:failedRequestURL]) {
-               [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", failedRequestURL]];
-               [[UIApplication sharedApplication]openURL:failedRequestURL];
+                [ForgeLog w:[NSString stringWithFormat:@"Open url by external app: %@", failedRequestURL]];
+                [[UIApplication sharedApplication] openURL:failedRequestURL options:@{ } completionHandler:^(BOOL success) { }];
             }
         }
     } else {
@@ -164,28 +164,28 @@
 - (void) webView:(WKWebView *)webView didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
     NSString *method = challenge.protectionSpace.authenticationMethod;
     BOOL isLocalhost = [method isEqualToString:NSURLAuthenticationMethodServerTrust]
-                    && [challenge.protectionSpace.host isEqualToString:@"localhost"];
+    && [challenge.protectionSpace.host isEqualToString:@"localhost"];
     BOOL isBasicAuth = [method isEqualToString:NSURLAuthenticationMethodDefault]
-                    || [method isEqualToString:NSURLAuthenticationMethodHTTPBasic]
-                    || [method isEqualToString:NSURLAuthenticationMethodHTTPDigest]
-                    || [method isEqualToString:NSURLAuthenticationMethodNTLM];
-
+    || [method isEqualToString:NSURLAuthenticationMethodHTTPBasic]
+    || [method isEqualToString:NSURLAuthenticationMethodHTTPDigest]
+    || [method isEqualToString:NSURLAuthenticationMethodNTLM];
+    
     // support self-signed certificates for localhost
     if (isLocalhost == YES) {
         NSURLCredential * credential = [[NSURLCredential alloc] initWithTrust:[challenge protectionSpace].serverTrust];
         [ForgeLog d:@"[tabs_WKWebView] Trusting self-signed certificate for localhost"];
         completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-
-    // support basic auth
+        
+        // support basic auth
     } else if (isBasicAuth == YES) {
-        [ForgeLog d:@"[tabs_WKWebView] Handling Basic Auth challenge"];    
+        [ForgeLog d:@"[tabs_WKWebView] Handling Basic Auth challenge"];
         [tabs_LoginAlertView showWithViewController:self.viewController login:^(NSURLCredential * _Nonnull credential) {
             completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
         } cancel:^{
             completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, nil);
         }];
-
-    // default handling
+        
+        // default handling
     } else {
         completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
     }
@@ -199,13 +199,13 @@
         [ForgeLog d:[NSString stringWithFormat:@"Unknown native call: %@ -> %@", message.name, message.body]];
         return;
     }
-
+    
     NSURL *url = message.webView.URL;
     if (![ForgeApp.sharedApp.viewController isWhiteListedURL:url]) {
         [ForgeLog w:[NSString stringWithFormat:@"Blocking execution of script for untrusted URL: %@", url]];
         return;
     }
-
+    
     [ForgeLog d:[NSString stringWithFormat:@"Native call: %@", message.body]];
     [BorderControl runTask:message.body forWebView:message.webView];
 }
@@ -217,12 +217,12 @@
     if (self.viewController.pattern == nil) {
         return NO;
     }
-
+    
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:self.viewController.pattern
                                                                            options:NSRegularExpressionCaseInsensitive
                                                                              error:nil];
     NSString *urlStr = [url absoluteString];
-
+    
     return [regex numberOfMatchesInString:urlStr options:0 range:NSMakeRange(0, [urlStr length])] > 0;
 }
 

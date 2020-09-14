@@ -73,8 +73,10 @@
         return;
     }
 
-    BOOL completed = [[UIApplication sharedApplication] openURL:url];
-    [self activityDidFinish:completed];
+    // Open the URL with Safari.
+    [[UIApplication sharedApplication] openURL:url options:@{ } completionHandler:^(BOOL success) {
+        [self activityDidFinish:success];
+    }];
 }
 
 @end
@@ -146,8 +148,9 @@
     }
 
     // Open the URL with Chrome.
-    BOOL completed = [[UIApplication sharedApplication] openURL:chromeURL];
-    [self activityDidFinish:completed];
+    [[UIApplication sharedApplication] openURL:chromeURL options:@{ } completionHandler:^(BOOL success) {
+        [self activityDidFinish:success];
+    }];
 }
 
 @end
