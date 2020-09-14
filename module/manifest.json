@@ -1,8 +1,8 @@
 {
-    "changes": "* Fixed: Missing support for NTLM on iOS\n* Fixed: Session cookies set in iOS tab views don't last for the lifetime of the app\n* Fixed: Android trims first and last tokens of objects returned from `modal.executeJS()`\n* Improved coloring for tinted, opaque tabs on iOS.",
+    "changes": "* Updated for platform v2.9 file API's.\n* iOS 14 support\n* Android 11 support\n",
     "description": "APIs to deal with opening browser tabs and external sites within your app.\n\nThe tabs module allows you to open external sites in an un-trusted popup view that your users can close at any point.",
-    "min_platform_version": "v2.8.5",
+    "min_platform_version": "v2.9.0",
     "namespace": "tabs",
-    "platform_version": "v2.8.5",
-    "version": "3.6.5"
+    "platform_version": "v2.9.0",
+    "version": "3.7"
 }
