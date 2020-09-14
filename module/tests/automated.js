@@ -41,19 +41,21 @@ asyncTest("Advanced tab", 2, function() {
             url: url
         }, function (modal) {
             modal.loadStarted.addListener(function () {
+                console.log("loadStarted");
                 ok(true, "Success");
             });
             modal.loadFinished.addListener(function () {
+                console.log("loadFinished");
                 modal.close();
+                console.log("loadFinished fin");
             });
             modal.closed.addListener(function () {
+                console.log("modal.closed");
                 ok(true, "Success");
                 start();
+                console.log("modal.closed fin");
             });
-        }, function (e) {
-            ok(false, "API call failure: "+e.message);
-            start();
-        });
+        }, apiError("tabs.openAdvanced"));
     });
 });
 

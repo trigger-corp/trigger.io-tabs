@@ -6,7 +6,7 @@ if (forge.file) {
     var pdf_url = "https://ops.trigger.io/75d92dce/tests/test.pdf";
     asyncTest("Save remote PDF locally and open it", 1, function() {
         forge.file.saveURL(pdf_url, function (file) {
-            forge.tools.getURL(file, function (url) {
+            forge.file.getScriptURL(file, function (url) {
                 forge.tabs.openAdvanced({
                     url: url,
                     title: "PDF File",
