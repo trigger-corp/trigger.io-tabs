@@ -78,23 +78,22 @@ asyncTest("Advanced tab - error", 1, function() {
 
 asyncTest("Trusted remote in tab", 1, function() {
     forge.tools.getURL("fixtures/tabs/trusted.html", function (url) {
+        forge.logging.log("Got URL: " + url);
         forge.tabs.openAdvanced({
             url: url
         }, function (modal) {
             modal.loadFinished.addListener(function () {
-                modal.executeJS('forge.tools.UUID();', function (result) {
-                    ok(result.search(/........-....-4...-....-............/) === 0, 'UUID returned ' + result);
+                modal.executeJS("forge.tools.UUID();", function (result) {
+                    var valid_uuid = result.search(/........-....-4...-....-............/);
+                    ok(valid_uuid === 0, "UUID returned: " + result);
                     start();
                     modal.close();
                 }, function (e) {
-                    ok(false, 'Failed to execute JS: ' + JSON.stringify(e));
+                    ok(false, "Failed to execute JS: " + JSON.stringify(e));
                     start();
                     modal.close();
                 });
             });
-        }, function (e) {
-            ok(false, "API call failure: "+e.message);
-            start();
-        });
+        }, apiError("tabs.openAdvanced"));
     });
 });
