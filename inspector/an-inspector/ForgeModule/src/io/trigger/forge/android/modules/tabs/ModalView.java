@@ -3,6 +3,7 @@ package io.trigger.forge.android.modules.tabs;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
@@ -543,23 +544,31 @@ public class ModalView {
         button.setOrientation(LinearLayout.VERTICAL);
         button.setGravity(Gravity.CENTER);
 
-
         if (buttonIcon != null) {
             ImageView image = new ImageView(ForgeApp.getActivity());
             image.setScaleType(ImageView.ScaleType.CENTER);
             Drawable icon;
-            ForgeFile buttonFile = new ForgeFile(ForgeApp.getActivity(), buttonIcon);
+
+            ForgeFile buttonFile = new ForgeFile(ForgeStorage.EndpointId.Source, buttonIcon.getAsString());
             String error = "Could not create button from image file: '" +
                     buttonIcon.getAsString() +
                     "' Please check that this file exists in your app's src/config.json directory and that it is a valid PNG file.";
-            if (buttonFile == null || buttonFile.fd() == null) {
+            AssetFileDescriptor fileDescriptor = null;
+            try {
+                fileDescriptor = ForgeStorage.getFileDescriptor(buttonFile);
+            } catch (IOException e) {
                 throw new IOException(error);
             }
-            icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), buttonFile.fd().createInputStream(), 0, 32, buttonColor);
+            if (fileDescriptor == null) {
+                throw new IOException(error);
+            }
+
+            icon = BitmapUtil.scaledDrawableFromStreamWithTint(ForgeApp.getActivity(), fileDescriptor.createInputStream(), 0, 32, buttonColor);
             image.setImageDrawable(icon);
             final int buttonMargin = Math.round(metrics.density * 4);
             image.setPadding(buttonMargin, 0, buttonMargin, 0);
             button.addView(image);
+
         } else {
             TextView text = new TextView(ForgeApp.getActivity());
             if (buttonText != null) {
