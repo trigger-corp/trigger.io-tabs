@@ -2,7 +2,7 @@
     "modules": {
         "file": {
             "disabled": true,
-            "version": "2.24",
+            "version": "2.25",
             "config": {
                 "usage_description": "file: this is not a usage description"
             }
