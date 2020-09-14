@@ -1,10 +1,7 @@
 [
-    {
-        "do": {
-            "set_in_info_plist": {
-                "key": "LSApplicationQueriesSchemes",
-                "value": ["googlechrome", "googlechromes"]
-            }
-        }
-    }
+    { "do": { "add_ios_system_framework": "UniformTypeIdentifiers.framework" } },
+    { "do": { "set_in_info_plist": {
+        "key": "LSApplicationQueriesSchemes",
+        "value": ["googlechrome", "googlechromes"]
+    } } }
 ]
