@@ -27,6 +27,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -134,9 +135,10 @@ public class WebViewProxy {
                     // can't use removeJavascriptInterface on 2.x
                     forgeWebView.addJavascriptInterface(new DummyJSBridge(), "__forge");
                     if (ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").has("trusted_urls")) {
-                        for (JsonElement whitelistPattern : ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls")) {
-                            if (ForgeUtil.urlMatchesPattern(url, whitelistPattern.getAsString())) {
-                                ForgeLog.i("Enabling forge JavaScript API for whitelisted URL in tabs browser: " + url);
+                        JsonArray trusted_urls = ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls");
+                        for (JsonElement pattern : trusted_urls) {
+                            if (ForgeUtil.urlMatchesPattern(url, pattern.getAsString())) {
+                                ForgeLog.i("Enabling forge JavaScript API for trusted URL in tabs browser: " + url);
                                 forgeWebView.addJavascriptInterface(new ForgeJSBridge(forgeWebView), "__forge");
                                 break;
                             }
@@ -160,11 +162,12 @@ public class WebViewProxy {
             }
         });
 
-        // Add JSBridge for whitelisted remote URLs
+        // Add JSBridge for trusted remote URLs
         if (ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").has("trusted_urls")) {
-            for (JsonElement whitelistPattern : ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls")) {
-                if (ForgeUtil.urlMatchesPattern(url, whitelistPattern.getAsString())) {
-                    ForgeLog.i("Enabling forge JavaScript API for whitelisted URL in tabs browser: " + url);
+            JsonArray trusted_urls = ForgeApp.appConfig.getAsJsonObject("core").getAsJsonObject("general").getAsJsonArray("trusted_urls");
+            for (JsonElement pattern : trusted_urls) {
+                if (ForgeUtil.urlMatchesPattern(url, pattern.getAsString())) {
+                    ForgeLog.i("Enabling forge JavaScript API for trusted URL in tabs browser: " + url);
                     forgeWebView.addJavascriptInterface(new ForgeJSBridge(forgeWebView), "__forge");
                     break;
                 }

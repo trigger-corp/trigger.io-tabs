@@ -201,7 +201,7 @@
     }
     
     NSURL *url = message.webView.URL;
-    if (![ForgeApp.sharedApp.viewController isWhiteListedURL:url]) {
+    if (![ForgeApp.sharedApp.viewController isTrustedURL:url]) {
         [ForgeLog w:[NSString stringWithFormat:@"Blocking execution of script for untrusted URL: %@", url]];
         return;
     }
